@@ -8,7 +8,7 @@ python generator/uploader.py
 This can take upto 10 minutes to complete.
 
 ### TOODs on Speeding of Datasets
-- [ ] Fix the script to generate data in sequence => older timestamps to newer timestamps. Impacts the [speed of insertion](https://docs.timescale.com/timescaledb/latest/how-to-guides/continuous-aggregates/)
+- [x] Fix the script to generate data in sequence => older timestamps to newer timestamps. Impacts the [speed of insertion](https://docs.timescale.com/timescaledb/latest/how-to-guides/continuous-aggregates/)
     - 2 hours for insertion
 - [ ] Add pgpool to the server to server as a cache
 - [ ] Add a Express Server to read queries using an API
