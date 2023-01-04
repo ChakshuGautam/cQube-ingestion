@@ -37,6 +37,9 @@ print ("Total Queries per second :: " + str(total_threads/(end_time - start_time
 # Close the connection pool
 # conn.close()
 
+# The current benchmarch gives 18 queries per second on a 1 core machine with 1GB RAM
+# More works needs to be done to speed this up to 1000 queries per second without a cache
+
 
 
 
