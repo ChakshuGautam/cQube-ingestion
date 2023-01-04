@@ -1,11 +1,4 @@
-### Creating and uploading data to the server
 
-```shell
-python generator/school_attendace.py
-python generator/uploader.py
-```
-
-This can take upto 10 minutes to complete.
 
 ### TOODs on Speeding of Datasets
 - [x] Fix the script to generate data in sequence => older timestamps to newer timestamps. Impacts the [speed of insertion](https://docs.timescale.com/timescaledb/latest/how-to-guides/continuous-aggregates/)
