@@ -3,7 +3,7 @@ import random
 import datetime
 
 # Number of rows to generate
-num_rows = 10000000
+num_rows = 10000000 # 10 million
 dates = [datetime.date(2022, 12, i) for i in range(1, 32)]
 
 # Open a new CSV file for writing

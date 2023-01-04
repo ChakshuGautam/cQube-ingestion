@@ -18,7 +18,7 @@ copy_sql = """
 #   # Load the data from the CSV file into the database
 #   cur.copy_from(csv_input, 'random_data', sep=',')
 #   conn.commit()
-# update buffering to 2GB
+# update buffering to 1GB
 with open('random_data.csv', 'r', buffering=10^9) as f:
     cur.execute("TRUNCATE TABLE random_data")
     cur.copy_expert(sql=copy_sql, file=f)

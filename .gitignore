@@ -1,4 +1,5 @@
 data
 pgdata
 venv
+.7z
 *.csv
