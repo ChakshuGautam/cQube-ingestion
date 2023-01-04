@@ -22,3 +22,6 @@ This can take upto 10 minutes to complete.
 - [ ] Implement 7Zip as the compression algorithm @htvenkatesh
 - [ ] POC on Insertion of 30M records from a CSV file (from 7Zip file) @htvenkatesh
 - [ ] Log Management - Log Rotation; Log Compression; Log Forwarding; @htvenkatesh
+- [ ] NVSK - Cloudflare
+- [ ] Throttle based on IP - Nest applications
+- [ ] Add a cache on the fronted (etags)
