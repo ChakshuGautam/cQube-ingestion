@@ -9,7 +9,7 @@ This can take upto 10 minutes to complete.
 
 ### TOODs on Speeding of Datasets
 - [x] Fix the script to generate data in sequence => older timestamps to newer timestamps. Impacts the [speed of insertion](https://docs.timescale.com/timescaledb/latest/how-to-guides/continuous-aggregates/)
-    - 2 hours for insertion
+    - 10 mins for for 10M records
 - [ ] Add pgpool to the server to server as a cache
 - [ ] Add a Express Server to read queries using an API
 - [ ] Add Varnish in front on it to verify the queries
