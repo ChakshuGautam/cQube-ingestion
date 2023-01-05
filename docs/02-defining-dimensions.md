@@ -41,6 +41,7 @@ The corresponding JSON Schema would need to be entered to accept the dimension a
     "title": "Root Schema",
     "required": [
         "name",
+        "type",
         "storage",
         "data"
     ],
@@ -53,13 +54,23 @@ The corresponding JSON Schema would need to be entered to accept the dimension a
                 "Schools"
             ]
         },
+        "type": {
+            "type": "string",
+            "default": "",
+            "title": "The type Schema",
+            "examples": [
+                "dynamic"
+            ]
+        },
         "storage": {
             "type": "object",
             "default": {},
             "title": "The storage Schema",
             "required": [
                 "indexes",
-                "primaryId"
+                "primaryId",
+                "retention",
+                "bucket_size"
             ],
             "properties": {
                 "indexes": {
@@ -87,6 +98,22 @@ The corresponding JSON Schema would need to be entered to accept the dimension a
                     "examples": [
                         "school_id"
                     ]
+                },
+                "retention": {
+                    "type": "null",
+                    "default": null,
+                    "title": "The retention Schema",
+                    "examples": [
+                        null
+                    ]
+                },
+                "bucket_size": {
+                    "type": "null",
+                    "default": null,
+                    "title": "The bucket_size Schema",
+                    "examples": [
+                        null
+                    ]
                 }
             },
             "examples": [{
@@ -94,7 +121,9 @@ The corresponding JSON Schema would need to be entered to accept the dimension a
                     "name",
                     "type"
                 ],
-                "primaryId": "school_id"
+                "primaryId": "school_id",
+                "retention": null,
+                "bucket_size": null
             }]
         },
         "data": {
@@ -191,12 +220,15 @@ The corresponding JSON Schema would need to be entered to accept the dimension a
     },
     "examples": [{
         "name": "Schools",
+        "type": "dynamic",
         "storage": {
             "indexes": [
                 "name",
                 "type"
             ],
-            "primaryId": "school_id"
+            "primaryId": "school_id",
+            "retention": null,
+            "bucket_size": null
         },
         "data": {
             "school_id": 901,
@@ -213,6 +245,20 @@ The corresponding JSON Schema would need to be entered to accept the dimension a
 ```
 2. Once the dimension is defined, it can be added to cQube by using the dimension schema (definition grammar) API.
 3. The next step is to insert data in the dimensions which can be done through a POST request to the dimension API. In this case it would be inserting the schools in the school dimension table.
+
+### Time as a dimension
+Example of a time dimension
+```json
+{
+    "name": "Last 7 Days",
+    "type": "time",
+    "storage": {
+        "retention": "30 days",
+        "bucket_size": "7 days"
+    }
+}
+```
+Here the `retention` is the time for which the data will be stored in the database and the `bucket_size` is the time interval for which the data will be aggregated.
 
 ### Notes:
 1. All the APIs to enter the data are documented [here](https://github.com/Sunbird-cQube/spec-ms/blob/main/spec.yaml).
