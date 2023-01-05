@@ -88,7 +88,7 @@ How do I map a dataset to a dimension?
 
 
 #### Event Grammar
-Event grammar defines how an event will be structured (when being send to ingestion) and how it will be mapped to a processor. It includes the following:
+Event grammar defines how an event will be structured (when being sent to ingestion) and how it will be mapped to a processor. It includes the following:
 - Schema of the event
 - Mapping of the event to a transformer
 - Mappings
@@ -161,7 +161,16 @@ A sample event for the above schema would be
 ```
 
 #### Transformer Grammar
-tranformer t(event) => dataset
+tranformer is defined as the following: _t(event) => dataset_
+
+Includes the following
+- Event Schema it can act on
+- Dataset Schema it outputs to
+```json
+
+```
+
+
 
 
 
