@@ -260,9 +260,14 @@ Example of a time dimension
 ```
 Here the `retention` is the time for which the data will be stored in the database and the `bucket_size` is the time interval for which the data will be aggregated.
 
+cQube has an upper limit to the amount of data that can stored based on the retention policy - 30M records. This is not enforced at the storage layer but the system is not optimized for datasets larger than this. This is kept to keep the architecture simple and not adding an additonal layer of archival storage complexity. This is a soft limit for now and can be increased in the future.
+
+If you have a requirement to increase this limit, please reach out to us.
+
 ### Notes:
 1. All the APIs to enter the data are documented [here](https://github.com/Sunbird-cQube/spec-ms/blob/main/spec.yaml).
 2. An update to the schema is not supported yet. To update please create a new schema and tie it up to the Dataset Model. Please note that this is a slower process and would lead to a downtime of the cQube instance until the migration is completed. Currently it can only happen through private APIs exposed to a developer.
 3. A relationnal database is used to store the data in a flat manner. All fields are flattened and used as column names when creating a dimension table.
 4. The schema provided to insert data is used to validate the data before inserting it into the database. This is to ensure that the data is in the correct format and the data types are correct. AJV is used to validate the data.
+
 
