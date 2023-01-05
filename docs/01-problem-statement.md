@@ -1,6 +1,6 @@
 ## Questions to be answered
-1. How dimensions are stored in cQube?
-2. How to create a new dimension?
+1. ~~How dimensions are stored in cQube?~~
+2. ~~How to create a new dimension?~~
 3. Type of Data that can be imported?
 4. Managing Data Retention based on the dimension.
 5. What happens when dimensions are not provided?
