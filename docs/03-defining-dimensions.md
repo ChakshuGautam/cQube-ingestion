@@ -254,7 +254,7 @@ Example of a time dimension
     "type": "time",
     "storage": {
         "retention": "30 days",
-        "bucket_size": "7 days"
+        "bucket_size": "7 days",
     }
 }
 ```
@@ -263,6 +263,16 @@ Here the `retention` is the time for which the data will be stored in the databa
 cQube has an upper limit to the amount of data that can stored based on the retention policy - 30M records. This is not enforced at the storage layer but the system is not optimized for datasets larger than this. This is kept to keep the architecture simple and not adding an additonal layer of archival storage complexity. This is a soft limit for now and can be increased in the future.
 
 If you have a requirement to increase this limit, please reach out to us.
+
+The lowest `bucket_size` that cQube would support would be a day.
+
+### Impact of Dimensions on Datasets
+1. Impact on Datasets 
+    - cQube Datasets are optimized for query based on dimensions.
+2. Impact on Input Data 
+    - The input data is validated against the dimension data before being persisted.
+    - The event schema should always reference a dimension for this to work.
+    
 
 ### Notes:
 1. All the APIs to enter the data are documented [here](https://github.com/Sunbird-cQube/spec-ms/blob/main/spec.yaml).
