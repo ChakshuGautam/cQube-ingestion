@@ -8,8 +8,20 @@ When defining a design doc, it should be done in the following order:
 5. Define an event
 6. Define a transformer
 7. Map the transformer to the event
-8. Map the dataset to the transformer
 
+
+#### KPI
+
+```json
+{
+    "name": "Attendance Bar Graph by School",
+    "description": "This is a bar graph of attendance by school",
+    "filter_dimensions": [
+        "Schools",
+        "Last 7 Days"
+    ],
+}
+```
 
 #### Dimension
 ```json
@@ -166,9 +178,37 @@ tranformer is defined as the following: _t(event) => dataset_
 Includes the following
 - Event Schema it can act on
 - Dataset Schema it outputs to
-```json
+- Formula that allows 
 
+A transformer is a [actor](https://en.wikipedia.org/wiki/Actor_model). A sample actor can be something like this in Javascript. Ideally this could be the same for any another actor models in another framework as well. Currently we are using [xstate](https://xstate.js.org/docs/) for this.
+
+```js
+    const transformer = {
+        name: "transformer_name",
+        event_schema: "es11",
+        dataset_schema: "ds23",
+        config: {
+            spawn((callback, receive) => {
+                // send to parent
+                callback('SOME_EVENT');
+
+                // receive from parent
+                receive((event) => {
+                // handle event
+                });
+
+                // disposal
+                return () => {
+                /* do cleanup here */
+                };
+            }),
+        }
+    }
 ```
+
+#### Pipe Definition
+A pipe connects a transformer to an event and to a dataset.
+
 
 
 
