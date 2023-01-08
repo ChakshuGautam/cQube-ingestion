@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
+  createKPI(): string {
+    return 'KPI created';
+  }
+
+  createDimension(dimension: Dimension): string {
+    return 'Dimension created';
   }
 }

@@ -1,3 +1,9 @@
+### Instruments
+- Instruments can be of the following types
+    - currently available instruments - `counter` ([def](https://opentelemetry.io/docs/reference/specification/metrics/api/#counter)) - allows for aggregations as `sum`, `count`, `percentage`, `min`, `max`, `avg`, `percentile`
+    - pending implementations  - `meter`, `gauge`, `histogram`,
+
+
 #### Event Grammar
 Event grammar defines how an event will be structured (when being sent to ingestion) and how it will be mapped to a processor. It includes the following:
 - Schema of the event
