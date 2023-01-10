@@ -19,11 +19,15 @@ export class QueryBuilderService {
         (column.format === 'float' || column.format === 'double')
       ) {
         createStatement += 'FLOAT8';
-      } else {
+      }
+      else {
         createStatement += `${column.type}`;
       }
       if (column.type === 'string' && column.maxLength) {
         createStatement += `(${column.maxLength})`;
+      }
+      if(column.notNull === true){
+        createStatement += ' NOT NULL';
       }
       createStatement += ',\n';
     }
