@@ -25,7 +25,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
-          cache-dependency-path: /impl/c-qube/*.lock
+          cache-dependency-path: ./impl/c-qube/yarn.lock
       - run: yarn install
       - run: yarn build
       - run: yarn test
