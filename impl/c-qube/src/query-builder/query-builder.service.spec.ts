@@ -74,4 +74,28 @@ describe('QueryBuilderService', () => {
       'CREATE TABLE my_table (\n  id integer,\n  name string(255),\n  date_created TIMESTAMP\n);',
     );
   });
+
+  it('generates a create statement with a single float column', () => {
+    const jsonSchema = {
+      title: 'my_table',
+      properties: {
+        id: { type: 'number', format: 'float' },
+      },
+    };
+
+    const createStatement = service.generateCreateStatement(jsonSchema as JSONSchema4);
+    expect(createStatement).toBe('CREATE TABLE my_table (\n  id FLOAT8\n);');
+  });
+
+  it('generates a create statement with a single double column', () => {
+    const jsonSchema = {
+      title: 'my_table',
+      properties: {
+        id: { type: 'number', format: 'double' },
+      },
+    };
+
+    const createStatement = service.generateCreateStatement(jsonSchema as JSONSchema4);
+    expect(createStatement).toBe('CREATE TABLE my_table (\n  id FLOAT8\n);');
+  });
 });
