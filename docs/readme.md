@@ -14,7 +14,7 @@
 7. [Defining Datasets](04-defining-datasets.md)
 8. [Data Retention](08-data-retention.md) (WIP)
 9. [Data Granularity](09-data-granularity.md) (WIP)
-10. [Transformers](05-defining-transformers.md)
+10. [Transformers](05-defining-transformer.md)
 11. [Pipe](11-pipe.md) (WIP)
 12. [Architecture](12-architecture.md) (WIP)
 
