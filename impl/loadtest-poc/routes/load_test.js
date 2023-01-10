@@ -71,7 +71,7 @@ router.post('/generateData', async function (req, res) {
 })
 
 function writeTenMillionUsers(writer, encoding, callback) {
-  let i = 30;
+  let i = 30000000;
   let id = 0;
   const timeElapsed = Date.now();
   const today = new Date(timeElapsed);
