@@ -1,0 +1,79 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["spec", "dimensions", "transformers", "datasets"]
+}
+
+model InstrumentType {
+  type         String         @id @default(cuid())
+  name         String
+  description  String?
+  EventGrammar EventGrammar[]
+
+  @@schema("spec")
+}
+
+model DimensionGrammar {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String
+  type        String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  @@schema("spec")
+}
+
+model DatasetGrammar {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String
+  dimensions  Json
+  schema      Json
+  type        String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  @@schema("spec")
+}
+
+model EventGrammar {
+  id                 Int            @id @default(autoincrement())
+  name               String
+  instrument         InstrumentType @relation(fields: [instrumentTypeType], references: [type])
+  schema             Json
+  instrumentField    String
+  isActive           Boolean        @default(true)
+  description        String
+  type               String
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  deletedAt          DateTime?
+  instrumentTypeType String
+
+  @@schema("spec")
+}
+
+model Transformer {
+  id             Int       @id @default(autoincrement())
+  name           String
+  event          String
+  dataset        String
+  transformSync  String
+  transformAsync String
+  type           String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  @@schema("transformers")
+}
+
+model Pipe {}

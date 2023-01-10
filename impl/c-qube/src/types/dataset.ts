@@ -9,7 +9,7 @@ export interface DimensionMapping {
   };
 }
 
-export interface DatasetSpec {
+export interface DatasetGrammar {
   name: string;
   description: string;
   dimensions: DimensionMapping[];
@@ -18,5 +18,5 @@ export interface DatasetSpec {
 
 export interface Dataset {
   data: object;
-  spec: DatasetSpec;
+  spec: DatasetGrammar;
 }
