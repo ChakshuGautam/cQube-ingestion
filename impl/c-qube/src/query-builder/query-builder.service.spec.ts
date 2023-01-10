@@ -81,9 +81,17 @@ describe('QueryBuilderService', () => {
       properties: {
         id: { type: 'number', format: 'float' },
       },
+      indexes: [
+        {
+          name: 'my_table_id_idx',
+          columns: ['id'],
+        },
+      ],
     };
 
-    const createStatement = service.generateCreateStatement(jsonSchema as JSONSchema4);
+    const createStatement = service.generateCreateStatement(
+      jsonSchema as JSONSchema4,
+    );
     expect(createStatement).toBe('CREATE TABLE my_table (\n  id FLOAT8\n);');
   });
 
@@ -95,7 +103,46 @@ describe('QueryBuilderService', () => {
       },
     };
 
-    const createStatement = service.generateCreateStatement(jsonSchema as JSONSchema4);
+    const createStatement = service.generateCreateStatement(
+      jsonSchema as JSONSchema4,
+    );
     expect(createStatement).toBe('CREATE TABLE my_table (\n  id FLOAT8\n);');
+  });
+
+  it('generates an index statement for each index defined in the schema', () => {
+    const jsonSchema = {
+      title: 'my_table',
+      properties: {
+        id: { type: 'integer' },
+        name: { type: 'string', maxLength: 255 },
+        date_created: { type: 'string', format: 'date-time' },
+      },
+      indexes: [{ columns: [['name']] }, { columns: [['date_created']] }],
+    };
+    const indexStatements = service.generateIndexStatement(
+      jsonSchema as JSONSchema4,
+    );
+    const expectedStatements = `CREATE INDEX my_table_name_idx ON my_table (name);\nCREATE INDEX my_table_date_created_idx ON my_table (date_created);\n`;
+    expect(indexStatements).toBe(expectedStatements);
+  });
+
+  it('generates an index statement for each index defined in the schema', () => {
+    const jsonSchema = {
+      title: 'my_table',
+      properties: {
+        id: { type: 'integer' },
+        name: { type: 'string', maxLength: 255 },
+        date_created: { type: 'string', format: 'date-time' },
+      },
+      indexes: [
+        { columns: [['name', 'date_created']] },
+        { columns: [['name'], ['date_created']] },
+      ],
+    };
+    const indexStatements = service.generateIndexStatement(
+      jsonSchema as JSONSchema4,
+    );
+    const expectedStatements = `CREATE INDEX my_table_name_date_created_idx ON my_table (name, date_created);\nCREATE INDEX my_table_name_idx ON my_table (name);\nCREATE INDEX my_table_date_created_idx ON my_table (date_created);\n`;
+    expect(indexStatements).toBe(expectedStatements);
   });
 });

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JSONSchema4 } from 'json-schema';
 @Injectable()
 export class QueryBuilderService {
-  constructor() { }
+  constructor() {}
 
   generateCreateStatement(jsonSchema: JSONSchema4) {
     const tableName = jsonSchema.title;
@@ -32,5 +32,22 @@ export class QueryBuilderService {
     createStatement += '\n);';
 
     return createStatement;
+  }
+
+  generateIndexStatement(schema: JSONSchema4): string | null {
+    let indexStatements = '';
+    if (schema.indexes) {
+      const indexes = schema.indexes;
+
+      for (const index of indexes) {
+        for (const column of index.columns) {
+          const indexName = `${schema.title}_${column.join('_')}_idx`;
+          const columns = column.join(', ');
+          const statement = `CREATE INDEX ${indexName} ON ${schema.title} (${columns});`;
+          indexStatements += `${statement}\n`;
+        }
+      }
+    }
+    return indexStatements;
   }
 }
