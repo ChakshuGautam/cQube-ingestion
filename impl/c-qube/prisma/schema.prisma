@@ -40,6 +40,7 @@ model DatasetGrammar {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
+  Pipe        Pipe[]
 
   @@schema("spec")
 }
@@ -57,6 +58,7 @@ model EventGrammar {
   updatedAt          DateTime       @updatedAt
   deletedAt          DateTime?
   instrumentTypeType String
+  Pipe               Pipe[]
 
   @@schema("spec")
 }
@@ -72,8 +74,22 @@ model Transformer {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   deletedAt      DateTime?
+  Pipe           Pipe[]
 
   @@schema("transformers")
 }
 
-model Pipe {}
+model Pipe {
+  id               Int            @id @default(autoincrement())
+  transformer      Transformer    @relation(fields: [transformerId], references: [id])
+  event            EventGrammar   @relation(fields: [eventGrammarId], references: [id])
+  dataset          DatasetGrammar @relation(fields: [datasetGrammarId], references: [id])
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  deletedAt        DateTime?
+  transformerId    Int
+  eventGrammarId   Int
+  datasetGrammarId Int
+
+  @@schema("transformers")
+}
