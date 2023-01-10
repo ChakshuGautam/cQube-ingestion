@@ -16,7 +16,7 @@ export class AppService {
     // 6. Create a Pipe
   }
 
-  flow(event: Event): void { }
+  flow(event: Event): void {}
 
   // TODO: on the Flows
   // 1. Create a new Dimension for School
@@ -29,7 +29,7 @@ export class AppService {
   // 8. Capture the event and transform it to a dataset using a transformer
 
   // TODO: Managing Postgres queries through say a Prisma and get the schema verified.
-  // TODO: Converting JSONSchema to PSQL Query to create a table
+  // Converting JSONSchema to PSQL Query to create a table
   // TODO: Adding indexes to the tables using the Dimensions and Dateset Schemas
 
   // TODO: on the tables that need to be created
