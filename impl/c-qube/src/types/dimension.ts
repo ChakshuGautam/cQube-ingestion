@@ -7,12 +7,16 @@ export interface Store {
   bucket_size: number | null;
 }
 
-export interface Dimension {
+export interface DimensionGrammar {
   name: string;
   type: string;
   storage: Store;
-  data: object | null;
   schema: JSONSchema7 | null;
+}
+
+export interface Dimension {
+  grammar: DimensionGrammar;
+  data: object | null;
 }
 
 // Example of a dimension:
