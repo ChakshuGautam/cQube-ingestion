@@ -14,10 +14,6 @@ jobs:
       matrix:
         node-version: [16]
 
-    defaults:
-      run:
-        working-directory: /impl/c-qube
-
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
@@ -26,9 +22,12 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
           cache-dependency-path: ./impl/c-qube/yarn.lock
-      - run: yarn install
-      - run: yarn build
-      - run: yarn test
+      - name: yarn commands
+        working-directory: impl/c-qube
+        run: |
+          yarn install
+          yarn build
+          yarn test
 
       - name: Tests
         run: yarn test:cov
