@@ -19,3 +19,11 @@ const qb = new QueryBuilderService();
 const query = qb.generateCreateStatement(schema);
 const query = qb.generateIndexStatement(schema);
 ```
+
+### Developer Workflow
+
+Run tests on a watch mode
+
+```bash
+$ yarn run test:watch
+```
