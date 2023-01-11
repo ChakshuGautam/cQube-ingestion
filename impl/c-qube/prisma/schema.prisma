@@ -20,9 +20,11 @@ model InstrumentType {
 
 model DimensionGrammar {
   id          Int       @id @default(autoincrement())
-  name        String
-  description String
+  name        String    @unique
+  description String?
+  schema      Json
   type        String
+  storage     Json
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
@@ -32,8 +34,8 @@ model DimensionGrammar {
 
 model DatasetGrammar {
   id          Int       @id @default(autoincrement())
-  name        String
-  description String
+  name        String    @unique
+  description String?
   dimensions  Json
   schema      Json
   type        String
@@ -47,12 +49,12 @@ model DatasetGrammar {
 
 model EventGrammar {
   id                 Int            @id @default(autoincrement())
-  name               String
+  name               String         @unique
   instrument         InstrumentType @relation(fields: [instrumentTypeType], references: [type])
   schema             Json
   instrumentField    String
   isActive           Boolean        @default(true)
-  description        String
+  description        String?
   type               String
   createdAt          DateTime       @default(now())
   updatedAt          DateTime       @updatedAt
@@ -65,7 +67,7 @@ model EventGrammar {
 
 model Transformer {
   id             Int       @id @default(autoincrement())
-  name           String
+  name           String    @unique
   event          String
   dataset        String
   transformSync  String

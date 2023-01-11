@@ -1,17 +1,18 @@
-import { JSONSchema7 } from 'json-schema';
+import { JSONSchema4 } from 'json-schema';
 
 export interface Store {
   indexes: string[];
-  primaryId: string;
-  retention: number | null;
-  bucket_size: number | null;
+  primaryId: string | null;
+  retention?: number | null;
+  bucket_size?: number | null;
 }
 
 export interface DimensionGrammar {
   name: string;
+  description?: string;
   type: string;
   storage: Store;
-  schema: JSONSchema7 | null;
+  schema: JSONSchema4 | null;
 }
 
 export interface Dimension {
