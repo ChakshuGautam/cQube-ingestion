@@ -81,4 +81,17 @@ export class DimensionService {
       await this.prisma.$queryRawUnsafe(query);
     }
   }
+
+  async insertDimensionData(
+    dimensionGrammar: DimensionGrammar,
+    data,
+  ): Promise<void> {
+    const insertQuery = this.qbService.generateInsertStatement(
+      dimensionGrammar.schema,
+      data,
+    );
+    for (const query of insertQuery) {
+      await this.prisma.$queryRawUnsafe(query);
+    }
+  }
 }

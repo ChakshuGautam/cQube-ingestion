@@ -21,3 +21,7 @@
 - [ ] NVSK - Cloudflare
 - [ ] Throttle based on IP - Nest applications
 - [ ] Add a cache on the fronted (etags)
+
+### TOODs on cQube Implementation
+
+Can be tracked [here](./impl/c-qube/src/app.service.ts).
