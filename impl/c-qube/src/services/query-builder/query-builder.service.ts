@@ -4,12 +4,12 @@ import { JSONSchema4 } from 'json-schema';
 export class QueryBuilderService {
   constructor() {}
 
-  generateCreateStatement(jsonSchema: JSONSchema4) {
-    const tableName = jsonSchema.title;
-    const psqlSchema = jsonSchema.psql_schema;
+  generateCreateStatement(schema: JSONSchema4) {
+    const tableName = schema.title;
+    const psqlSchema = schema.psql_schema;
     let createStatement = `CREATE TABLE ${psqlSchema}.${tableName} (\n`;
 
-    const properties = jsonSchema.properties;
+    const properties = schema.properties;
     for (const property in properties) {
       const column: JSONSchema4 = properties[property];
       createStatement += `  ${property} `;
@@ -56,5 +56,30 @@ export class QueryBuilderService {
       }
     }
     return indexStatements;
+  }
+
+  generateInsertStatement(schema: JSONSchema4, data: any): string {
+    const tableName = schema.title;
+    const psqlSchema = schema.psql_schema;
+    const fields = [];
+    const values = [];
+
+    const propertiesToSkip = ['id'];
+
+    const properties = schema.properties;
+    for (const property in properties) {
+      if (propertiesToSkip.includes(property)) continue;
+      fields.push(property);
+      values.push(data[property]);
+    }
+
+    const query = `INSERT INTO ${psqlSchema}.${tableName} (${fields.join(
+      ', ',
+    )}) VALUES (${values.join(', ')});`;
+    return query;
+  }
+
+  generateUpdateStatement(schema: JSONSchema4, data: any): string[] {
+    throw new Error('Method not implemented.');
   }
 }

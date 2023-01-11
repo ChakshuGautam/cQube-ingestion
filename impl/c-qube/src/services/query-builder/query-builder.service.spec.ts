@@ -168,4 +168,36 @@ describe('QueryBuilderService', () => {
     ];
     expect(indexStatements.sort()).toEqual(expectedStatements.sort());
   });
+
+  it('generates a insert statement', () => {
+    const jsonSchema = {
+      title: 'my_table',
+      psql_schema: 'my_schema',
+      properties: {
+        id: { type: 'integer' },
+        name: { type: 'string', maxLength: 255 },
+        date_created: { type: 'string', format: 'date-time' },
+      },
+      indexes: [
+        { columns: [['name', 'date_created']] },
+        { columns: [['name'], ['date_created']] },
+      ],
+    };
+
+    const dataForJSONSchema = {
+      name: 'test',
+      date_created: '2020-01-01T00:00:00.000Z',
+    };
+
+    const insertStatement = service.generateInsertStatement(
+      jsonSchema as JSONSchema4,
+      dataForJSONSchema,
+    );
+
+    console.debug(insertStatement);
+
+    expect(insertStatement).toBe(
+      'INSERT INTO my_schema.my_table (name, date_created) VALUES (test, 2020-01-01T00:00:00.000Z);',
+    );
+  });
 });
