@@ -28,8 +28,6 @@ export class AppService {
   // 7. Push and event to the pipe
   // 8. Capture the event and transform it to a dataset using a transformer
 
-  // TODO: Managing Postgres queries through say a Prisma and get the schema verified.
-  // Converting JSONSchema to PSQL Query to create a table
   // TODO: Adding indexes to the tables using the Dimensions and Dateset Schemas
 
   // TODO: on the tables that need to be created
