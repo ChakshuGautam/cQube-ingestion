@@ -70,7 +70,7 @@ export class QueryBuilderService {
     for (const property in properties) {
       if (propertiesToSkip.includes(property)) continue;
       fields.push(property);
-      values.push(data[property]);
+      values.push(`'${data[property]}'`);
     }
 
     const query = `INSERT INTO ${psqlSchema}.${tableName} (${fields.join(

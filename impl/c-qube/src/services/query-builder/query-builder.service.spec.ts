@@ -194,10 +194,8 @@ describe('QueryBuilderService', () => {
       dataForJSONSchema,
     );
 
-    console.debug(insertStatement);
-
     expect(insertStatement).toBe(
-      'INSERT INTO my_schema.my_table (name, date_created) VALUES (test, 2020-01-01T00:00:00.000Z);',
+      `INSERT INTO my_schema.my_table (name, date_created) VALUES ('test', '2020-01-01T00:00:00.000Z');`,
     );
   });
 });

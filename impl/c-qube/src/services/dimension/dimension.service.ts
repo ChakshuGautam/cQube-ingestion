@@ -90,8 +90,6 @@ export class DimensionService {
       dimensionGrammar.schema,
       data,
     );
-    for (const query of insertQuery) {
-      await this.prisma.$queryRawUnsafe(query);
-    }
+    await this.prisma.$queryRawUnsafe(insertQuery);
   }
 }

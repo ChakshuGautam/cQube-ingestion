@@ -85,17 +85,14 @@ describe('DimensionService', () => {
         ],
       },
     };
-    const d = await service.createDimension(grammar);
-    const data = [
-      { id: 1, name: 'school1', date_created: '2020-01-01' },
-      { id: 2, name: 'school2', date_created: '2020-01-02' },
-      { id: 3, name: 'school3', date_created: '2020-01-03' },
-    ];
+    await service.createDimension(grammar);
+    const data = { name: 'school3', date_created: '2020-01-01T00:00:00.000Z' };
     await service.insertDimensionData(grammar, data);
     const result = await service.prisma.$queryRawUnsafe(
       `select * from dimensions.school;`,
     );
-    expect(result).toEqual(data);
+    expect(result[0].name).toEqual(data.name);
+    expect(result[0].date_created.toISOString()).toBe(data.date_created);
     //teaddown
     await service.prisma.$executeRawUnsafe(
       `DROP TABLE IF EXISTS "dimensions"."school";`,
