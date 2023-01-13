@@ -24,4 +24,13 @@
 
 ### TOODs on cQube Implementation
 
-Can be tracked [here](./impl/c-qube/src/app.service.ts).
+- [ ] Can be tracked [here](./impl/c-qube/src/app.service.ts).
+- [ ] Adapter Implemenation with the following use case
+  - [ ] [Dataset1](https://ntpproductionall.blob.core.windows.net/public-reports/public/diksha-data-exhaust/2023-01-11.csv)
+  - [ ] [Dataset2]()
+  - [ ] [Dataset3]()
+  - [ ] [Dataset4]()
+  - [ ] [Dataset5]()
+- [ ] [Implement Dashlet Specification](https://project-sunbird.atlassian.net/wiki/spaces/SBDES/pages/2312110137/Dashlets+Design+Doc)
+- [ ] [Auto Dashboard and Chart Creation using Metabase API and making it public](https://www.metabase.com/learn/administration/metabase-api)
+- [ ] A UI to import data and define configs
