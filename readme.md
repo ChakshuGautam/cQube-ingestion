@@ -34,3 +34,5 @@
 - [ ] [Implement Dashlet Specification](https://project-sunbird.atlassian.net/wiki/spaces/SBDES/pages/2312110137/Dashlets+Design+Doc)
 - [ ] [Auto Dashboard and Chart Creation using Metabase API and making it public](https://www.metabase.com/learn/administration/metabase-api)
 - [ ] A UI to import data and define configs
+- [ ] Aggregation of Events
+- [ ] Tranformers for Bulk Events management - Use [Polars](https://github.com/pola-rs/polars) to do it in native JS/TS.
