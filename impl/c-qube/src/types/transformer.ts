@@ -1,8 +1,8 @@
 // Code transformer interface as an akka actor
 
 import { CallbackHandler } from 'supertest';
-import { Dataset, DatasetSpec } from './dataset';
-import { EventSpec } from './event';
+import { Dataset, DatasetGrammar } from './dataset';
+import { EventGrammar } from './event';
 
 export type TransformAsync = (
   callback: CallbackHandler,
@@ -16,8 +16,8 @@ export type TransformSync = (
 
 export interface Transformer {
   name: string;
-  event: EventSpec;
-  dataset: DatasetSpec;
+  event: EventGrammar;
+  dataset: DatasetGrammar;
 
   // TODO: Make one of these two required
   transformAsync?: TransformAsync;

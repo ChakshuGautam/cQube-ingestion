@@ -9,7 +9,8 @@ export interface Instrument {
   name: string;
 }
 
-export interface EventSpec {
+export interface EventGrammar {
+  name: string;
   instrument: Instrument;
   description: string;
   schema: JSONSchema7;
@@ -19,5 +20,5 @@ export interface EventSpec {
 
 export interface Event {
   data: object;
-  spec: EventSpec;
+  spec: EventGrammar;
 }

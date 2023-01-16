@@ -23,7 +23,7 @@ How do I map a dataset to a dimension?
     "date": "2019-01-01", // Dimension
     "grade": 1, // Addtional filterable data => indexed
     "school_id": 901, //Dimension
-    "indexes": [{ "columns": ["date"] }, { "columns": ["school_id"] }] // Happen automatically (Not part of the schema)
+    "indexes": [["date"], ["school_id"]] // Happen automatically
   },
   "dimensionMappings": [
     {
