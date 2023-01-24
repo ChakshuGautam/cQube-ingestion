@@ -1,4 +1,4 @@
-import { JSONSchema7 } from 'json-schema';
+import { JSONSchema4 } from 'json-schema';
 import { Dimension } from './dimension';
 
 export interface DimensionMapping {
@@ -13,7 +13,7 @@ export interface DatasetGrammar {
   name: string;
   description: string;
   dimensions: DimensionMapping[];
-  schema: JSONSchema7;
+  schema: JSONSchema4;
 }
 
 export interface Dataset {

@@ -20,6 +20,8 @@ export interface Dimension {
   data: object | null;
 }
 
+export const createSimpleDimension = [];
+
 // Example of a dimension:
 // {
 //   "name": "Schools",

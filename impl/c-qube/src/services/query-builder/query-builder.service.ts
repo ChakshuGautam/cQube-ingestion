@@ -79,6 +79,35 @@ export class QueryBuilderService {
     return query;
   }
 
+  generateBulkInsertStatement(schema: JSONSchema4, data: any[]): string {
+    const tableName = schema.title;
+    const psqlSchema = schema.psql_schema;
+    const fields = [];
+    const values = [];
+
+    const propertiesToSkip = ['id'];
+
+    const properties = schema.properties;
+    for (const property in properties) {
+      if (propertiesToSkip.includes(property)) continue;
+      fields.push(property);
+    }
+
+    for (const row of data) {
+      const rowValues = [];
+      for (const property in properties) {
+        if (propertiesToSkip.includes(property)) continue;
+        rowValues.push(`'${row[property]}'`);
+      }
+      values.push(`(${rowValues.join(', ')})`);
+    }
+
+    const query = `INSERT INTO ${psqlSchema}.${tableName} (${fields.join(
+      ', ',
+    )}) VALUES ${values.join(', ')};`;
+    return query;
+  }
+
   generateUpdateStatement(schema: JSONSchema4, data: any): string[] {
     throw new Error('Method not implemented.');
   }

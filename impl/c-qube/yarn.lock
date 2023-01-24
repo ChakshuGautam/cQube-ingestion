@@ -1839,6 +1839,13 @@ cross-spawn@^7.0.0, cross-spawn@^7.0.2, cross-spawn@^7.0.3:
     shebang-command "^2.0.0"
     which "^2.0.1"
 
+csv-parser@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/csv-parser/-/csv-parser-3.0.0.tgz#b88a6256d79e090a97a1b56451f9327b01d710e7"
+  integrity sha512-s6OYSXAK3IdKqYO33y09jhypG/bSDHPuyCme/IdEHfWpLf/jKcpitVFyOC6UemgGk8v7Q5u2XE0vvwmanxhGlQ==
+  dependencies:
+    minimist "^1.2.0"
+
 debug@2.6.9:
   version "2.6.9"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.9.tgz#5d128515df134ff327e90a4c93f4e077a536341f"
@@ -3296,6 +3303,16 @@ locate-path@^6.0.0:
   dependencies:
     p-locate "^5.0.0"
 
+lodash.isequal@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.isequal/-/lodash.isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
+  integrity sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==
+
+lodash.keys@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/lodash.keys/-/lodash.keys-4.2.0.tgz#a08602ac12e4fb83f91fc1fb7a360a4d9ba35205"
+  integrity sha512-J79MkJcp7Df5mizHiVNpjoHXLi4HLjh9VLS/M7lQSGoQ+0oQ+lWEigREkqKyizPB1IawvQLLKY8mzEcm1tkyxQ==
+
 lodash.memoize@4.x:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/lodash.memoize/-/lodash.memoize-4.1.2.tgz#bcc6c49a42a2840ed997f323eada5ecd182e0bfe"
@@ -3305,6 +3322,21 @@ lodash.merge@^4.6.2:
   version "4.6.2"
   resolved "https://registry.yarnpkg.com/lodash.merge/-/lodash.merge-4.6.2.tgz#558aa53b43b661e1925a0afdfa36a9a1085fe57a"
   integrity sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==
+
+lodash.omit@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.omit/-/lodash.omit-4.5.0.tgz#6eb19ae5a1ee1dd9df0b969e66ce0b7fa30b5e60"
+  integrity sha512-XeqSp49hNGmlkj2EJlfrQFIzQ6lXdNro9sddtQzcJY8QaoC2GO0DT7xaIokHeyM+mIT0mPMlPvkYzg2xCuHdZg==
+
+lodash.without@^4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/lodash.without/-/lodash.without-4.4.0.tgz#3cd4574a00b67bae373a94b748772640507b7aac"
+  integrity sha512-M3MefBwfDhgKgINVuBJCO1YR3+gf6s9HNJsIiZ/Ru77Ws6uTb9eBuvrkpzO+9iLoAaRodGuq7tyrPCx+74QYGQ==
+
+lodash.xor@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.xor/-/lodash.xor-4.5.0.tgz#4d48ed7e98095b0632582ba714d3ff8ae8fb1db6"
+  integrity sha512-sVN2zimthq7aZ5sPGXnSz32rZPuqcparVW50chJQe+mzTYV+IsxSsl/2gnkWWE2Of7K3myBQBqtLKOUEHJKRsQ==
 
 lodash@^4.17.19, lodash@^4.17.21:
   version "4.17.21"
@@ -3438,7 +3470,7 @@ minimatch@^3.0.4, minimatch@^3.0.5, minimatch@^3.1.1, minimatch@^3.1.2:
   dependencies:
     brace-expansion "^1.1.7"
 
-minimist@^1.2.6:
+minimist@^1.2.0, minimist@^1.2.6:
   version "1.2.7"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.7.tgz#daa1c4d91f507390437c6a8bc01078e7000c4d18"
   integrity sha512-bzfL1YUZsP41gmu/qjrEk0Q6i2ix/cVeAhbCbqH9u3zYutS1cLg00qhrD0M2MVdCcx4Sc0UpP2eBWo9rotpq6g==
@@ -3531,6 +3563,48 @@ node-releases@^2.0.6:
   version "2.0.8"
   resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-2.0.8.tgz#0f349cdc8fcfa39a92ac0be9bc48b7706292b9ae"
   integrity sha512-dFSmB8fFHEH/s81Xi+Y/15DQY6VHW81nXRj86EMSL3lmuTmK1e+aT4wrFCkTbm+gSwkw4KpX+rT/pMM2c1mF+A==
+
+nodejs-polars-darwin-arm64@0.7.2:
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/nodejs-polars-darwin-arm64/-/nodejs-polars-darwin-arm64-0.7.2.tgz#06c960a6d3f7a347259941e7eb16d3d46f38faed"
+  integrity sha512-oWrmKqC8aFaj5iX1DsZACFdzFo6xa13AGgKqzJAkOqEUAww3eh7r4eLnJLPp3EIfJsr1aDeZwPyMwF4i/X1x2w==
+
+nodejs-polars-darwin-x64@0.7.2:
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/nodejs-polars-darwin-x64/-/nodejs-polars-darwin-x64-0.7.2.tgz#94b439d4150f7d84e99eb7cbdb3abe88a4c92563"
+  integrity sha512-0JoJAZLWTJeee8fGO5xe9rfbRQTT7TUb3JuuCrtHshyMGT23nfT9Pw6C5L9AWjPrmkAOhrmyPeZ+cJDNug3xUQ==
+
+nodejs-polars-linux-arm64-gnu@0.7.2:
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/nodejs-polars-linux-arm64-gnu/-/nodejs-polars-linux-arm64-gnu-0.7.2.tgz#01162a00c3681a93353fc69dc22ba7a4f65ac461"
+  integrity sha512-rINXZfqQtE6dZ/5ItuG82Us8ZbPMt3FCtqHVj2GcFwkmECwJpe1Qwh1qXFzaWL7Om6NHvbGe2ERlSrxqKXRSlg==
+
+nodejs-polars-linux-x64-gnu@0.7.2:
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/nodejs-polars-linux-x64-gnu/-/nodejs-polars-linux-x64-gnu-0.7.2.tgz#68ad0d38db56359763f338ccc6563155346e881f"
+  integrity sha512-liAu2Yhtj97Ca1YducGEbT9+NKrV/z7+EBaPlo6BC8qIdwDsVzu/3A2g56HxmNclvEkguKnyibjEnOAtQbhMqQ==
+
+nodejs-polars-win32-ia32-msvc@0.7.2:
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/nodejs-polars-win32-ia32-msvc/-/nodejs-polars-win32-ia32-msvc-0.7.2.tgz#ec25c954f0b047b336db6d4fd1d8b82fa246cbec"
+  integrity sha512-3ZuDNjcsfSAn8i72YUD5HMDXxv6NNIeLo2Sg3Bvm8p+YjPMKE3bipUMdCczaaFovqAzhkbRT5DyA6YOpq0/saw==
+
+nodejs-polars-win32-x64-msvc@0.7.2:
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/nodejs-polars-win32-x64-msvc/-/nodejs-polars-win32-x64-msvc-0.7.2.tgz#646c3b5ef805ff3c0bfd76efc679b90a184bc7e9"
+  integrity sha512-QejJDUL8wFrybV8QSyyzwiRs5uA0YekEwZ9i/LfraEecIH67k3ko0asgtxx33oAyms9blEL3uGmnPWYX5ajoHw==
+
+nodejs-polars@^0.7.2:
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/nodejs-polars/-/nodejs-polars-0.7.2.tgz#fa389511250925decf524ea5f3f1207636fbc470"
+  integrity sha512-YD5XX7E67wX0joGo177mJio4TAnzVlTyzlB+V7vaL7ZuVsMaJyMcYZ+uzvFC0BxGMoWY+16Vxjr13yYpaU4SmA==
+  optionalDependencies:
+    nodejs-polars-darwin-arm64 "0.7.2"
+    nodejs-polars-darwin-x64 "0.7.2"
+    nodejs-polars-linux-arm64-gnu "0.7.2"
+    nodejs-polars-linux-x64-gnu "0.7.2"
+    nodejs-polars-win32-ia32-msvc "0.7.2"
+    nodejs-polars-win32-x64-msvc "0.7.2"
 
 normalize-path@^3.0.0, normalize-path@~3.0.0:
   version "3.0.0"
@@ -4325,6 +4399,18 @@ to-fast-properties@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/to-fast-properties/-/to-fast-properties-2.0.0.tgz#dc5e698cbd079265bc73e0377681a4e4e83f616e"
   integrity sha512-/OaKK0xYrs3DmxRYqL/yDc+FxFUVYhDlXMhRmv3z915w2HF1tnN1omB354j8VUGO/hbRzyD6Y3sA7v7GS/ceog==
+
+to-json-schema@^0.2.5:
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/to-json-schema/-/to-json-schema-0.2.5.tgz#ef3c3f11ad64460dcfbdbafd0fd525d69d62a98f"
+  integrity sha512-jP1ievOee8pec3tV9ncxLSS48Bnw7DIybgy112rhMCEhf3K4uyVNZZHr03iQQBzbV5v5Hos+dlZRRyk6YSMNDw==
+  dependencies:
+    lodash.isequal "^4.5.0"
+    lodash.keys "^4.2.0"
+    lodash.merge "^4.6.2"
+    lodash.omit "^4.5.0"
+    lodash.without "^4.4.0"
+    lodash.xor "^4.5.0"
 
 to-regex-range@^5.0.1:
   version "5.0.1"

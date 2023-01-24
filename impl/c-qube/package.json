@@ -25,8 +25,11 @@
     "@nestjs/platform-express": "^9.0.0",
     "@prisma/client": "4.8.1",
     "@types/json-schema": "^7.0.11",
+    "csv-parser": "^3.0.0",
+    "nodejs-polars": "^0.7.2",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.2.0",
+    "to-json-schema": "^0.2.5"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
@@ -67,6 +70,7 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "testTimeout": 30000
   }
 }

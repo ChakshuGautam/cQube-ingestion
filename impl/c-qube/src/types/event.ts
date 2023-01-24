@@ -1,4 +1,4 @@
-import { JSONSchema7 } from 'json-schema';
+import { JSONSchema4 } from 'json-schema';
 
 export enum InstrumentType {
   COUNTER,
@@ -13,7 +13,7 @@ export interface EventGrammar {
   name: string;
   instrument: Instrument;
   description: string;
-  schema: JSONSchema7;
+  schema: JSONSchema4;
   instrument_field: string;
   is_active: boolean;
 }
