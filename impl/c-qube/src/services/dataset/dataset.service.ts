@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DatasetGrammar, DimensionMapping } from 'src/types/Dataset';
+import { DatasetGrammar, DimensionMapping } from '../../types/Dataset';
 import { DatasetGrammar as DatasetGrammarModel } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
 import { QueryBuilderService } from '../query-builder/query-builder.service';
