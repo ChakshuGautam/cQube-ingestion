@@ -60,6 +60,11 @@ describe('CsvAdapterService', () => {
         `DROP TABLE IF EXISTS dimensions."${dimensionColumns[i]}"`,
       );
     }
+    await service.prisma.$executeRawUnsafe(
+      `select 'drop table if exists "' || tablename || '" cascade;' 
+        from pg_tables where schemaname = 'datasets';`,
+    );
+
     /* 
       async csvToDomainSpec(csvPath: string,
               dataFieldColumn: string,
