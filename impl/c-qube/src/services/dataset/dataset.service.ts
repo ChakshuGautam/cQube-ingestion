@@ -83,4 +83,15 @@ export class DatasetService {
     );
     await this.prisma.$queryRawUnsafe(insertQuery);
   }
+
+  async insertBulkDatasetData(
+    DatasetGrammar: DatasetGrammar,
+    data: any[],
+  ): Promise<void> {
+    const insertQuery = this.qbService.generateBulkInsertStatement(
+      DatasetGrammar.schema,
+      data,
+    );
+    await this.prisma.$queryRawUnsafe(insertQuery);
+  }
 }

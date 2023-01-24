@@ -21,7 +21,6 @@ export class CsvAdapterService {
   async csvToDomainSpec(
     csvPath: string,
     dataFieldColumn: string,
-    subjectColumn: string,
     eventCounterColumns: string[],
   ): Promise<any> {
     // Setup DataFrame
@@ -32,10 +31,7 @@ export class CsvAdapterService {
     const dateFieldFrequency = 'Daily';
 
     const dimensionColumns = allHeaders.filter(
-      (h) =>
-        h !== dataFieldColumn &&
-        h !== subjectColumn &&
-        !eventCounterColumns.includes(h),
+      (h) => h !== dataFieldColumn && !eventCounterColumns.includes(h),
     );
 
     // Needs User Input

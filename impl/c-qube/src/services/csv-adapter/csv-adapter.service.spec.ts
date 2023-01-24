@@ -41,15 +41,11 @@ describe('CsvAdapterService', () => {
     ];
 
     const dateFieldColumn = 'Date';
-    const subjectColumn = 'object_id';
     // Can be inferred from the dataFieldColumn
     const dateFieldFrequency = 'Daily';
 
     const dimensionColumns = allHeaders.filter(
-      (h) =>
-        h !== dateFieldColumn &&
-        h !== subjectColumn &&
-        !eventCounterColumns.includes(h),
+      (h) => h !== dateFieldColumn && !eventCounterColumns.includes(h),
     );
 
     await service.prisma.$executeRawUnsafe(
@@ -74,7 +70,6 @@ describe('CsvAdapterService', () => {
     await service.csvToDomainSpec(
       csvPath,
       dateFieldColumn,
-      subjectColumn,
       eventCounterColumns,
     );
   });

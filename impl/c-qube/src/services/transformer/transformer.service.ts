@@ -7,7 +7,6 @@ import {
   Transformer as TransformerModel,
   DatasetGrammar as DatasetGrammarModel,
 } from '@prisma/client';
-import { DatasetGrammar } from 'src/types/Dataset';
 
 @Injectable()
 export class TransformerService {
