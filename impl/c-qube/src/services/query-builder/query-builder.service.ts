@@ -4,10 +4,20 @@ import { JSONSchema4 } from 'json-schema';
 export class QueryBuilderService {
   constructor() {}
 
-  generateCreateStatement(schema: JSONSchema4) {
+  cleanStatement(statement: string): string {
+    return statement
+      .replace(/^[ ]+|[ ]+$/g, '')
+      .replace(/\s\s+/g, ' ')
+      .replace(/\n/g, '')
+      .replace(/\(\s/g, '(')
+      .replace(/\s\)/g, ')');
+  }
+
+  generateCreateStatement(schema: JSONSchema4, autoPrimaryKey = false): string {
     const tableName = schema.title;
     const psqlSchema = schema.psql_schema;
-    let createStatement = `CREATE TABLE ${psqlSchema}.${tableName} (\n`;
+    const primaryKeySegment = autoPrimaryKey ? '\n id SERIAL PRIMARY KEY,' : '';
+    let createStatement = `CREATE TABLE ${psqlSchema}.${tableName} (${primaryKeySegment}\n`;
 
     const properties = schema.properties;
     for (const property in properties) {
@@ -37,7 +47,7 @@ export class QueryBuilderService {
     createStatement = createStatement.slice(0, -2); // remove last comma and newline
     createStatement += '\n);';
 
-    return createStatement;
+    return this.cleanStatement(createStatement);
   }
 
   generateIndexStatement(schema: JSONSchema4): string[] | null {
@@ -55,7 +65,7 @@ export class QueryBuilderService {
         }
       }
     }
-    return indexStatements;
+    return indexStatements.map((statement) => this.cleanStatement(statement));
   }
 
   generateInsertStatement(schema: JSONSchema4, data: any): string {
@@ -76,7 +86,7 @@ export class QueryBuilderService {
     const query = `INSERT INTO ${psqlSchema}.${tableName} (${fields.join(
       ', ',
     )}) VALUES (${values.join(', ')});`;
-    return query;
+    return this.cleanStatement(query);
   }
 
   generateBulkInsertStatement(schema: JSONSchema4, data: any[]): string {
@@ -105,7 +115,7 @@ export class QueryBuilderService {
     const query = `INSERT INTO ${psqlSchema}.${tableName} (${fields.join(
       ', ',
     )}) VALUES ${values.join(', ')};`;
-    return query;
+    return this.cleanStatement(query);
   }
 
   generateUpdateStatement(schema: JSONSchema4, data: any): string[] {

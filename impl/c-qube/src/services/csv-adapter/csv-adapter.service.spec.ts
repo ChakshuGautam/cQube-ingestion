@@ -45,7 +45,10 @@ describe('CsvAdapterService', () => {
     const dateFieldFrequency = 'Daily';
 
     const dimensionColumns = allHeaders.filter(
-      (h) => h !== dateFieldColumn && !eventCounterColumns.includes(h),
+      (h) =>
+        h !== dateFieldColumn &&
+        !eventCounterColumns.includes(h) &&
+        h.length > 0,
     );
 
     await service.prisma.$executeRawUnsafe(
@@ -61,12 +64,6 @@ describe('CsvAdapterService', () => {
         from pg_tables where schemaname = 'datasets';`,
     );
 
-    /* 
-      async csvToDomainSpec(csvPath: string,
-              dataFieldColumn: string,
-              subjectColumn: string,
-              eventCounterColumns: string[],)
-    */
     await service.csvToDomainSpec(
       csvPath,
       dateFieldColumn,

@@ -31,7 +31,10 @@ export class CsvAdapterService {
     const dateFieldFrequency = 'Daily';
 
     const dimensionColumns = allHeaders.filter(
-      (h) => h !== dataFieldColumn && !eventCounterColumns.includes(h),
+      (h) =>
+        h !== dataFieldColumn &&
+        !eventCounterColumns.includes(h) &&
+        h.length > 0,
     );
 
     // Needs User Input
@@ -122,6 +125,11 @@ export class CsvAdapterService {
             name: `${dimensionGrammars[i].name}_${defaultTimeDimensions[j]}_${eventGrammars[k].name}`,
             description: '',
             dimensions: [dimensionGrammars[i].name],
+            schema: {
+              properties: {
+                [dimensionGrammars[i].name]: { type: 'string' },
+              },
+            },
           };
         }
       }
