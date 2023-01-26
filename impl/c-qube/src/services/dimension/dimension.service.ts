@@ -67,9 +67,13 @@ export class DimensionService {
       );
   }
 
-  async createDimension(dimensionGrammar: DimensionGrammar): Promise<void> {
+  async createDimension(
+    dimensionGrammar: DimensionGrammar,
+    autoPrimaryKey = true,
+  ): Promise<void> {
     const createQuery = this.qbService.generateCreateStatement(
       dimensionGrammar.schema,
+      autoPrimaryKey,
     );
     const indexQuery: string[] = this.qbService.generateIndexStatement(
       dimensionGrammar.schema,

@@ -44,7 +44,7 @@ describe('DimensionService', () => {
         ],
       },
     };
-    const d = await service.createDimension(grammar);
+    const d = await service.createDimension(grammar, false);
     const indexes: any[] = await service.prisma.$queryRawUnsafe(
       `select indexname from pg_indexes where tablename = 'school';`,
     );
@@ -85,7 +85,7 @@ describe('DimensionService', () => {
         ],
       },
     };
-    await service.createDimension(grammar);
+    await service.createDimension(grammar, false);
     const data = { name: 'school3', date_created: '2020-01-01T00:00:00.000Z' };
     await service.insertDimensionData(grammar, data);
     const result = await service.prisma.$queryRawUnsafe(

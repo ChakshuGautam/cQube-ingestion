@@ -56,7 +56,6 @@ export class CsvAdapterService {
           title: d,
           psql_schema: 'dimensions',
           properties: {
-            id: { type: 'integer' },
             name: { type: 'string' },
           },
           indexes: [{ columns: [['name']] }],
