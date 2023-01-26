@@ -6,6 +6,7 @@ import { DimensionGrammar } from 'src/types/dimension';
 import { EventGrammar, InstrumentType } from '../../types/event';
 import { DimensionService } from '../dimension/dimension.service';
 import { DatasetService } from '../dataset/dataset.service';
+import { DatasetGrammar, DimensionMapping } from '../../types/dataset';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pl = require('nodejs-polars');
@@ -41,7 +42,7 @@ export class CsvAdapterService {
     const isAggregated = true;
 
     // Generate DimensionGrammar
-    const dimensionGrammars = dimensionColumns.map((d) => {
+    const dimensionGrammars: DimensionGrammar[] = dimensionColumns.map((d) => {
       return {
         name: d,
         description: '',
@@ -64,12 +65,20 @@ export class CsvAdapterService {
     });
 
     // Insert DimensionGrammars into the database
-    for (let i = 0; i < dimensionGrammars.length; i++) {
-      await this.dimensionService.createDimensionGrammar(dimensionGrammars[i]);
-      await this.dimensionService.createDimension(dimensionGrammars[i]);
-    }
+    await Promise.all(
+      dimensionGrammars.map((x) =>
+        this.dimensionService.createDimensionGrammar(x),
+      ),
+    );
 
-    // Insert Dimensions into the database; Read the CSV and determine the unique values for each dimension
+    // Insert Dimensions into the database
+    await Promise.all(
+      dimensionGrammars.map((x) => this.dimensionService.createDimension(x)),
+    );
+
+    const insertDimensionDataPromises = [];
+
+    // Read the CSV and determine the unique values for each dimension
     for (let i = 0; i < dimensionGrammars.length; i++) {
       const uniqueDimensionValues = df
         .select(dimensionGrammars[i].name)
@@ -83,11 +92,14 @@ export class CsvAdapterService {
           };
         });
 
-      await this.dimensionService.insertBulkDimensionData(
-        dimensionGrammars[i],
-        uniqueDimensionValues,
+      insertDimensionDataPromises.push(
+        this.dimensionService.insertBulkDimensionData(
+          dimensionGrammars[i],
+          uniqueDimensionValues,
+        ),
       );
     }
+    await Promise.all(insertDimensionDataPromises);
 
     // Generate EventGrammar
     const eventGrammars = eventCounterColumns.map((event) => {
@@ -119,11 +131,13 @@ export class CsvAdapterService {
     for (let i = 0; i < dimensionGrammars.length; i++) {
       for (let j = 0; j < defaultTimeDimensions.length; j++) {
         for (let k = 0; k < eventGrammars.length; k++) {
-          const dg = {
+          let dimensionMapping: DimensionMapping[];
+
+          const dataserGrammar: DatasetGrammar = {
             // content_subject_daily_total_interactions
             name: `${dimensionGrammars[i].name}_${defaultTimeDimensions[j]}_${eventGrammars[k].name}`,
             description: '',
-            dimensions: [dimensionGrammars[i].name],
+            dimensions: dimensionMapping,
             schema: {
               properties: {
                 [dimensionGrammars[i].name]: { type: 'string' },
