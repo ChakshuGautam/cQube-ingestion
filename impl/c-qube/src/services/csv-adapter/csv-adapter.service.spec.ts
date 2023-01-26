@@ -30,7 +30,7 @@ describe('CsvAdapterService', () => {
   });
 
   it('should process a CSV', async () => {
-    const csvPath = '/Users/chakshugautam/Downloads/2023-01-11.csv';
+    const csvPath = 'fixtures/2023-01-11.csv';
     const df: DataFrame = pl.readCSV(csvPath);
     const allHeaders = df.columns;
 
