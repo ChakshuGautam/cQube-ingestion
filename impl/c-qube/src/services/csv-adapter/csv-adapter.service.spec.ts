@@ -62,7 +62,7 @@ describe('CsvAdapterService', () => {
     );
     for (let i = 0; i < dimensionColumns.length; i++) {
       await service.prisma.$executeRawUnsafe(
-        `DROP TABLE IF EXISTS dimensions."${dimensionColumns[i]}"`,
+        `DROP TABLE IF EXISTS dimensions."${dimensionColumns[i]}" CASCADE`,
       );
     }
     await service.prisma.$executeRawUnsafe(
@@ -82,7 +82,7 @@ describe('CsvAdapterService', () => {
       await service.prisma.$executeRawUnsafe(
         `DROP TABLE IF EXISTS datasets."${datasetGrammars[
           i
-        ].name.toLowerCase()}"`,
+        ].name.toLowerCase()}" CASCADE`,
       );
     }
 

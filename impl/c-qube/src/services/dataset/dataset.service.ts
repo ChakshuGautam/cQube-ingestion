@@ -13,9 +13,9 @@ export class DatasetService {
 
   counterAggregates(): any {
     return {
-      count: { type: 'float' },
-      sum: { type: 'float' },
-      avg: { type: 'float' },
+      count: { type: 'number', format: 'float' },
+      sum: { type: 'number', format: 'float' },
+      avg: { type: 'number', format: 'float' },
     };
   }
 
@@ -85,6 +85,11 @@ export class DatasetService {
       }
     }
     // Add aggregates to schema
+    datasetGrammar.schema.properties = {
+      ...datasetGrammar.schema.properties,
+      ...this.counterAggregates(),
+    };
+
     const createQuery = this.qbService.generateCreateStatement(
       datasetGrammar.schema,
     );
@@ -92,6 +97,8 @@ export class DatasetService {
       datasetGrammar.schema,
     );
     await this.prisma.$queryRawUnsafe(createQuery).catch((error) => {
+      console.log(datasetGrammar.schema.properties);
+
       console.error(error);
       console.error(createQuery);
     });
