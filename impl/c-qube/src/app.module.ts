@@ -9,6 +9,7 @@ import { PipeService } from './services/pipe/pipe.service';
 import { TransformerService } from './services/transformer/transformer.service';
 import { CsvAdapterService } from './services/csv-adapter/csv-adapter.service';
 import { EventService } from './services/event/event.service';
+import { InstrumenttypeService } from './services/instrumenttype/instrumenttype.service';
 
 @Module({
   imports: [],
@@ -23,6 +24,7 @@ import { EventService } from './services/event/event.service';
     TransformerService,
     CsvAdapterService,
     EventService,
+    InstrumenttypeService,
   ],
 })
 export class AppModule {}
