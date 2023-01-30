@@ -11,6 +11,14 @@ export class DatasetService {
     private qbService: QueryBuilderService,
   ) {}
 
+  counterAggregates(): any {
+    return {
+      count: { type: 'float' },
+      sum: { type: 'float' },
+      avg: { type: 'float' },
+    };
+  }
+
   dbModelToDatasetGrammar(model: DatasetGrammarModel): DatasetGrammar {
     return {
       name: model.name,
@@ -32,9 +40,10 @@ export class DatasetService {
           dimensions: JSON.stringify(DatasetGrammar.dimensions),
         },
       })
-      .then((model: DatasetGrammarModel) =>
-        this.dbModelToDatasetGrammar(model),
-      );
+      .then((model: DatasetGrammarModel) => this.dbModelToDatasetGrammar(model))
+      .catch((error) => {
+        throw error;
+      });
   }
 
   async getDatasetGrammar(DatasetId: number): Promise<DatasetGrammar | null> {
@@ -61,14 +70,31 @@ export class DatasetService {
       );
   }
 
-  async createDataset(DatasetGrammar: DatasetGrammar): Promise<void> {
+  async createDataset(datasetGrammar: DatasetGrammar): Promise<void> {
+    // add FK params to schema
+    if (datasetGrammar.dimensions.length > 0) {
+      datasetGrammar.schema['fk'] = [];
+      for (const dimension of datasetGrammar.dimensions) {
+        datasetGrammar.schema['fk'].push({
+          column: dimension.key,
+          reference: {
+            table: `dimensions.${dimension.dimension.name.name}`,
+            column: dimension.dimension.mapped_to,
+          },
+        });
+      }
+    }
+    // Add aggregates to schema
     const createQuery = this.qbService.generateCreateStatement(
-      DatasetGrammar.schema,
+      datasetGrammar.schema,
     );
     const indexQuery: string[] = this.qbService.generateIndexStatement(
-      DatasetGrammar.schema,
+      datasetGrammar.schema,
     );
-    await this.prisma.$queryRawUnsafe(createQuery);
+    await this.prisma.$queryRawUnsafe(createQuery).catch((error) => {
+      console.error(error);
+      console.error(createQuery);
+    });
 
     // iterate over indexQuery and execute each query
     for (const query of indexQuery) {
@@ -76,20 +102,20 @@ export class DatasetService {
     }
   }
 
-  async insertDatasetData(DatasetGrammar: DatasetGrammar, data): Promise<void> {
+  async insertDatasetData(datasetGrammar: DatasetGrammar, data): Promise<void> {
     const insertQuery = this.qbService.generateInsertStatement(
-      DatasetGrammar.schema,
+      datasetGrammar.schema,
       data,
     );
     await this.prisma.$queryRawUnsafe(insertQuery);
   }
 
   async insertBulkDatasetData(
-    DatasetGrammar: DatasetGrammar,
+    datasetGrammar: DatasetGrammar,
     data: any[],
   ): Promise<void> {
     const insertQuery = this.qbService.generateBulkInsertStatement(
-      DatasetGrammar.schema,
+      datasetGrammar.schema,
       data,
     );
     await this.prisma.$queryRawUnsafe(insertQuery);

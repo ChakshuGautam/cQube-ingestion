@@ -1,16 +1,43 @@
 import { Injectable } from '@nestjs/common';
 import { JSONSchema4 } from 'json-schema';
+
+type fk = {
+  column: string;
+  reference: {
+    table: string;
+    column: string;
+  };
+};
+
 @Injectable()
 export class QueryBuilderService {
   constructor() {}
 
   cleanStatement(statement: string): string {
-    return statement
-      .replace(/^[ ]+|[ ]+$/g, '')
-      .replace(/\s\s+/g, ' ')
-      .replace(/\n/g, '')
-      .replace(/\(\s/g, '(')
-      .replace(/\s\)/g, ')');
+    return (
+      statement
+        .replace(/^[ ]+|[ ]+$/g, '')
+        // .replace(/\s\s+/g, ' ')
+        .replace(/\n/g, '')
+        .replace(/\(\s+/g, '(')
+        .replace(/\,\s+/g, ', ')
+        .replace(/\s+\)/g, ')')
+    );
+  }
+
+  addFKConstraintDuringCreation(
+    schema: JSONSchema4,
+    createStatement: string,
+  ): string {
+    createStatement = this.cleanStatement(createStatement);
+    const fkStatements = schema.fk.map((fk: fk) => {
+      return `constraint fk_${fk.column} FOREIGN KEY (${fk.column}) REFERENCES ${fk.reference.table}(name)`;
+    });
+    console.debug('fkStatements', fkStatements);
+    createStatement = createStatement.replace(');', ',');
+    createStatement += fkStatements.join(',\n');
+    createStatement += ');';
+    return this.cleanStatement(createStatement);
   }
 
   generateCreateStatement(schema: JSONSchema4, autoPrimaryKey = false): string {
@@ -41,12 +68,22 @@ export class QueryBuilderService {
       if (column.type === 'string' && column.maxLength) {
         createStatement += `(${column.maxLength})`;
       }
+      if (column.type === 'string' && column.unique) {
+        createStatement += ` UNIQUE`;
+      }
       createStatement += ',\n';
     }
 
     createStatement = createStatement.slice(0, -2); // remove last comma and newline
     createStatement += '\n);';
 
+    if (schema.fk !== undefined) {
+      createStatement = this.addFKConstraintDuringCreation(
+        schema,
+        createStatement,
+      );
+      console.log('createStatement', createStatement);
+    }
     return this.cleanStatement(createStatement);
   }
 

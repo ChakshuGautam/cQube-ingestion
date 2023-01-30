@@ -15,7 +15,7 @@ const pl = require('nodejs-polars');
 export class CsvAdapterService {
   constructor(
     public dimensionService: DimensionService,
-    public datesetService: DatasetService,
+    public datasetService: DatasetService,
     public prisma: PrismaService,
   ) {}
 
@@ -42,27 +42,8 @@ export class CsvAdapterService {
     const isAggregated = true;
 
     // Generate DimensionGrammar
-    const dimensionGrammars: DimensionGrammar[] = dimensionColumns.map((d) => {
-      return {
-        name: d,
-        description: '',
-        type: 'dynamic',
-        storage: {
-          indexes: ['name'],
-          primaryId: 'id',
-          retention: null,
-          bucket_size: null,
-        },
-        schema: {
-          title: d,
-          psql_schema: 'dimensions',
-          properties: {
-            name: { type: 'string' },
-          },
-          indexes: [{ columns: [['name']] }],
-        },
-      } as DimensionGrammar;
-    });
+    const dimensionGrammars: DimensionGrammar[] =
+      this.getDimensionGrammars(dimensionColumns);
 
     // Insert DimensionGrammars into the database
     await Promise.all(
@@ -76,6 +57,106 @@ export class CsvAdapterService {
       dimensionGrammars.map((x) => this.dimensionService.createDimension(x)),
     );
 
+    await this.insertDimensionData(dimensionGrammars, df);
+
+    // Generate EventGrammar
+    const eventGrammars = this.generateEventGrammar(eventCounterColumns);
+
+    // TODO: Insert EventGrammars into the database
+
+    // Generate DatasetGrammar
+    const defaultTimeDimensions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
+
+    // Generate DatasetGrammars
+    // Loop over Dimensions and pick one of time dimensions, pick one of eventGrammars
+    const dataserGrammars: DatasetGrammar[] = this.generateDatasetGrammars(
+      dimensionGrammars,
+      defaultTimeDimensions,
+      eventGrammars,
+    );
+
+    //TODO: Insert DatasetGrammars into the database
+    await Promise.all(
+      dataserGrammars.map((x) => this.datasetService.createDatasetGrammar(x)),
+    );
+
+    await Promise.all(
+      dataserGrammars.map((x) => this.datasetService.createDataset(x)),
+    );
+
+    // Insert events into the datasets
+
+    // Divide Headers into 3 groups - EventsCounters, EventSubjects and Dimensions
+    // The current criteria is that the name of the headers should contain the word "event" or "dimension"
+    // Auto generate Domain Spec from the headers and the types of fields (string, number, boolean)
+    // 1. Auto Generate the EventGrammar and DimensionGrammar
+    // 2. Auto Generate the Event and Dimensions
+    // 3. Auto Generate the DatasetGrammar
+    return {};
+  }
+
+  public generateDatasetGrammars(
+    dimensionGrammars: DimensionGrammar[],
+    defaultTimeDimensions: string[],
+    eventGrammars: EventGrammar[],
+  ): DatasetGrammar[] {
+    const datasetGrammars: DatasetGrammar[] = [];
+    for (let i = 0; i < dimensionGrammars.length; i++) {
+      for (let j = 0; j < defaultTimeDimensions.length; j++) {
+        for (let k = 0; k < eventGrammars.length; k++) {
+          const dimensionMapping: DimensionMapping[] = [];
+          dimensionMapping.push({
+            key: `${dimensionGrammars[i].name}`,
+            dimension: {
+              name: dimensionGrammars[i],
+              mapped_to: `${dimensionGrammars[i].name}`,
+            },
+          });
+          const dataserGrammar: DatasetGrammar = {
+            // content_subject_daily_total_interactions
+            name: `${dimensionGrammars[i].name}_${defaultTimeDimensions[j]}_${eventGrammars[k].name}`,
+            description: '',
+            dimensions: dimensionMapping,
+            schema: {
+              title: `${dimensionGrammars[i].name}_${defaultTimeDimensions[j]}_${eventGrammars[k].name}`,
+              psql_schema: 'datasets',
+              properties: {
+                [dimensionGrammars[i].name]: { type: 'string' },
+              },
+            },
+          };
+
+          datasetGrammars.push(dataserGrammar);
+        }
+      }
+    }
+    return datasetGrammars;
+  }
+
+  public generateEventGrammar(eventCounterColumns: string[]) {
+    return eventCounterColumns.map((event) => {
+      return {
+        name: event,
+        instrument: {
+          type: InstrumentType.COUNTER,
+          name: 'counter',
+        },
+        description: '',
+        instrument_field: 'counter',
+        is_active: true,
+        schema: {
+          properties: {
+            id: { type: 'string' },
+          },
+        } as JSONSchema4,
+      } as EventGrammar;
+    });
+  }
+
+  public async insertDimensionData(
+    dimensionGrammars: DimensionGrammar[],
+    df: DataFrame,
+  ) {
     const insertDimensionDataPromises = [];
 
     // Read the CSV and determine the unique values for each dimension
@@ -100,62 +181,29 @@ export class CsvAdapterService {
       );
     }
     await Promise.all(insertDimensionDataPromises);
+  }
 
-    // Generate EventGrammar
-    const eventGrammars = eventCounterColumns.map((event) => {
+  public getDimensionGrammars(dimensionColumns: string[]): DimensionGrammar[] {
+    return dimensionColumns.map((d) => {
       return {
-        name: event,
-        instrument: {
-          type: InstrumentType.COUNTER,
-          name: 'counter',
-        },
+        name: d,
         description: '',
-        instrument_field: 'counter',
-        is_active: true,
+        type: 'dynamic',
+        storage: {
+          indexes: ['name'],
+          primaryId: 'id',
+          retention: null,
+          bucket_size: null,
+        },
         schema: {
+          title: d,
+          psql_schema: 'dimensions',
           properties: {
-            id: { type: 'string' },
+            name: { type: 'string', unique: true },
           },
-        } as JSONSchema4,
-      } as EventGrammar;
+          indexes: [{ columns: [['name']] }],
+        },
+      } as DimensionGrammar;
     });
-
-    // TODO: Insert EventGrammars into the database
-
-    // Generate DatasetGrammar
-    const defaultTimeDimensions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
-
-    // Generate DatasetGrammars
-    // Loop over Dimensions and pick one of time dimensions, pick one of eventGrammars
-    // TODO: Insert DatasetGrammars into the database
-    for (let i = 0; i < dimensionGrammars.length; i++) {
-      for (let j = 0; j < defaultTimeDimensions.length; j++) {
-        for (let k = 0; k < eventGrammars.length; k++) {
-          let dimensionMapping: DimensionMapping[];
-
-          const dataserGrammar: DatasetGrammar = {
-            // content_subject_daily_total_interactions
-            name: `${dimensionGrammars[i].name}_${defaultTimeDimensions[j]}_${eventGrammars[k].name}`,
-            description: '',
-            dimensions: dimensionMapping,
-            schema: {
-              properties: {
-                [dimensionGrammars[i].name]: { type: 'string' },
-              },
-            },
-          };
-        }
-      }
-    }
-
-    // Insert events into the datasets
-
-    // Divide Headers into 3 groups - EventsCounters, EventSubjects and Dimensions
-    // The current criteria is that the name of the headers should contain the word "event" or "dimension"
-    // Auto generate Domain Spec from the headers and the types of fields (string, number, boolean)
-    // 1. Auto Generate the EventGrammar and DimensionGrammar
-    // 2. Auto Generate the Event and Dimensions
-    // 3. Auto Generate the DatasetGrammar
-    return {};
   }
 }

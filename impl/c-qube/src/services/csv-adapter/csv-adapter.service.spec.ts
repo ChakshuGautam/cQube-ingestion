@@ -5,6 +5,8 @@ import { PrismaService } from '../../prisma.service';
 import { DimensionService } from '../dimension/dimension.service';
 import { DataFrame } from 'nodejs-polars';
 import { DatasetService } from '../dataset/dataset.service';
+import { DimensionGrammar } from 'src/types/dimension';
+import { DatasetGrammar } from 'src/types/dataset';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pl = require('nodejs-polars');
 
@@ -43,6 +45,7 @@ describe('CsvAdapterService', () => {
     const dateFieldColumn = 'Date';
     // Can be inferred from the dataFieldColumn
     const dateFieldFrequency = 'Daily';
+    const defaultTimeDimensions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
 
     const dimensionColumns = allHeaders.filter(
       (h) =>
@@ -54,6 +57,9 @@ describe('CsvAdapterService', () => {
     await service.prisma.$executeRawUnsafe(
       `TRUNCATE table spec."DimensionGrammar";`,
     );
+    await service.prisma.$executeRawUnsafe(
+      `TRUNCATE table spec."DatasetGrammar" CASCADE;`,
+    );
     for (let i = 0; i < dimensionColumns.length; i++) {
       await service.prisma.$executeRawUnsafe(
         `DROP TABLE IF EXISTS dimensions."${dimensionColumns[i]}"`,
@@ -63,6 +69,22 @@ describe('CsvAdapterService', () => {
       `select 'drop table if exists "' || tablename || '" cascade;' 
         from pg_tables where schemaname = 'datasets';`,
     );
+    const dimensionGrammars: DimensionGrammar[] =
+      service.getDimensionGrammars(dimensionColumns);
+    const eventGrammars = service.generateEventGrammar(eventCounterColumns);
+    const datasetGrammars: DatasetGrammar[] = service.generateDatasetGrammars(
+      dimensionGrammars,
+      defaultTimeDimensions,
+      eventGrammars,
+    );
+
+    for (let i = 0; i < datasetGrammars.length; i++) {
+      await service.prisma.$executeRawUnsafe(
+        `DROP TABLE IF EXISTS datasets."${datasetGrammars[
+          i
+        ].name.toLowerCase()}"`,
+      );
+    }
 
     await service.csvToDomainSpec(
       csvPath,

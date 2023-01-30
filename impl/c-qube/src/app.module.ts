@@ -13,6 +13,16 @@ import { EventService } from './services/event/event.service';
 @Module({
   imports: [],
   controllers: [AppController],
-  providers: [AppService, PrismaService, QueryBuilderService, DimensionService, DatasetService, PipeService, TransformerService, CsvAdapterService, EventService],
+  providers: [
+    AppService,
+    PrismaService,
+    QueryBuilderService,
+    DimensionService,
+    DatasetService,
+    PipeService,
+    TransformerService,
+    CsvAdapterService,
+    EventService,
+  ],
 })
 export class AppModule {}

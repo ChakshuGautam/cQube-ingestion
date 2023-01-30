@@ -1,10 +1,10 @@
 import { JSONSchema4 } from 'json-schema';
-import { Dimension } from './dimension';
+import { DimensionGrammar } from './dimension';
 
 export interface DimensionMapping {
   key: string;
   dimension: {
-    name: Dimension;
+    name: DimensionGrammar;
     mapped_to: string;
   };
 }
