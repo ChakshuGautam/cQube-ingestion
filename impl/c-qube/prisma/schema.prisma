@@ -11,7 +11,7 @@ datasource db {
 
 model InstrumentType {
   type         String         @id @default(cuid())
-  name         String
+  name         String         @unique
   description  String?
   EventGrammar EventGrammar[]
 
@@ -48,20 +48,19 @@ model DatasetGrammar {
 }
 
 model EventGrammar {
-  id                 Int            @id @default(autoincrement())
-  name               String         @unique
-  instrument         InstrumentType @relation(fields: [instrumentTypeType], references: [type])
-  schema             Json
-  instrumentField    String
-  isActive           Boolean        @default(true)
-  description        String?
-  type               String
-  createdAt          DateTime       @default(now())
-  updatedAt          DateTime       @updatedAt
-  deletedAt          DateTime?
-  instrumentTypeType String
-  Pipe               Pipe[]
-  Transformer        Transformer[]
+  id              Int            @id @default(autoincrement())
+  name            String         @unique
+  instrument      InstrumentType @relation(fields: [instrumentType], references: [type])
+  schema          Json
+  instrumentField String
+  isActive        Boolean        @default(true)
+  description     String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  deletedAt       DateTime?
+  instrumentType  String
+  Pipe            Pipe[]
+  Transformer     Transformer[]
 
   @@schema("spec")
 }
