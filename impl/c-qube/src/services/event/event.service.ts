@@ -12,12 +12,6 @@ import {
 import { PrismaService } from '../../prisma.service';
 import { QueryBuilderService } from '../query-builder/query-builder.service';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const createCsvWriter = require('csv-writer').createObjectCsvWriter;
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const _ = require('lodash');
-
 @Injectable()
 export class EventService {
   constructor(
@@ -94,7 +88,7 @@ export class EventService {
     }
   }
 
-  async insertEventData(EventGrammar: EventGrammar, data): Promise<void> {
+  async processEventData(EventGrammar: EventGrammar, data): Promise<void> {
     const insertQuery = this.qbService.generateInsertStatement(
       EventGrammar.schema,
       data,
@@ -102,7 +96,7 @@ export class EventService {
     return null;
   }
 
-  async insertBulkEventData(
+  async processBulkEventData(
     EventGrammar: EventGrammar,
     data: any[],
   ): Promise<void> {
