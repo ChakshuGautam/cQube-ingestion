@@ -69,25 +69,6 @@ export class EventService {
       .then((model: EventGrammarModel) => this.dbModelToEventGrammar(model));
   }
 
-  async createEvent(
-    EventGrammar: EventGrammar,
-    autoPrimaryKey = true,
-  ): Promise<void> {
-    const createQuery = this.qbService.generateCreateStatement(
-      EventGrammar.schema,
-      autoPrimaryKey,
-    );
-    const indexQuery: string[] = this.qbService.generateIndexStatement(
-      EventGrammar.schema,
-    );
-    await this.prisma.$queryRawUnsafe(createQuery);
-
-    // iterate over indexQuery and execute each query
-    for (const query of indexQuery) {
-      await this.prisma.$queryRawUnsafe(query);
-    }
-  }
-
   async processEventData(EventGrammar: EventGrammar, data): Promise<void> {
     const insertQuery = this.qbService.generateInsertStatement(
       EventGrammar.schema,
