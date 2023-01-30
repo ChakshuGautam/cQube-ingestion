@@ -33,7 +33,6 @@ export class QueryBuilderService {
     const fkStatements = schema.fk.map((fk: fk) => {
       return `constraint fk_${fk.column} FOREIGN KEY (${fk.column}) REFERENCES ${fk.reference.table}(name)`;
     });
-    console.debug('fkStatements', fkStatements);
     createStatement = createStatement.replace(');', ',');
     createStatement += fkStatements.join(',\n');
     createStatement += ');';
@@ -82,7 +81,6 @@ export class QueryBuilderService {
         schema,
         createStatement,
       );
-      console.log('createStatement', createStatement);
     }
     return this.cleanStatement(createStatement);
   }

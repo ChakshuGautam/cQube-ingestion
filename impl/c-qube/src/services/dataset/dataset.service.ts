@@ -70,7 +70,10 @@ export class DatasetService {
       );
   }
 
-  async createDataset(datasetGrammar: DatasetGrammar): Promise<void> {
+  async createDataset(
+    datasetGrammar: DatasetGrammar,
+    autoPrimaryKey = true,
+  ): Promise<void> {
     // add FK params to schema
     if (datasetGrammar.dimensions.length > 0) {
       datasetGrammar.schema['fk'] = [];
@@ -92,13 +95,13 @@ export class DatasetService {
 
     const createQuery = this.qbService.generateCreateStatement(
       datasetGrammar.schema,
+      autoPrimaryKey,
     );
     const indexQuery: string[] = this.qbService.generateIndexStatement(
       datasetGrammar.schema,
     );
     await this.prisma.$queryRawUnsafe(createQuery).catch((error) => {
-      console.log(datasetGrammar.schema.properties);
-
+      console.error(datasetGrammar.schema.properties);
       console.error(error);
       console.error(createQuery);
     });
