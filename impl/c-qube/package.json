@@ -26,6 +26,8 @@
     "@prisma/client": "4.8.1",
     "@types/json-schema": "^7.0.11",
     "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "lodash": "^4.17.21",
     "nodejs-polars": "^0.7.2",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
