@@ -17,4 +17,16 @@ describe('InstrumenttypeService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+
+  it('should create a default instrument type', async () => {
+    const instrumentType = await service.createDefaultInstrumentType();
+    expect(instrumentType).toBeDefined();
+    expect(instrumentType.name).toEqual('COUNTER');
+  });
+
+  it('should get an instrument type by name', async () => {
+    const instrumentType = await service.getInstrumentTypeByName('COUNTER');
+    expect(instrumentType).toBeDefined();
+    expect(instrumentType.name).toEqual('COUNTER');
+  });
 });

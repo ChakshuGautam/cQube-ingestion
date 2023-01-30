@@ -13,6 +13,7 @@ export class InstrumenttypeService {
   ) {
     this.createDefaultInstrumentType();
   }
+
   // insert a default instrument type
   async createDefaultInstrumentType(): Promise<InstrumentTypeModel> {
     if ((await this.prisma.instrumentType.findMany()).length > 0) {
@@ -24,5 +25,15 @@ export class InstrumenttypeService {
         },
       });
     }
+  }
+
+  getInstrumentTypeByName(
+    instrumentName: string,
+  ): Promise<InstrumentTypeModel> {
+    return this.prisma.instrumentType.findUnique({
+      where: {
+        name: instrumentName,
+      },
+    });
   }
 }
