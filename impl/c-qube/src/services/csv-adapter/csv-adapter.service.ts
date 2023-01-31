@@ -60,7 +60,10 @@ export class CsvAdapterService {
     await this.insertDimensionData(dimensionGrammars, df);
 
     // Generate EventGrammar
-    const eventGrammars = this.generateEventGrammar(eventCounterColumns);
+    const eventGrammars: EventGrammar[] = this.generateEventGrammar(
+      eventCounterColumns,
+      dimensionGrammars,
+    );
 
     // TODO: Insert EventGrammars into the database
 
@@ -72,7 +75,7 @@ export class CsvAdapterService {
     const dataserGrammars: DatasetGrammar[] = this.generateDatasetGrammars(
       dimensionGrammars,
       defaultTimeDimensions,
-      eventGrammars,
+      eventCounterColumns,
     );
 
     //TODO: Insert DatasetGrammars into the database
@@ -98,12 +101,12 @@ export class CsvAdapterService {
   public generateDatasetGrammars(
     dimensionGrammars: DimensionGrammar[],
     defaultTimeDimensions: string[],
-    eventGrammars: EventGrammar[],
+    eventCounterColumns: string[],
   ): DatasetGrammar[] {
     const datasetGrammars: DatasetGrammar[] = [];
     for (let i = 0; i < dimensionGrammars.length; i++) {
       for (let j = 0; j < defaultTimeDimensions.length; j++) {
-        for (let k = 0; k < eventGrammars.length; k++) {
+        for (let k = 0; k < eventCounterColumns.length; k++) {
           const dimensionMapping: DimensionMapping[] = [];
           dimensionMapping.push({
             key: `${dimensionGrammars[i].name}`,
@@ -114,11 +117,11 @@ export class CsvAdapterService {
           });
           const dataserGrammar: DatasetGrammar = {
             // content_subject_daily_total_interactions
-            name: `${dimensionGrammars[i].name}_${defaultTimeDimensions[j]}_${eventGrammars[k].name}`,
+            name: `${dimensionGrammars[i].name}_${defaultTimeDimensions[j]}_${eventCounterColumns[k]}`,
             description: '',
             dimensions: dimensionMapping,
             schema: {
-              title: `${dimensionGrammars[i].name}_${defaultTimeDimensions[j]}_${eventGrammars[k].name}`,
+              title: `${dimensionGrammars[i].name}_${defaultTimeDimensions[j]}_${eventCounterColumns[k]}`,
               psql_schema: 'datasets',
               properties: {
                 [dimensionGrammars[i].name]: { type: 'string' },
@@ -133,24 +136,41 @@ export class CsvAdapterService {
     return datasetGrammars;
   }
 
-  public generateEventGrammar(eventCounterColumns: string[]) {
-    return eventCounterColumns.map((event) => {
-      return {
-        name: event,
-        instrument: {
-          type: InstrumentType.COUNTER,
-          name: 'counter',
-        },
-        description: '',
-        instrument_field: 'counter',
-        is_active: true,
-        schema: {
-          properties: {
-            id: { type: 'string' },
+  public generateEventGrammar(
+    eventCounterColumns: string[],
+    dimensionGrammars: DimensionGrammar[],
+  ) {
+    const eventGrammars: EventGrammar[] = [];
+    for (let i = 0; i < dimensionGrammars.length; i++) {
+      for (let j = 0; j < eventCounterColumns.length; j++) {
+        const eventName = `${dimensionGrammars[i].name}_${eventCounterColumns[j]}`;
+        const eventGrammar: EventGrammar = {
+          name: eventName,
+          instrument: {
+            type: InstrumentType.COUNTER,
+            name: 'counter',
           },
-        } as JSONSchema4,
-      } as EventGrammar;
-    });
+          description: '',
+          instrument_field: 'counter',
+          dimension: {
+            key: '',
+            dimension: {
+              name: dimensionGrammars[i],
+              mapped_to: `${dimensionGrammars[i].name}`,
+            },
+          } as DimensionMapping,
+          is_active: true,
+          schema: {
+            properties: {
+              id: { type: 'string' },
+            },
+          } as JSONSchema4,
+        } as EventGrammar;
+
+        eventGrammars.push(eventGrammar);
+      }
+    }
+    return eventGrammars;
   }
 
   public async insertDimensionData(

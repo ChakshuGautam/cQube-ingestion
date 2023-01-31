@@ -71,11 +71,14 @@ describe('CsvAdapterService', () => {
     );
     const dimensionGrammars: DimensionGrammar[] =
       service.getDimensionGrammars(dimensionColumns);
-    const eventGrammars = service.generateEventGrammar(eventCounterColumns);
+    const eventGrammars = service.generateEventGrammar(
+      eventCounterColumns,
+      dimensionGrammars,
+    );
     const datasetGrammars: DatasetGrammar[] = service.generateDatasetGrammars(
       dimensionGrammars,
       defaultTimeDimensions,
-      eventGrammars,
+      eventCounterColumns,
     );
 
     for (let i = 0; i < datasetGrammars.length; i++) {

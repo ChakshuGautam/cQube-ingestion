@@ -33,51 +33,50 @@ model DimensionGrammar {
 }
 
 model DatasetGrammar {
-  id          Int           @id @default(autoincrement())
-  name        String        @unique
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
   description String?
   dimensions  Json
   schema      Json
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
   Pipe        Pipe[]
-  Transformer Transformer[]
 
   @@schema("spec")
 }
 
 model EventGrammar {
-  id              Int            @id @default(autoincrement())
-  name            String         @unique
-  instrument      InstrumentType @relation(fields: [instrumentType], references: [type])
-  schema          Json
-  instrumentField String
-  isActive        Boolean        @default(true)
-  description     String?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  deletedAt       DateTime?
-  instrumentType  String
-  Pipe            Pipe[]
-  Transformer     Transformer[]
+  id               Int            @id @default(autoincrement())
+  name             String         @unique
+  instrument       InstrumentType @relation(fields: [instrumentType], references: [type])
+  schema           Json
+  dimensionMapping Json
+  instrumentField  String
+  isActive         Boolean        @default(true)
+  description      String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  deletedAt        DateTime?
+  instrumentType   String
+  Pipe             Pipe[]
 
   @@schema("spec")
 }
 
 model Transformer {
-  id               Int            @id @default(autoincrement())
-  name             String         @unique
-  event            EventGrammar   @relation(fields: [eventGrammarId], references: [id])
-  dataset          DatasetGrammar @relation(fields: [datasetGrammarId], references: [id])
-  transformSync    String
-  transformAsync   String
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  deletedAt        DateTime?
-  Pipe             Pipe[]
-  eventGrammarId   Int
-  datasetGrammarId Int
+  id                 Int       @id @default(autoincrement())
+  name               String    @unique
+  suggestiveEvents   String[]
+  suggestiveDatasets String[]
+  transformSync      String
+  transformAsync     String
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  deletedAt          DateTime?
+  Pipe               Pipe[]
+  eventGrammarId     Int
+  datasetGrammarId   Int
 
   @@schema("transformers")
 }

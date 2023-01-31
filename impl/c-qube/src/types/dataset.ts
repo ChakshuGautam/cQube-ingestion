@@ -20,3 +20,13 @@ export interface Dataset {
   data: object;
   spec: DatasetGrammar;
 }
+
+export interface DatasetUpdateRequest {
+  data: Dataset;
+  dimensionFilter: string;
+  updateParams: {
+    sum: number;
+    count: number;
+    avg: number;
+  };
+}

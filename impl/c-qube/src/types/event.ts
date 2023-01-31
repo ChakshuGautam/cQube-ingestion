@@ -1,4 +1,5 @@
 import { JSONSchema4 } from 'json-schema';
+import { DimensionMapping } from './dataset';
 
 export enum InstrumentType {
   COUNTER,
@@ -16,6 +17,7 @@ export interface EventGrammar {
   schema: JSONSchema4;
   instrument_field: string;
   is_active: boolean;
+  dimension: DimensionMapping;
 }
 
 export interface Event {
