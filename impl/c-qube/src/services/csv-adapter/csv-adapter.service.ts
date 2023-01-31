@@ -133,10 +133,15 @@ export class CsvAdapterService {
       isChainable: false,
       pipeContext: {},
     };
-    const datasetUpdateRequest: DatasetUpdateRequest[] | Event[] =
-      pipe.transformer.transformSync(callback, transformContext, events);
+    const datasetUpdateRequest: DatasetUpdateRequest[] =
+      pipe.transformer.transformSync(
+        callback,
+        transformContext,
+        events,
+      ) as DatasetUpdateRequest[];
 
     console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
+    this.datasetService.processDatasetUpdateRequest(datasetUpdateRequest);
 
     return {};
   }

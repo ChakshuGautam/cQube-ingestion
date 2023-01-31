@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { DatasetGrammar, DimensionMapping } from '../../types/dataset';
+import {
+  DatasetGrammar,
+  DatasetUpdateRequest,
+  DimensionMapping,
+} from '../../types/dataset';
 import { DatasetGrammar as DatasetGrammarModel } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
 import { QueryBuilderService } from '../query-builder/query-builder.service';
@@ -139,5 +143,15 @@ export class DatasetService {
       data,
     );
     await this.prisma.$queryRawUnsafe(insertQuery);
+  }
+
+  async processDatasetUpdateRequest(
+    durs: DatasetUpdateRequest[],
+  ): Promise<void> {
+    const data = [];
+    for (const dur of durs) {
+      data.push({ ...dur.updateParams, ...dur.filterParams });
+    }
+    await this.insertBulkDatasetData(durs[0].dataset, data);
   }
 }

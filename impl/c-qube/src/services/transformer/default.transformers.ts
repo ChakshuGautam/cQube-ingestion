@@ -55,7 +55,7 @@ export const defaultTransformers: Transformer[] = [
               },
               filterParams: {
                 date: x[0],
-                name: x[1],
+                dimensions_pdata_id: x[1],
               },
             };
           });
