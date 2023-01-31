@@ -19,6 +19,15 @@ export class DatasetService {
     };
   }
 
+  addDateDimension(key): any {
+    return {
+      [key]: {
+        type: 'string',
+        format: 'date',
+      },
+    };
+  }
+
   dbModelToDatasetGrammar(model: DatasetGrammarModel): DatasetGrammar {
     return {
       name: model.name,
@@ -91,6 +100,7 @@ export class DatasetService {
     datasetGrammar.schema.properties = {
       ...datasetGrammar.schema.properties,
       ...this.counterAggregates(),
+      ...this.addDateDimension('date'),
     };
 
     const createQuery = this.qbService.generateCreateStatement(

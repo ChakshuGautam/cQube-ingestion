@@ -51,6 +51,8 @@ export class QueryBuilderService {
       createStatement += `  ${property} `;
       if (column.type === 'string' && column.format === 'date-time') {
         createStatement += 'TIMESTAMP';
+      } else if (column.type === 'string' && column.format === 'date') {
+        createStatement += `DATE`;
       } else if (
         column.type === 'number' &&
         (column.format === 'float' || column.format === 'double')

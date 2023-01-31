@@ -136,6 +136,8 @@ export class CsvAdapterService {
     const datasetUpdateRequest: DatasetUpdateRequest[] | Event[] =
       pipe.transformer.transformSync(callback, transformContext, events);
 
+    console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
+
     return {};
   }
 

@@ -30,6 +30,8 @@ export const defaultTransformers: Transformer[] = [
           .filter((x) => !Number.isNaN(x['counter']))
           .filter((x) => x['date'] === '11/01/23');
 
+        // TODO: Change the above date string to regex
+
         const newDF: DataFrame = pl.readRecords(eventData, {
           inferSchemaLength: 10,
         });
@@ -40,18 +42,24 @@ export const defaultTransformers: Transformer[] = [
             pl.count('counter').alias('count'),
             pl.col('counter').sum().alias('sum'),
           );
-        console.log('df', changedDF);
-        return [
-          {
-            dataset: context.dataset,
-            dimensionFilter: events[0].spec.name,
-            updateParams: {
-              sum: 1,
-              count: 1,
-              avg: 1,
-            },
-          },
-        ] as DatasetUpdateRequest[];
+        const datasetUpdateRequests: DatasetUpdateRequest[] = changedDF
+          .select('date', 'name', 'avg', 'count', 'sum')
+          .map((x) => {
+            return {
+              dataset: context.dataset,
+              dimensionFilter: events[0].spec.name,
+              updateParams: {
+                sum: x[4],
+                count: x[3],
+                avg: x[2],
+              },
+              filterParams: {
+                date: x[0],
+                name: x[1],
+              },
+            };
+          });
+        return datasetUpdateRequests;
       }
     },
   },

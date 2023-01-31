@@ -29,4 +29,7 @@ export interface DatasetUpdateRequest {
     count: number;
     avg: number;
   };
+  filterParams: {
+    [key: string]: string;
+  };
 }
