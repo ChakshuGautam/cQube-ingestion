@@ -124,7 +124,7 @@ export class CsvAdapterService {
       context: TransformerContext,
       events: Event[],
     ) => {
-      console.debug('callback', err, events.length);
+      //console.debug('callback', err, events.length);
     };
 
     const transformContext: TransformerContext = {
@@ -140,7 +140,7 @@ export class CsvAdapterService {
         events,
       ) as DatasetUpdateRequest[];
 
-    console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
+    // console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
     this.datasetService.processDatasetUpdateRequest(datasetUpdateRequest);
 
     return {};
