@@ -75,8 +75,6 @@ model Transformer {
   updatedAt          DateTime  @updatedAt
   deletedAt          DateTime?
   Pipe               Pipe[]
-  eventGrammarId     Int
-  datasetGrammarId   Int
 
   @@schema("transformers")
 }

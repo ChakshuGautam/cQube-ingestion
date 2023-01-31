@@ -100,8 +100,6 @@ export class CsvAdapterService {
       dataset: datasetGrammars[0],
     };
 
-    console.log(JSON.stringify(pipe, null, 2));
-
     // TODO: Insert Pipes into the database
 
     // Generate Events for pipe
@@ -126,7 +124,7 @@ export class CsvAdapterService {
       context: TransformerContext,
       events: Event[],
     ) => {
-      console.log('callback', err, events.length);
+      console.debug('callback', err, events.length);
     };
 
     const transformContext: TransformerContext = {

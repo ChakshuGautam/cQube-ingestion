@@ -13,12 +13,12 @@ export class TransformerService {
   constructor(public prisma: PrismaService) {}
   // Crude implementation of AKKA actor
   stringToTransformAsync = (transformAsync: string): TransformAsync => {
-    return (callback, event) => {
+    return (callback, context, event) => {
       // event will be processed by eval
       return new Promise((resolve, reject) => {
         try {
           const result = eval(transformAsync);
-          callback(null, result);
+          callback(null, context, result);
           resolve(result);
         } catch (error) {
           reject(error);
@@ -28,10 +28,10 @@ export class TransformerService {
   };
 
   stringToTransformSync = (transformSync: string): TransformSync => {
-    return (callback, event) => {
+    return (callback, context, event) => {
       try {
         const result = eval(transformSync);
-        callback(null, result);
+        callback(null, context, result);
         return result;
       } catch (error) {
         throw error;
@@ -40,19 +40,17 @@ export class TransformerService {
   };
 
   async persistTransormer(transformer: Transformer): Promise<TransformerModel> {
-    const eventGrammar: EventGrammarModel =
-      await this.prisma.eventGrammar.findUnique({
-        where: { name: transformer.event.name },
-      });
-    const datasetGrammar: DatasetGrammarModel =
-      await this.prisma.datasetGrammar.findUnique({
-        where: { name: transformer.event.name },
-      });
+    // const eventGrammar: EventGrammarModel =
+    //   await this.prisma.eventGrammar.findUnique({
+    //     where: { name: transformer },
+    //   });
+    // const datasetGrammar: DatasetGrammarModel =
+    //   await this.prisma.datasetGrammar.findUnique({
+    //     where: { name: transformer.event.name },
+    //   });
     return this.prisma.transformer.create({
       data: {
         name: transformer.name,
-        eventGrammarId: eventGrammar.id,
-        datasetGrammarId: datasetGrammar.id,
         transformAsync: transformer.transformAsync
           ? transformer.transformAsync.toString()
           : null,
