@@ -22,7 +22,7 @@ export interface Dataset {
 }
 
 export interface DatasetUpdateRequest {
-  data: Dataset;
+  dataset: DatasetGrammar;
   dimensionFilter: string;
   updateParams: {
     sum: number;

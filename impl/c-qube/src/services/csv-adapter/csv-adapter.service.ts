@@ -3,10 +3,17 @@ import { JSONSchema4 } from 'json-schema';
 import { DataFrame } from 'nodejs-polars';
 import { PrismaService } from '../../prisma.service';
 import { DimensionGrammar } from 'src/types/dimension';
-import { EventGrammar, InstrumentType } from '../../types/event';
+import { Event, EventGrammar, InstrumentType } from '../../types/event';
 import { DimensionService } from '../dimension/dimension.service';
 import { DatasetService } from '../dataset/dataset.service';
-import { DatasetGrammar, DimensionMapping } from '../../types/dataset';
+import {
+  DatasetGrammar,
+  DatasetUpdateRequest,
+  DimensionMapping,
+} from '../../types/dataset';
+import { defaultTransformers } from '../transformer/default.transformers';
+import { Pipe } from 'src/types/pipe';
+import { TransformerContext } from 'src/types/transformer';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pl = require('nodejs-polars');
@@ -64,7 +71,6 @@ export class CsvAdapterService {
       eventCounterColumns,
       dimensionGrammars,
     );
-
     // TODO: Insert EventGrammars into the database
 
     // Generate DatasetGrammar
@@ -72,29 +78,66 @@ export class CsvAdapterService {
 
     // Generate DatasetGrammars
     // Loop over Dimensions and pick one of time dimensions, pick one of eventGrammars
-    const dataserGrammars: DatasetGrammar[] = this.generateDatasetGrammars(
+    const datasetGrammars: DatasetGrammar[] = this.generateDatasetGrammars(
       dimensionGrammars,
       defaultTimeDimensions,
       eventCounterColumns,
     );
 
-    //TODO: Insert DatasetGrammars into the database
+    // Insert DatasetGrammars into the database
     await Promise.all(
-      dataserGrammars.map((x) => this.datasetService.createDatasetGrammar(x)),
+      datasetGrammars.map((x) => this.datasetService.createDatasetGrammar(x)),
     );
 
     await Promise.all(
-      dataserGrammars.map((x) => this.datasetService.createDataset(x)),
+      datasetGrammars.map((x) => this.datasetService.createDataset(x)),
     );
+
+    // Create Pipes
+    const pipe: Pipe = {
+      event: eventGrammars[0],
+      transformer: defaultTransformers[0],
+      dataset: datasetGrammars[0],
+    };
+
+    console.log(JSON.stringify(pipe, null, 2));
+
+    // TODO: Insert Pipes into the database
+
+    // Generate Events for pipe
+    const events: Event[] = df
+      .select('dimensions_pdata_id', 'total_interactions', 'Date')
+      .map((x) => {
+        return {
+          spec: eventGrammars[0],
+          data: {
+            name: x[0],
+            counter: parseInt(x[1]),
+            date: x[2],
+          },
+        };
+      });
+
+    // console.log(events.length, JSON.stringify(events[0], null, 2));
 
     // Insert events into the datasets
+    const callback = (
+      err: any,
+      context: TransformerContext,
+      events: Event[],
+    ) => {
+      console.log('callback', err, events.length);
+    };
 
-    // Divide Headers into 3 groups - EventsCounters, EventSubjects and Dimensions
-    // The current criteria is that the name of the headers should contain the word "event" or "dimension"
-    // Auto generate Domain Spec from the headers and the types of fields (string, number, boolean)
-    // 1. Auto Generate the EventGrammar and DimensionGrammar
-    // 2. Auto Generate the Event and Dimensions
-    // 3. Auto Generate the DatasetGrammar
+    const transformContext: TransformerContext = {
+      dataset: datasetGrammars[0],
+      events: events,
+      isChainable: false,
+      pipeContext: {},
+    };
+    const datasetUpdateRequest: DatasetUpdateRequest[] | Event[] =
+      pipe.transformer.transformSync(callback, transformContext, events);
+
     return {};
   }
 

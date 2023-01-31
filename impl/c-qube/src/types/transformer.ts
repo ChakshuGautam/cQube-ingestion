@@ -10,23 +10,23 @@ type CallbackHandler = (
 ) => void;
 
 export type TransformerContext = {
-  dataset: Dataset;
-  event: Event[];
+  dataset: DatasetGrammar;
+  events: Event[];
   isChainable: boolean;
   pipeContext: any;
 };
 
 export type TransformAsync = (
   callback: CallbackHandler,
-  connext: TransformerContext,
+  context: TransformerContext,
   events: Event[],
-) => Promise<Event[] | DatasetUpdateRequest>;
+) => Promise<Event[] | DatasetUpdateRequest[]>;
 
 export type TransformSync = (
   callback: CallbackHandler,
-  connext: TransformerContext,
+  context: TransformerContext,
   events: Event[],
-) => Event[] | DatasetUpdateRequest;
+) => Event[] | DatasetUpdateRequest[];
 
 export interface Transformer {
   name: string;
