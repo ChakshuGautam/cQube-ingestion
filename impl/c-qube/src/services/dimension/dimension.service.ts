@@ -59,6 +59,16 @@ export class DimensionService {
       );
   }
 
+  async getDimensionGrammaModelByName(
+    name: string,
+  ): Promise<DimensionGrammarModel | null> {
+    return this.prisma.dimensionGrammar.findFirst({
+      where: {
+        name: name,
+      },
+    });
+  }
+
   async getDimensionGrammarByName(
     name: string,
   ): Promise<DimensionGrammar | null> {
