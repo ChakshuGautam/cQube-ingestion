@@ -306,11 +306,17 @@ export class CsvAdapterService {
       await readFile(ingestionFolder + '/config.json', 'utf8'),
     );
 
+    //   Ingest DimensionGrammar
+    //   -- Get all files that match the regex
+    //   -- Invoke createDimensionGrammarFromCSVDefinition with filePath
+    //   -- Insert them into DB - L79 for this file
     const dimensions: DimensionGrammar[] = [];
     const regexDimensionGrammar = /\-dimension\.grammar.csv$/i;
     for (let j = 0; j < config?.programs.length; j++) {
       const inputFiles = readdirSync(config?.programs[j].input?.files);
       for (let i = 0; i < inputFiles?.length; i++) {
+        // Create a function to get all files in the folder
+        // Create a function to use regex to match the file
         if (regexDimensionGrammar.test(inputFiles[i])) {
           // Getting the data from the CSV files
           // const data = await fs.readFile(
@@ -328,7 +334,9 @@ export class CsvAdapterService {
       }
     }
 
-    // Ingesting the Event
+    //   Ingest EventGrammar
+    //   -- Get all files that match the regex
+    //   -- Read the CSV
     const eventGrammars: EventGrammar[] = [];
     const regexEventGrammar = /\-event\.grammar.csv$/i;
     for (let j = 0; j < config?.programs.length; j++) {
@@ -361,7 +369,9 @@ export class CsvAdapterService {
       eventGrammars,
     );
 
-    // Insert DatasetGrammars into the database
+    //   Ingest DatasetGrammar
+    //   -- Generate Datasets using the DimensionGrammar and EventGrammar
+    //   -- Insert them into DB
     await Promise.all(
       datasetGrammars.map((x) => this.datasetService.createDatasetGrammar(x)),
     );
@@ -370,19 +380,6 @@ export class CsvAdapterService {
     await Promise.all(
       datasetGrammars.map((x) => this.datasetService.createDataset(x)),
     );
-    // Create a function to get all files in the folder
-    // Create a function to use regex to match the files
-
-    //   Ingest DimensionGrammar
-    //   -- Get all files that match the regex
-    //   -- Invoke createDimensionGrammarFromCSVDefinition with filePath
-    //   -- Insert them into DB - L79 for this file
-    //   Ingest EventGrammar
-    //   -- Get all files that match the regex
-    //   -- Read the CSV
-    //   Ingest DatasetGrammar
-    //   -- Generate Datasets using the DimensionGrammar and EventGrammar
-    //   -- Insert them into DB
 
     // Ingest Data
     //   Ingest DimensionData
