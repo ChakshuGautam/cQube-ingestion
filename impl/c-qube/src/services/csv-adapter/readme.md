@@ -125,3 +125,5 @@
   }
 }
 ```
+
+The CSVs will have headers over them to given inputs for the dataset and event. The headers are as follows:

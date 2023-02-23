@@ -6,6 +6,7 @@ import { DimensionGrammar } from 'src/types/dimension';
 import { Event, EventGrammar, InstrumentType } from '../../types/event';
 import { DimensionService } from '../dimension/dimension.service';
 import { DatasetService } from '../dataset/dataset.service';
+import { EventService } from '../event/event.service';
 import {
   DatasetGrammar,
   DatasetUpdateRequest,
@@ -14,14 +15,34 @@ import {
 import { defaultTransformers } from '../transformer/default.transformers';
 import { Pipe } from 'src/types/pipe';
 import { TransformerContext } from 'src/types/transformer';
+import { readFile } from 'fs/promises';
+import {
+  createDimensionGrammarFromCSVDefinition,
+  createEventGrammarFromCSVDefinition,
+} from './csv-adapter.utils';
+import { readdirSync } from 'fs';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
+const fs = require('fs').promises;
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const pl = require('nodejs-polars');
+
+enum ColumnType {
+  string = 'string',
+  integer = 'integer',
+  float = 'float',
+}
+
+export type Column = {
+  name: string;
+  type: ColumnType;
+};
 
 @Injectable()
 export class CsvAdapterService {
   constructor(
     public dimensionService: DimensionService,
+    public eventService: EventService,
     public datasetService: DatasetService,
     public prisma: PrismaService,
   ) {}
@@ -38,7 +59,7 @@ export class CsvAdapterService {
     // Can be inferred from the dataFieldColumn
     const dateFieldFrequency = 'Daily';
 
-    const dimensionColumns = allHeaders.filter(
+    const Columns = allHeaders.filter(
       (h) =>
         h !== dataFieldColumn &&
         !eventCounterColumns.includes(h) &&
@@ -50,7 +71,7 @@ export class CsvAdapterService {
 
     // Generate DimensionGrammar
     const dimensionGrammars: DimensionGrammar[] =
-      this.getDimensionGrammars(dimensionColumns);
+      this.getDimensionGrammars(Columns);
 
     // Insert DimensionGrammars into the database
     await Promise.all(
@@ -251,8 +272,8 @@ export class CsvAdapterService {
     await Promise.all(insertDimensionDataPromises);
   }
 
-  public getDimensionGrammars(dimensionColumns: string[]): DimensionGrammar[] {
-    return dimensionColumns.map((d) => {
+  public getDimensionGrammars(Columns: string[]): DimensionGrammar[] {
+    return Columns.map((d) => {
       return {
         name: d,
         description: '',
@@ -273,5 +294,107 @@ export class CsvAdapterService {
         },
       } as DimensionGrammar;
     });
+  }
+
+  public async ingest() {
+    await this.nuke();
+
+    // Parse the config
+    const ingestionFolder = './ingest';
+    const config = JSON.parse(
+      await readFile(ingestionFolder + '/config.json', 'utf8'),
+    );
+    const regexDimensionGrammar = /\-dimension\.grammar.csv$/i;
+    for (let j = 0; j < config?.programs.length; j++) {
+      const inputFiles = readdirSync(config?.programs[j].input?.files);
+      for (let i = 0; i < inputFiles?.length; i++) {
+        if (regexDimensionGrammar.test(inputFiles[i])) {
+          // Getting the data from the CSV files
+          // const data = await fs.readFile(
+          //   config?.programs[0].input?.files + `/${inputFiles[i]}`,
+          //   'utf8',
+          // );
+          const dimensionGrammar =
+            await createDimensionGrammarFromCSVDefinition(
+              config?.programs[j].input?.files + `/${inputFiles[i]}`,
+            );
+          await this.dimensionService.createDimension(dimensionGrammar);
+          await this.dimensionService.createDimensionGrammar(dimensionGrammar);
+        }
+      }
+    }
+
+    // Ingesting the Event
+    const regexEventGrammar = /\-event\.grammar.csv$/i;
+    for (let j = 0; j < config?.programs.length; j++) {
+      const inputFiles = readdirSync(config?.programs[j].input?.files);
+      for (let i = 0; i < inputFiles?.length; i++) {
+        if (regexEventGrammar.test(inputFiles[i])) {
+          // console.log(config?.programs[j].input?.files + `/${inputFiles[i]}`);
+          const eventGrammar = await createEventGrammarFromCSVDefinition(
+            config?.programs[j].input?.files + `/${inputFiles[i]}`,
+            config?.programs[j].input?.files,
+          );
+          console.log(eventGrammar);
+          await this.eventService.createEventGrammar(eventGrammar);
+        }
+      }
+    }
+
+    // Create a function to get all files in the folder
+    // Create a function to use regex to match the files
+
+    //   Ingest DimensionGrammar
+    //   -- Get all files that match the regex
+    //   -- Invoke createDimensionGrammarFromCSVDefinition with filePath
+    //   -- Insert them into DB - L79 for this file
+    //   Ingest EventGrammar
+    //   -- Get all files that match the regex
+    //   -- Read the CSV
+    //   Ingest DatasetGrammar
+    //   -- Generate Datasets using the DimensionGrammar and EventGrammar
+    //   -- Insert them into DB
+
+    // Ingest Data
+    //   Ingest DimensionData
+    //   -- Get all files that match the regex
+    //   -- Read the CSV
+    //   Ingest EventData
+    //   -- Get all files that match the regex
+    //   -- Read the CSV
+  }
+
+  public async nuke() {
+    try {
+      await this.prisma.$executeRawUnsafe(
+        `TRUNCATE table spec."DimensionGrammar" CASCADE;`,
+      );
+      await this.prisma.$executeRawUnsafe(
+        `TRUNCATE table spec."DatasetGrammar" CASCADE;`,
+      );
+      await this.prisma.$executeRawUnsafe(
+        `TRUNCATE table spec."EventGrammar" CASCADE;`,
+      );
+
+      const dimensions: any[] = await this.prisma
+        .$queryRaw`select 'drop table if exists "' || tablename || '" cascade;'
+        from pg_tables where schemaname = 'dimensions';`;
+      for (let i = 0; i < dimensions.length; i++) {
+        const parts = dimensions[i]['?column?'].split('"');
+        const query = parts[0] + '"dimensions"."' + parts[1] + '"' + parts[2];
+        await this.prisma.$executeRawUnsafe(query);
+      }
+
+      const datasets: any[] = await this.prisma
+        .$queryRaw`select 'drop table if exists "' || tablename || '" cascade;'
+        from pg_tables where schemaname = 'datasets';`;
+      for (let i = 0; i < datasets.length; i++) {
+        const parts = datasets[i]['?column?'].split('"');
+        const query = parts[0] + '"datasets"."' + parts[1] + '"' + parts[2];
+        await this.prisma.$executeRawUnsafe(query);
+      }
+    } catch (e) {
+      console.error(e);
+    }
   }
 }

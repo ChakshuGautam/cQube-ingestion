@@ -36,29 +36,42 @@ export class EventService {
     };
   }
 
-  async createEventGrammar(EventGrammar: EventGrammar): Promise<EventGrammar> {
+  // async createEvent(
+  //   eventGrammar: EventGrammar,
+  //   autoPrimaryKey = true,
+  // ): Promise<void> {
+  //   const createQuery = this.qbService.generateCreateStatement(
+  //     eventGrammar.schema,
+  //     autoPrimaryKey,
+  //   );
+  //   console.log(createQuery);
+  //   console.log('------');
+  //   await this.prisma.$queryRawUnsafe(createQuery);
+  // }
+
+  async createEventGrammar(eventGrammar: EventGrammar): Promise<EventGrammar> {
     const dimensionGrammar: DimensionGrammarModel =
       await this.dimensionService.getDimensionGrammaModelByName(
-        EventGrammar.dimension.dimension.name.name,
+        eventGrammar.dimension.dimension.name.name,
       );
     return this.prisma.eventGrammar
       .create({
         data: {
-          name: EventGrammar.name,
-          description: EventGrammar.description,
-          schema: EventGrammar.schema,
-          instrumentField: EventGrammar.instrument_field,
-          isActive: EventGrammar.is_active,
+          name: eventGrammar.name,
+          description: eventGrammar.description,
+          schema: eventGrammar.schema,
+          instrumentField: eventGrammar.instrument_field,
+          isActive: eventGrammar.is_active,
           dimensionMapping: JSON.stringify({
-            key: EventGrammar.dimension.key,
+            key: eventGrammar.dimension.key,
             dimension: {
               name: dimensionGrammar.id,
-              mapped_to: EventGrammar.dimension.dimension.mapped_to,
+              mapped_to: eventGrammar.dimension.dimension.mapped_to,
             },
           }),
           instrument: {
             connect: {
-              name: EventGrammar.instrument.name,
+              name: 'COUNTER', //TODO: Change this to eventGrammar.instrument.name
             },
           },
         },

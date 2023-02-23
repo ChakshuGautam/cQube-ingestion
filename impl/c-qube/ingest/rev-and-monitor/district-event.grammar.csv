@@ -1,0 +1,5 @@
+,district,
+,district_id,
+date,string,string
+date,district_id,meeting_conducted
+timeDimension,dimension,metric

@@ -1,0 +1,5 @@
+,cluster,
+,cluster_id,
+date,string,integer
+date,cluster_id,meeting_conducted
+timeDimension,dimension,metric

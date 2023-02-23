@@ -1,0 +1,15 @@
+{
+  "programs": [
+    {
+      "name": "Review and Monitoring",
+      "description": "Review and Monitoring",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/rev-and-monitor"
+      },
+      "output": {
+        "location": "output/rev-and-monitor"
+      }
+    }
+  ]
+}

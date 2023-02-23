@@ -36,3 +36,4 @@ lerna-debug.log*
 
 # Fixtures
 !fixtures/**
+!rev-and-monitor/**

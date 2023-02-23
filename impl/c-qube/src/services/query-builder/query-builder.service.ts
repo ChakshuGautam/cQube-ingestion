@@ -17,6 +17,7 @@ export class QueryBuilderService {
     return (
       statement
         .replace(/^[ ]+|[ ]+$/g, '')
+        // Due to BAD data in CSV files, this might fail so commented out
         // .replace(/\s\s+/g, ' ')
         .replace(/\n/g, '')
         .replace(/\(\s+/g, '(')
