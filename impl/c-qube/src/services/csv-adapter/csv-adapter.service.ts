@@ -17,6 +17,7 @@ import { Pipe } from 'src/types/pipe';
 import { TransformerContext } from 'src/types/transformer';
 import { readFile } from 'fs/promises';
 import {
+  createDatasetGrammarsFromEG,
   createDimensionGrammarFromCSVDefinition,
   createEventGrammarFromCSVDefinition,
 } from './csv-adapter.utils';
@@ -27,7 +28,7 @@ const fs = require('fs').promises;
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pl = require('nodejs-polars');
 
-enum ColumnType {
+export enum ColumnType {
   string = 'string',
   integer = 'integer',
   float = 'float',
@@ -304,6 +305,8 @@ export class CsvAdapterService {
     const config = JSON.parse(
       await readFile(ingestionFolder + '/config.json', 'utf8'),
     );
+
+    const dimensions: DimensionGrammar[] = [];
     const regexDimensionGrammar = /\-dimension\.grammar.csv$/i;
     for (let j = 0; j < config?.programs.length; j++) {
       const inputFiles = readdirSync(config?.programs[j].input?.files);
@@ -318,13 +321,15 @@ export class CsvAdapterService {
             await createDimensionGrammarFromCSVDefinition(
               config?.programs[j].input?.files + `/${inputFiles[i]}`,
             );
-          await this.dimensionService.createDimension(dimensionGrammar);
+          dimensions.push(dimensionGrammar);
           await this.dimensionService.createDimensionGrammar(dimensionGrammar);
+          await this.dimensionService.createDimension(dimensionGrammar);
         }
       }
     }
 
     // Ingesting the Event
+    const eventGrammars: EventGrammar[] = [];
     const regexEventGrammar = /\-event\.grammar.csv$/i;
     for (let j = 0; j < config?.programs.length; j++) {
       const inputFiles = readdirSync(config?.programs[j].input?.files);
@@ -336,11 +341,35 @@ export class CsvAdapterService {
             config?.programs[j].input?.files,
           );
           console.log(eventGrammar);
-          await this.eventService.createEventGrammar(eventGrammar);
+          eventGrammars.push(...eventGrammar);
+          for (let i = 0; i < eventGrammar.length; i++) {
+            console.log(eventGrammar[i].name);
+            await this.eventService
+              .createEventGrammar(eventGrammar[i])
+              .catch((e) => {
+                console.error(e);
+              });
+          }
         }
       }
     }
+    const defaultTimeDimensions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
+    const datasetGrammars = createDatasetGrammarsFromEG(
+      'rev_and_monitoring',
+      dimensions,
+      defaultTimeDimensions,
+      eventGrammars,
+    );
 
+    // Insert DatasetGrammars into the database
+    await Promise.all(
+      datasetGrammars.map((x) => this.datasetService.createDatasetGrammar(x)),
+    );
+
+    // Create Empty Dataset Tables
+    await Promise.all(
+      datasetGrammars.map((x) => this.datasetService.createDataset(x)),
+    );
     // Create a function to get all files in the folder
     // Create a function to use regex to match the files
 

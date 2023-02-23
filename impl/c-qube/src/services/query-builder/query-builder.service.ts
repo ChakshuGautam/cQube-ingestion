@@ -32,7 +32,11 @@ export class QueryBuilderService {
   ): string {
     createStatement = this.cleanStatement(createStatement);
     const fkStatements = schema.fk.map((fk: fk) => {
-      return `constraint fk_${fk.column} FOREIGN KEY (${fk.column}) REFERENCES ${fk.reference.table}(name)`;
+      let referenceField = `${fk.reference.table}(name)`;
+      if (fk.reference.column) {
+        referenceField = `${fk.reference.table}(${fk.reference.column})`;
+      }
+      return `constraint fk_${fk.column} FOREIGN KEY (${fk.column}) REFERENCES ${referenceField}`; //TODO: Should be the FK
     });
     createStatement = createStatement.replace(');', ',');
     createStatement += fkStatements.join(',\n');

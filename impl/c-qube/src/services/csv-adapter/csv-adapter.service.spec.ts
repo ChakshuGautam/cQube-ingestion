@@ -6,6 +6,7 @@ import { DimensionService } from '../dimension/dimension.service';
 import { DatasetService } from '../dataset/dataset.service';
 import { DimensionGrammar } from 'src/types/dimension';
 import {
+  createDatasetGrammarsFromEG,
   createDimensionGrammarFromCSVDefinition,
   createEventGrammar,
   createEventGrammarFromCSVDefinition,
@@ -208,15 +209,21 @@ describe('CsvAdapterService', () => {
   });
 
   it('should create a datasetGrammars from a CSV', async () => {
-    // const csvPathDimension = 'fixtures/cluster-dimension.grammar.csv';
-    // const csvPathEvent = 'fixtures/cluster-event.grammar.csv';
-    // const dimensionGrammarForCluster: DimensionGrammar =
-    //   await createDimensionGrammarFromCSVDefinition(csvPathDimension);
-    // const eventGrammarForCluster: EventGrammar =
-    //   await createDimensionGrammarFromCSVDefinition(csvPathDimension);
-    // const datasetGrammars: DatasetGrammar[] =
-    //   await generateDatasetGrammarsFromEGandDimG();
-    expect(1).toEqual(1);
+    const csvPathDimension = 'fixtures/cluster-dimension.grammar.csv';
+    const csvPathEvent = 'fixtures/cluster-event.grammar.csv';
+    const dimensionGrammarForCluster: DimensionGrammar =
+      await createDimensionGrammarFromCSVDefinition(csvPathDimension);
+    const eventGrammarForCluster: EventGrammar =
+      await createEventGrammarFromCSVDefinition(csvPathEvent, 'fixtures');
+    const defaultTimeDimensions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
+    const datasetGrammars: DatasetGrammar[] = await createDatasetGrammarsFromEG(
+      [dimensionGrammarForCluster],
+      defaultTimeDimensions,
+      [eventGrammarForCluster],
+    );
+    expect(datasetGrammars).toBeDefined();
+    console.log(JSON.stringify(datasetGrammars[0], null, 2));
+    expect(datasetGrammars.length).toEqual(4);
   });
 
   // Run first
