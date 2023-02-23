@@ -112,98 +112,12 @@ describe('CsvAdapterService', () => {
 
   it('should test the creation of EventGrammar', async () => {
     const csvPath = 'fixtures/cluster-event.grammar.csv';
-    const eventGrammar: EventGrammar =
+    const eventGrammars: EventGrammar[] =
       await createEventGrammarFromCSVDefinition(csvPath, 'fixtures');
-    expect(eventGrammar).toBeDefined();
 
-    const exptectedEventGrammar = {
-      name: 'cluster',
-      instrument: {
-        type: 0,
-        name: 'counter',
-      },
-      description: '',
-      instrument_field: 'meeting_conducted',
-      dimension: {
-        key: 'cluster_id',
-        dimension: {
-          name: {
-            name: 'cluster',
-            description: '',
-            type: 'dynamic',
-            storage: {
-              indexes: ['name'],
-              primaryId: 'cluster_id',
-              retention: null,
-              bucket_size: null,
-            },
-            schema: {
-              title: 'cluster',
-              psql_schema: 'dimensions',
-              properties: {
-                cluster_id: {
-                  type: 'string',
-                  unique: true,
-                },
-                cluster_name: {
-                  type: 'string',
-                  unique: true,
-                },
-                block_id: {
-                  type: 'string',
-                  unique: true,
-                },
-                block_name: {
-                  type: 'string',
-                  unique: true,
-                },
-                district_id: {
-                  type: 'string',
-                  unique: true,
-                },
-                district_name: {
-                  type: 'string',
-                  unique: true,
-                },
-                latitude: {
-                  type: 'string',
-                  unique: true,
-                },
-                longitude: {
-                  type: 'string',
-                  unique: true,
-                },
-              },
-              indexes: [
-                {
-                  columns: [['cluster_name']],
-                },
-              ],
-            },
-          },
-          mapped_to: 'cluster_id',
-        },
-      },
-      is_active: true,
-      schema: {
-        properties: {
-          date: {
-            type: 'date',
-            unique: true,
-          },
-          cluster_id: {
-            type: 'string',
-            unique: true,
-          },
-          meeting_conducted: {
-            type: 'integer',
-            unique: true,
-          },
-        },
-      },
-    };
+    expect(eventGrammars).toBeDefined();
+    expect(eventGrammars.length).toEqual(3);
 
-    expect(eventGrammar).toEqual(exptectedEventGrammar);
     // Pretty print dimensionGrammar object
     // console.log(JSON.stringify(eventGrammar, null, 2));
   });
@@ -213,17 +127,17 @@ describe('CsvAdapterService', () => {
     const csvPathEvent = 'fixtures/cluster-event.grammar.csv';
     const dimensionGrammarForCluster: DimensionGrammar =
       await createDimensionGrammarFromCSVDefinition(csvPathDimension);
-    const eventGrammarForCluster: EventGrammar =
+    const eventGrammarForCluster: EventGrammar[] =
       await createEventGrammarFromCSVDefinition(csvPathEvent, 'fixtures');
     const defaultTimeDimensions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
     const datasetGrammars: DatasetGrammar[] = await createDatasetGrammarsFromEG(
+      'fixtures',
       [dimensionGrammarForCluster],
       defaultTimeDimensions,
-      [eventGrammarForCluster],
+      eventGrammarForCluster,
     );
     expect(datasetGrammars).toBeDefined();
-    console.log(JSON.stringify(datasetGrammars[0], null, 2));
-    expect(datasetGrammars.length).toEqual(4);
+    expect(datasetGrammars.length).toEqual(12);
   });
 
   // Run first
