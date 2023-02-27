@@ -1,7 +1,9 @@
-#### Transformer Grammar
-tranformer is defined as the following: _t(event) => dataset_
+# Transformer Grammar
+
+Transformers can be visualized as functions or transformations  : _`t(event) => dataset`_
 
 Includes the following
+
 - Event Schema it can act on
 - Dataset Schema it outputs to
 - Formula that allows 
@@ -9,25 +11,25 @@ Includes the following
 A transformer is a [actor](https://en.wikipedia.org/wiki/Actor_model). A sample actor can be something like this in Javascript. Ideally this could be the same for any another actor models in another framework as well. Currently we are using [xstate](https://xstate.js.org/docs/) for this.
 
 ```js
-    const transformer = {
-        name: "transformer_name",
-        event_schema: "es11",
-        dataset_schema: "ds23",
-        config: {
-            spawn((callback, receive) => {
-                // send to parent
-                callback('SOME_EVENT');
+const transformer = {
+  name: "transformer_name",
+  event_schema: "es11",
+  dataset_schema: "ds23",
+  config: {
+    spawn((callback, receive) => {
+      // send to parent
+      callback('SOME_EVENT');
 
-                // receive from parent
-                receive((event) => {
-                // handle event
-                });
+      // receive from parent
+      receive((event) => {
+        // handle event
+      });
 
-                // disposal
-                return () => {
-                /* do cleanup here */
-                };
-            }),
-        }
-    }
+      // disposal
+      return () => {
+        /* do cleanup here */
+      };
+    }),
+  }
+}
 ```
