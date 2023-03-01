@@ -385,7 +385,6 @@ export class CsvAdapterService {
           );
           eventGrammars.push(...eventGrammar);
           for (let i = 0; i < eventGrammar.length; i++) {
-            console.log(eventGrammar[i].name);
             await this.eventService
               .createEventGrammar(eventGrammar[i])
               .catch((e) => {
