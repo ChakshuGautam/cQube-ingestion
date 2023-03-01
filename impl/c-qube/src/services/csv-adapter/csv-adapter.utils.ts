@@ -1,11 +1,23 @@
 import { JSONSchema4 } from 'json-schema';
-import { DatasetGrammar, DimensionMapping } from 'src/types/dataset';
+import { DataFrame } from 'nodejs-polars';
+import {
+  DatasetGrammar,
+  DimensionMapping,
+  TimeDimension,
+} from 'src/types/dataset';
 import { DimensionGrammar } from 'src/types/dimension';
-import { EventGrammar, InstrumentType } from '../../types/event';
+import {
+  EventGrammar,
+  InstrumentType,
+  Event as cQubeEvent,
+} from '../../types/event';
 // import { InstrumentType, EventGrammar } from 'src/types/event';
 import { Column, ColumnType } from './csv-adapter.service';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs').promises;
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const pl = require('nodejs-polars');
 
 export const createDimensionGrammarFromCSVDefinition = async (
   csvFilePath: string,
@@ -235,29 +247,166 @@ export const createDatasetGrammarsFromEG = (
   const datasetGrammars: DatasetGrammar[] = [];
   for (let j = 0; j < defaultTimeDimensions.length; j++) {
     for (let k = 0; k < eventGrammars.length; k++) {
-      const dimensionMapping: DimensionMapping[] = [];
-      dimensionMapping.push(eventGrammars[k].dimension);
-      const propetyName = `${eventGrammars[k].dimension.dimension.name.name}_id`;
-      const name = `${folderName}_${eventGrammars[k].name.split('_')[0]}_${
-        defaultTimeDimensions[j]
-      }_${eventGrammars[k].dimension.dimension.name.name}`;
-      const dataserGrammar: DatasetGrammar = {
-        // content_subject_daily_total_interactions
-        name,
-        description: '',
-        dimensions: dimensionMapping,
-        schema: {
-          title: name,
-          psql_schema: 'datasets',
-          properties: {
-            [propetyName]: {
-              type: 'string',
-            },
-          },
-        },
-      };
-      datasetGrammars.push(dataserGrammar);
+      const datasetGrammar: DatasetGrammar = createSingleDatasetGrammarsFromEG(
+        folderName,
+        defaultTimeDimensions[j],
+        eventGrammars[k],
+      );
+      datasetGrammars.push(datasetGrammar);
     }
   }
   return datasetGrammars;
+};
+
+export const createSingleDatasetGrammarsFromEG = (
+  folderName: string,
+  defaultTimeDimension: string,
+  eventGrammars: EventGrammar,
+): DatasetGrammar => {
+  const dimensionMapping: DimensionMapping[] = [];
+  dimensionMapping.push(eventGrammars.dimension);
+  const propetyName = `${eventGrammars.dimension.dimension.name.name}_id`;
+  const name = `${folderName}_${
+    eventGrammars.name.split('_')[0]
+  }_${defaultTimeDimension}_${eventGrammars.dimension.dimension.name.name}`;
+  const timeDimensionKeySet = {
+    Weekly: 'week',
+    Monthly: 'month',
+    Yearly: 'year',
+    Daily: 'date',
+  };
+  const dataserGrammar: DatasetGrammar = {
+    // content_subject_daily_total_interactions
+    name,
+    description: '',
+    dimensions: dimensionMapping,
+    timeDimension: {
+      key: timeDimensionKeySet[defaultTimeDimension],
+      type: defaultTimeDimension,
+    } as TimeDimension,
+    schema: {
+      title: name,
+      psql_schema: 'datasets',
+      properties: {
+        [propetyName]: {
+          type: 'string',
+        },
+        sum: {
+          type: 'number',
+        },
+        count: {
+          type: 'number',
+        },
+      },
+    },
+  };
+  return dataserGrammar;
+};
+
+// Parse date in the following format: 02/01/23
+export const getDate = (date): Date => {
+  const splitDate = date.split('/');
+  const day = parseInt(splitDate[0], 10);
+  const month = parseInt(splitDate[1], 10);
+  const year = 2000 + parseInt(splitDate[2], 10);
+  const dateObject = new Date(year, month - 1, day);
+  return dateObject;
+};
+
+// Parse date in the following format: 02/01/23
+export const getWeek = (date): number => {
+  const splitDate = date.split('/');
+  const day = parseInt(splitDate[0], 10);
+  const month = parseInt(splitDate[1], 10);
+  const year = 2000 + parseInt(splitDate[2], 10);
+  const dateObject = new Date(year, month - 1, day);
+  return Math.ceil(
+    (dateObject.getTime() -
+      new Date(dateObject.getFullYear(), 0, 1).getTime()) /
+      (1000 * 60 * 60 * 24 * 7),
+  );
+};
+
+// Parse date in the following format: 02/01/23
+export const getMonth = (date): number => {
+  const splitDate = date.split('/');
+  const day = parseInt(splitDate[0], 10);
+  const month = parseInt(splitDate[1], 10);
+  return month;
+};
+
+// Parse date in the following format: 02/01/23
+export const getYear = (date): number => {
+  const splitDate = date.split('/');
+  const day = parseInt(splitDate[0], 10);
+  const month = parseInt(splitDate[1], 10);
+  const year = 2000 + parseInt(splitDate[2], 10);
+  const dateObject = new Date(year, month - 1, day);
+  return dateObject.getFullYear();
+};
+
+export const createDatasetDataToBeInsertedFromEG = async (
+  folderName: string,
+  timeDimension: string,
+  eventGrammar: EventGrammar,
+): Promise<cQubeEvent[]> => {
+  const dimensionMapping: DimensionMapping[] = [];
+  dimensionMapping.push(eventGrammar.dimension);
+  const propetyName = `${eventGrammar.dimension.dimension.name.name}_id`;
+
+  const filePath =
+    folderName + '/' + eventGrammar.name.split('_')[0] + '-event.data.csv';
+  // const df: DataFrame = pl.readCSV(filePath);
+  // let dfModified: DataFrame;
+
+  const fileContent = await fs.readFile(filePath, 'utf-8');
+  const lines = fileContent.split('\n');
+  const df = [];
+  for (let i = 0; i < lines.length; i++) {
+    df.push(lines[i].split(',').map((value) => value.trim()));
+  }
+
+  const getIndexForHeader = (headers: string[], header: string): number => {
+    return headers.indexOf(header);
+  };
+
+  // Get headers
+  const headers = df[0];
+
+  // Get index for non time dimension
+  const dimenstionIndex = getIndexForHeader(headers, propetyName);
+
+  // Get index for timeDimension
+  const timeDimensionIndex = getIndexForHeader(headers, 'date');
+
+  // Counter index
+  const counterIndex = getIndexForHeader(
+    headers,
+    eventGrammar.instrument_field,
+  );
+
+  const datasetEvents: cQubeEvent[] = [];
+  for (let row = 1; row < df.length - 1; row++) {
+    const rowData = df[row];
+    const rowObject = {};
+    rowObject[eventGrammar.instrument_field] = parseInt(rowData[counterIndex]);
+    rowObject[propetyName] = rowData[dimenstionIndex];
+    // rowObject[eventGrammars.dimension.dimension.name.name] =
+    //   rowData[dimenstionIndex];
+    if (timeDimension === 'Daily') {
+      rowObject['date'] = getDate(rowData[timeDimensionIndex]);
+    } else if (timeDimension === 'Weekly') {
+      rowObject['week'] = getWeek(rowData[timeDimensionIndex]);
+    } else if (timeDimension === 'Monthly') {
+      rowObject['month'] = getMonth(rowData[timeDimensionIndex]);
+    } else if (timeDimension === 'Yearly') {
+      rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+    }
+    datasetEvents.push({ data: rowObject, spec: eventGrammar });
+  }
+  return datasetEvents;
+
+  // remove all columns except propertyName, timeDimension, and dimension.
+  // Add a timeDimension column based on the date of the event.
+  // new column name is date, week, month or year depending on the selected timeDimension
 };

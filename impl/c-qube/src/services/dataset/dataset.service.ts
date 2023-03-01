@@ -3,6 +3,7 @@ import {
   DatasetGrammar,
   DatasetUpdateRequest,
   DimensionMapping,
+  TimeDimension,
 } from '../../types/dataset';
 import { DatasetGrammar as DatasetGrammarModel } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
@@ -24,10 +25,17 @@ export class DatasetService {
   }
 
   addDateDimension(key): any {
+    if (key === 'date') {
+      return {
+        [key]: {
+          type: 'string',
+          format: 'date',
+        },
+      };
+    }
     return {
       [key]: {
-        type: 'string',
-        format: 'date',
+        type: 'integer',
       },
     };
   }
@@ -36,21 +44,23 @@ export class DatasetService {
     return {
       name: model.name,
       description: model.description,
+      timeDimension: model.timeDimension as unknown as TimeDimension,
       dimensions: model.dimensions as unknown as DimensionMapping[],
       schema: model.schema as object,
     };
   }
 
   async createDatasetGrammar(
-    DatasetGrammar: DatasetGrammar,
+    datasetGrammar: DatasetGrammar,
   ): Promise<DatasetGrammar> {
     return this.prisma.datasetGrammar
       .create({
         data: {
-          name: DatasetGrammar.name,
-          description: DatasetGrammar.description,
-          schema: DatasetGrammar.schema,
-          dimensions: JSON.stringify(DatasetGrammar.dimensions),
+          name: datasetGrammar.name,
+          description: datasetGrammar.description,
+          schema: datasetGrammar.schema,
+          dimensions: JSON.stringify(datasetGrammar.dimensions),
+          timeDimension: JSON.stringify(datasetGrammar.timeDimension),
         },
       })
       .then((model: DatasetGrammarModel) => this.dbModelToDatasetGrammar(model))
@@ -59,11 +69,11 @@ export class DatasetService {
       });
   }
 
-  async getDatasetGrammar(DatasetId: number): Promise<DatasetGrammar | null> {
+  async getDatasetGrammar(datasetId: number): Promise<DatasetGrammar | null> {
     return this.prisma.datasetGrammar
       .findUnique({
         where: {
-          id: DatasetId,
+          id: datasetId,
         },
       })
       .then((model: DatasetGrammarModel) =>
@@ -88,6 +98,7 @@ export class DatasetService {
     autoPrimaryKey = true,
   ): Promise<void> {
     // add FK params to schema
+    let timeDimensionKey = 'date';
     if (datasetGrammar.dimensions.length > 0) {
       datasetGrammar.schema['fk'] = [];
       for (const dimension of datasetGrammar.dimensions) {
@@ -100,11 +111,12 @@ export class DatasetService {
         });
       }
     }
+    timeDimensionKey = datasetGrammar.timeDimension.key;
     // Add aggregates to schema
     datasetGrammar.schema.properties = {
       ...datasetGrammar.schema.properties,
       ...this.counterAggregates(),
-      ...this.addDateDimension('date'),
+      ...this.addDateDimension(timeDimensionKey),
     };
 
     const createQuery = this.qbService.generateCreateStatement(
@@ -149,9 +161,24 @@ export class DatasetService {
     durs: DatasetUpdateRequest[],
   ): Promise<void> {
     const data = [];
+    durs[0].dataset.schema.properties = {
+      ...durs[0].dataset.schema.properties,
+      ...this.counterAggregates(),
+      ...this.addNonTimeDimension(durs[0].dataset.dimensions[0]),
+      ...this.addDateDimension(durs[0].dataset.timeDimension.key),
+    };
     for (const dur of durs) {
       data.push({ ...dur.updateParams, ...dur.filterParams });
     }
     await this.insertBulkDatasetData(durs[0].dataset, data);
+  }
+  addNonTimeDimension(dimension: DimensionMapping): {
+    [k: string]: any;
+  } {
+    return {
+      [dimension.key]: {
+        type: 'string',
+      },
+    };
   }
 }

@@ -136,16 +136,55 @@ export class DimensionService {
         console.log(data);
       }
       // save data to CSV
-      const csvWriter = createCsvWriter({
-        path: `fixtures/${dimensionGrammar.name}.csv`,
-        header: [
-          { id: 'name', title: 'name' },
-          { id: 'id', title: 'id' },
-        ],
-      });
-      await csvWriter.writeRecords(data).then(() => {
-        console.log('...Done');
-      });
+      // const csvWriter = createCsvWriter({
+      //   path: `fixtures/${dimensionGrammar.name}.csv`,
+      //   header: [
+      //     { id: 'name', title: 'name' },
+      //     { id: 'id', title: 'id' },
+      //   ],
+      // });
+      // await csvWriter.writeRecords(data).then(() => {
+      //   console.log('...Done');
+      // });
+
+      console.error(dimensionGrammar.name);
+      console.error(err);
+    });
+  }
+
+  async insertBulkDimensionDataV2(
+    dimensionGrammar: DimensionGrammar,
+    data: any[],
+  ): Promise<void> {
+    // data = data.map((item) => {
+    //   return {
+    //     name: item.name.replace(/\s+\)/g, ')'),
+    //     id: item.id,
+    //   };
+    // });
+    // data = _.uniqBy(data, 'name');
+
+    const insertQuery = this.qbService.generateBulkInsertStatement(
+      dimensionGrammar.schema,
+      data,
+    );
+
+    await this.prisma.$queryRawUnsafe(insertQuery).catch(async (err) => {
+      console.log('After', dimensionGrammar.name, data.length);
+      if (data.length < 50) {
+        console.log(data);
+      }
+      // save data to CSV
+      // const csvWriter = createCsvWriter({
+      //   path: `fixtures/${dimensionGrammar.name}.csv`,
+      //   header: [
+      //     { id: 'name', title: 'name' },
+      //     { id: 'id', title: 'id' },
+      //   ],
+      // });
+      // await csvWriter.writeRecords(data).then(() => {
+      //   console.log('...Done');
+      // });
 
       console.error(dimensionGrammar.name);
       console.error(err);

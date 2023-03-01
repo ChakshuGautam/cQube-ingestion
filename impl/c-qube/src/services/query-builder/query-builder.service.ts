@@ -149,7 +149,14 @@ export class QueryBuilderService {
       const rowValues = [];
       for (const property in properties) {
         if (propertiesToSkip.includes(property)) continue;
-        rowValues.push(`'${row[property]}'`);
+        if (
+          schema.properties[property].type === 'string' &&
+          schema.properties[property].format === 'date'
+        ) {
+          rowValues.push(`'${row[property].toISOString()}'`);
+        } else {
+          rowValues.push(`'${row[property]}'`);
+        }
       }
       values.push(`(${rowValues.join(', ')})`);
     }

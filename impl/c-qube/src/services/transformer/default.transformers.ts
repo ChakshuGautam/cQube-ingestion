@@ -3,7 +3,7 @@ import { Transformer, TransformSync } from 'src/types/transformer';
 const pl = require('nodejs-polars');
 import { DataFrame } from 'nodejs-polars';
 import { DatasetUpdateRequest } from 'src/types/dataset';
-import { Event as cQubeEvent } from 'src/types/event';
+import { Event as cQubeEvent, EventGrammar } from 'src/types/event';
 
 export const defaultTransformers: Transformer[] = [
   {
@@ -18,17 +18,23 @@ export const defaultTransformers: Transformer[] = [
         return modifiedEvents;
       } else {
         // Generate Dataframe from events using EventGrammar
-        const eventData = events
-          .map((event: cQubeEvent) => event.data)
-          .map((x) => {
-            return {
-              counter: parseInt(x['counter']),
-              date: x['date'],
-              name: x['name'],
-            };
-          })
-          .filter((x) => !Number.isNaN(x['counter']))
-          .filter((x) => x['date'] === '11/01/23');
+        // const eventData = events
+        //   .map((event: cQubeEvent) => event.data)
+        //   .map((x) => {
+        //     return {
+        //       counter: parseInt(x['counter']),
+        //       date: x['date'],
+        //       name: x['name'],
+        //     };
+        //   })
+        //   .filter((x) => !Number.isNaN(x['counter']))
+        //   .filter((x) => x['date'] === '11/01/23');
+
+        const eventData = events.map((event: cQubeEvent) => event.data);
+        const eventGrammar = events[0].spec;
+        const datasetGrammar = context.dataset;
+
+        const instrumentField = eventGrammar.instrument_field;
 
         // TODO: Change the above date string to regex
 
@@ -36,26 +42,35 @@ export const defaultTransformers: Transformer[] = [
           inferSchemaLength: 10,
         });
         const changedDF = newDF
-          .groupBy('date', 'name')
+          .groupBy(
+            datasetGrammar.timeDimension.key,
+            datasetGrammar.dimensions[0].key,
+          )
           .agg(
-            pl.avg('counter').alias('avg'),
-            pl.count('counter').alias('count'),
-            pl.col('counter').sum().alias('sum'),
+            pl.avg(instrumentField).alias('avg'),
+            pl.count(instrumentField).alias('count'),
+            pl.col(instrumentField).sum().alias('sum'),
           );
         const datasetUpdateRequests: DatasetUpdateRequest[] = changedDF
-          .select('date', 'name', 'avg', 'count', 'sum')
+          .select(
+            datasetGrammar.timeDimension.key,
+            datasetGrammar.dimensions[0].key,
+            'avg',
+            'count',
+            'sum',
+          )
           .map((x) => {
             return {
-              dataset: context.dataset,
-              dimensionFilter: events[0].spec.name,
+              dataset: datasetGrammar,
+              dimensionFilter: eventGrammar.name,
               updateParams: {
                 sum: x[4],
                 count: x[3],
                 avg: x[2],
               },
               filterParams: {
-                date: x[0],
-                dimensions_pdata_id: x[1],
+                [datasetGrammar.timeDimension.key]: x[0],
+                [datasetGrammar.dimensions[0].key]: x[1],
               },
             };
           });

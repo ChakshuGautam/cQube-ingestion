@@ -9,10 +9,16 @@ export interface DimensionMapping {
   };
 }
 
+export interface TimeDimension {
+  key: string;
+  type: string;
+}
+
 export interface DatasetGrammar {
   name: string;
   description: string;
   dimensions: DimensionMapping[];
+  timeDimension: TimeDimension;
   schema: JSONSchema4;
 }
 
