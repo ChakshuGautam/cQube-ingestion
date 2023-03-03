@@ -1,0 +1,24 @@
+{
+  "programs": [
+    {
+      "name": "Review and Monitoring",
+      "namespace": "rev_and_monitoring",
+      "description": "Review and Monitoring",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/rev-and-monitor"
+      },
+      "output": {
+        "location": "output/rev-and-monitor"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "academicyear,district",
+          "academicyear,block",
+          "academicyear,cluster"
+        ],
+        "blacklisted": []
+      }
+    }
+  ]
+}

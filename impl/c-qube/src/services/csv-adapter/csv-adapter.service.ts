@@ -316,10 +316,13 @@ export class CsvAdapterService {
   public async ingest() {
     await this.nuke();
 
+    const defaultTimeDimensions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
+    const datasetGrammars: DatasetGrammar[] = [];
+
     // Parse the config
     const ingestionFolder = './ingest';
     const config = JSON.parse(
-      await readFile(ingestionFolder + '/config.json', 'utf8'),
+      await readFile(ingestionFolder + '/config.old.json', 'utf8'),
     );
 
     //   Ingest DimensionGrammar
@@ -404,14 +407,15 @@ export class CsvAdapterService {
           }
         }
       }
+      datasetGrammars.push(
+        ...createDatasetGrammarsFromEG(
+          config.programs[j].namespace,
+          dimensions,
+          defaultTimeDimensions,
+          eventGrammars,
+        ),
+      );
     }
-    const defaultTimeDimensions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
-    const datasetGrammars = createDatasetGrammarsFromEG(
-      'rev_and_monitoring',
-      dimensions,
-      defaultTimeDimensions,
-      eventGrammars,
-    );
 
     // Create EventGrammars for Whitelisted Compound Dimensions
     // For 1TimeDimension + 1EventCounter + (1+Dimensions)

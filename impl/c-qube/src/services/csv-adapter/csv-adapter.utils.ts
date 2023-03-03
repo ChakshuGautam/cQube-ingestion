@@ -457,7 +457,6 @@ export const createCompoundDatasetDataToBeInserted = async (
     }
     datasetEvents.push({ data: rowObject, spec: eventGrammar });
   }
-  console.log(datasetEvents[0]);
   return datasetEvents;
 
   // remove all columns except propertyName, timeDimension, and dimension.
