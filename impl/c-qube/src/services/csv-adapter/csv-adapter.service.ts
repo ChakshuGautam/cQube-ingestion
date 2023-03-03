@@ -29,9 +29,22 @@ import {
 } from './csv-adapter.utils';
 import { readdirSync } from 'fs';
 import { logToFile } from '../../utils/debug';
+import {
+  intro,
+  outro,
+  confirm,
+  select,
+  spinner,
+  isCancel,
+  cancel,
+  text,
+} from '@clack/prompts';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const chalk = require('chalk');
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs').promises;
+
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pl = require('nodejs-polars');
 
@@ -314,21 +327,27 @@ export class CsvAdapterService {
   }
 
   public async ingest() {
+    const s = spinner();
+    s.start('🚧 1. Deleting Old Data');
     await this.nuke();
+    s.stop('✅ 1. The Data has been Nuked');
 
     const defaultTimeDimensions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
     const datasetGrammars: DatasetGrammar[] = [];
 
     // Parse the config
+    s.start('🚧 2. Reading your config');
     const ingestionFolder = './ingest';
     const config = JSON.parse(
-      await readFile(ingestionFolder + '/config.old.json', 'utf8'),
+      await readFile(ingestionFolder + '/config.json', 'utf8'),
     );
+    s.stop('✅ 2. Config parsing completed');
 
     //   Ingest DimensionGrammar
     //   -- Get all files that match the regex
     //   -- Invoke createDimensionGrammarFromCSVDefinition with filePath
     //   -- Insert them into DB - L79 for this file
+    s.start('🚧 3. Processing Dimensions');
     const insertDimensionDataPromises = [];
     const dimensions: DimensionGrammar[] = [];
     const regexDimensionGrammar = /\-dimension\.grammar.csv$/i;
@@ -339,11 +358,6 @@ export class CsvAdapterService {
         // Create a function to get all files in the folder
         // Create a function to use regex to match the file
         if (regexDimensionGrammar.test(inputFiles[i])) {
-          // Getting the data from the CSV files
-          // const data = await fs.readFile(
-          //   config?.programs[0].input?.files + `/${inputFiles[i]}`,
-          //   'utf8',
-          // );
           const dimensionGrammar =
             await createDimensionGrammarFromCSVDefinition(
               config?.programs[j].input?.files + `/${inputFiles[i]}`,
@@ -353,8 +367,37 @@ export class CsvAdapterService {
             config?.programs[j].input?.files + `/${dimensionDataFile}`,
           );
           dimensions.push(dimensionGrammar);
-          await this.dimensionService.createDimensionGrammar(dimensionGrammar);
-          await this.dimensionService.createDimension(dimensionGrammar);
+          await this.dimensionService
+            .createDimensionGrammar(dimensionGrammar)
+            .then((s) => {
+              console.info(
+                chalk.blue('Added Dimension Spec!', dimensionGrammar.name),
+              );
+            })
+            .catch((e) => {
+              console.info(
+                chalk.blue(
+                  'Error in adding Dimension Spec!',
+                  dimensionGrammar.name,
+                  e,
+                ),
+              );
+            });
+          await this.dimensionService
+            .createDimension(dimensionGrammar)
+            .then((s) => {
+              console.info(
+                chalk.blue('Added Dimension Table!', dimensionGrammar.name),
+              );
+            })
+            .catch((e) => {
+              console.info(
+                chalk.blue(
+                  'Error in adding Dimension Table!',
+                  dimensionGrammar.name,
+                ),
+              );
+            });
 
           const allHeaders = df.columns;
           // Ingest Data
@@ -362,25 +405,35 @@ export class CsvAdapterService {
           //   -- Get all files that match the regex
           //   -- Read the CSV
           insertDimensionDataPromises.push(
-            this.dimensionService.insertBulkDimensionDataV2(
-              dimensionGrammar,
-              df.rows().map((r, index) => {
-                const data = {};
-                for (let i = 0; i < allHeaders.length; i++) {
-                  data[allHeaders[i]] = r[i];
-                }
-                return {
-                  id: index,
-                  ...data,
-                };
+            this.dimensionService
+              .insertBulkDimensionDataV2(
+                dimensionGrammar,
+                df.rows().map((r, index) => {
+                  const data = {};
+                  for (let i = 0; i < allHeaders.length; i++) {
+                    data[allHeaders[i]] = r[i];
+                  }
+                  return {
+                    id: index,
+                    ...data,
+                  };
+                }),
+              )
+              .then((s) => {
+                console.log(
+                  chalk.blue('Added Dimension Data!', dimensionGrammar.name),
+                );
+              })
+              .catch((e) => {
+                console.error('Error in adding', dimensionGrammar.name);
               }),
-            ),
           );
         }
       }
     }
 
     await Promise.all(insertDimensionDataPromises);
+    s.stop('✅ 3. Dimensions have been ingested');
 
     //   Ingest EventGrammar
     //   -- Get all files that match the regex

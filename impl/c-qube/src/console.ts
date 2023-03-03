@@ -2,6 +2,16 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { CsvAdapterService } from './services/csv-adapter/csv-adapter.service';
 import { resetLogs } from './utils/debug';
+import {
+  intro,
+  outro,
+  confirm,
+  select,
+  spinner,
+  isCancel,
+  cancel,
+  text,
+} from '@clack/prompts';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs');
@@ -19,7 +29,9 @@ async function bootstrap() {
 
   switch (command) {
     case 'ingest':
+      intro(`Starting Ingestion Process`);
       await csvAdapterService.ingest();
+      outro(`You're all set!`);
       break;
     case 'nuke-db':
       await csvAdapterService.nuke();

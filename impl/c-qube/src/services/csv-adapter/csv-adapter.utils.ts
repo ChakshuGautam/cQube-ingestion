@@ -49,7 +49,7 @@ export const createDimensionGrammarFromCSVDefinition = async (
     .map((value) => row3.split(',')[value]);
 
   // row 2 and 3
-  const dimenstionColumns: Column[] = row2.split(',').map((value, index) => {
+  const dimensionColumns: Column[] = row2.split(',').map((value, index) => {
     return {
       name: row3.split(',')[index],
       type: value,
@@ -57,7 +57,7 @@ export const createDimensionGrammarFromCSVDefinition = async (
   });
 
   const dimensionGrammar = createCompositeDimensionGrammars(
-    dimenstionColumns,
+    dimensionColumns,
     dimensionName,
     pk,
     indexes,
@@ -76,7 +76,9 @@ export const createCompositeDimensionGrammars = (
   for (let i = 0; i < dimensionColumns.length; i++) {
     properties[dimensionColumns[i].name] = {
       type: dimensionColumns[i].type,
-      unique: true,
+      unique:
+        indexes.indexOf(dimensionColumns[i].name) > -1 ||
+        dimensionColumns[i].name === primaryId,
     };
   }
 

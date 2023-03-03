@@ -156,14 +156,6 @@ export class DimensionService {
     dimensionGrammar: DimensionGrammar,
     data: any[],
   ): Promise<void> {
-    // data = data.map((item) => {
-    //   return {
-    //     name: item.name.replace(/\s+\)/g, ')'),
-    //     id: item.id,
-    //   };
-    // });
-    // data = _.uniqBy(data, 'name');
-
     const insertQuery = this.qbService.generateBulkInsertStatement(
       dimensionGrammar.schema,
       data,
@@ -174,18 +166,6 @@ export class DimensionService {
       if (data.length < 50) {
         console.log(data);
       }
-      // save data to CSV
-      // const csvWriter = createCsvWriter({
-      //   path: `fixtures/${dimensionGrammar.name}.csv`,
-      //   header: [
-      //     { id: 'name', title: 'name' },
-      //     { id: 'id', title: 'id' },
-      //   ],
-      // });
-      // await csvWriter.writeRecords(data).then(() => {
-      //   console.log('...Done');
-      // });
-
       console.error(dimensionGrammar.name);
       console.error(err);
     });
