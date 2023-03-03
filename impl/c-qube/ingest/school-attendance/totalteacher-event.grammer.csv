@@ -1,0 +1,5 @@
+,district,block,cluster,school,school,grade,
+,district_id,block_id,cluster_id,school_id,school_category,grade,
+date,string,string,string,string,string,integer,integer
+date,district_id,block_id,cluster_id,school_id,school_category,grade,total_teachers
+timeDimension,dimension,dimension,dimension,dimension,dimension,dimension,metric
