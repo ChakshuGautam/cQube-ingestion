@@ -346,6 +346,9 @@ export class CsvAdapterService {
     // Verify all file names
     // TODO: Check if there is no random file name outside of regexes.
 
+    // Verify all string values in all files
+    // TODO: It needs to be a closed loop. This should be the first check for the CSV files. Headers should all match.
+
     //   Ingest DimensionGrammar
     //   -- Get all files that match the regex
     //   -- Invoke createDimensionGrammarFromCSVDefinition with filePath
