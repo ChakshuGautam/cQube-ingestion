@@ -1,5 +1,4 @@
 import { JSONSchema4 } from 'json-schema';
-import { DataFrame } from 'nodejs-polars';
 import {
   DatasetGrammar,
   DimensionMapping,
@@ -127,13 +126,15 @@ export const createEventGrammar = (
     },
     description: '',
     instrument_field: instrumentField,
-    dimension: {
-      key: mapping.eventGrammarKey,
-      dimension: {
-        name: mapping.dimensionGrammar,
-        mapped_to: mapping.dimensionGrammarKey,
+    dimension: [
+      {
+        key: mapping.eventGrammarKey,
+        dimension: {
+          name: mapping.dimensionGrammar,
+          mapped_to: mapping.dimensionGrammarKey,
+        },
       },
-    } as DimensionMapping,
+    ] as DimensionMapping[],
     is_active: true,
     schema: {
       properties,
@@ -163,34 +164,16 @@ export const createEventGrammarFromCSVDefinition = async (
 ): Promise<EventGrammar[]> => {
   const eventGrammars: EventGrammar[] = [];
 
-  const fileContent = await fs.readFile(csvFilePath, 'utf-8');
-  const row1 = fileContent.split('\n')[0];
-  const row2 = fileContent.split('\n')[1];
-  const row3 = fileContent.split('\n')[2];
-  const row4 = fileContent.split('\n')[3];
-  const row5 = fileContent.split('\n')[4];
-
-  const eventGrammarDef: EventGrammarCSVFormat[] = row5
-    .split(',')
-    .map((value, index) => {
-      return {
-        dimensionName:
-          row1.split(',')[index] === '' ? null : row1.split(',')[index],
-        dimensionGrammarKey:
-          row2.split(',')[index] === '' ? null : row2.split(',')[index],
-        fieldDataType: row3.split(',')[index] as ColumnType,
-        fieldName: row4.split(',')[index],
-        fieldType: row5.split(',')[index] as FieldType,
-      };
-    });
+  const {
+    eventGrammarDef,
+    instrumentField,
+  }: {
+    eventGrammarDef: EventGrammarCSVFormat[];
+    instrumentField: string;
+  } = await getEGDefFromFile(csvFilePath);
 
   // Find eventGrammarsDefs where field type is dimension
-  const dimensionGrammarDefs = eventGrammarDef.filter(
-    (value) => value.fieldType === FieldType.dimension,
-  );
-
-  // Find text "metric" in trow 5 get it's index and get the value from row 4
-  const instrumentField = row4.split(',')[row5.split(',').indexOf('metric')];
+  const dimensionGrammarDefs = getDGDefsFromEGDefs(eventGrammarDef);
 
   for (let i = 0; i < dimensionGrammarDefs.length; i++) {
     const dimensionGrammar = await createDimensionGrammarFromCSVDefinition(
@@ -264,11 +247,11 @@ export const createSingleDatasetGrammarsFromEG = (
   eventGrammars: EventGrammar,
 ): DatasetGrammar => {
   const dimensionMapping: DimensionMapping[] = [];
-  dimensionMapping.push(eventGrammars.dimension);
-  const propetyName = `${eventGrammars.dimension.dimension.name.name}_id`;
+  dimensionMapping.push(eventGrammars.dimension[0]);
+  const propetyName = `${eventGrammars.dimension[0]?.dimension.name.name}_id`;
   const name = `${folderName}_${
     eventGrammars.name.split('_')[0]
-  }_${defaultTimeDimension}_${eventGrammars.dimension.dimension.name.name}`;
+  }_${defaultTimeDimension}_${eventGrammars.dimension[0]?.dimension.name.name}`;
   const timeDimensionKeySet = {
     Weekly: 'week',
     Monthly: 'month',
@@ -351,8 +334,8 @@ export const createDatasetDataToBeInsertedFromEG = async (
   eventGrammar: EventGrammar,
 ): Promise<cQubeEvent[]> => {
   const dimensionMapping: DimensionMapping[] = [];
-  dimensionMapping.push(eventGrammar.dimension);
-  const propetyName = `${eventGrammar.dimension.dimension.name.name}_id`;
+  dimensionMapping.push(eventGrammar.dimension[0]);
+  const propetyName = `${eventGrammar.dimension[0].dimension.name.name}_id`;
 
   const filePath =
     folderName + '/' + eventGrammar.name.split('_')[0] + '-event.data.csv';
@@ -392,13 +375,15 @@ export const createDatasetDataToBeInsertedFromEG = async (
     rowObject[eventGrammar.instrument_field] = parseInt(rowData[counterIndex]);
     rowObject[propetyName] = rowData[dimenstionIndex];
     // rowObject[eventGrammars.dimension.dimension.name.name] =
-    //   rowData[dimenstionIndex];
+    // rowData[dimenstionIndex];
     if (timeDimension === 'Daily') {
       rowObject['date'] = getDate(rowData[timeDimensionIndex]);
     } else if (timeDimension === 'Weekly') {
       rowObject['week'] = getWeek(rowData[timeDimensionIndex]);
+      rowObject['year'] = getYear(rowData[timeDimensionIndex]);
     } else if (timeDimension === 'Monthly') {
       rowObject['month'] = getMonth(rowData[timeDimensionIndex]);
+      rowObject['year'] = getYear(rowData[timeDimensionIndex]);
     } else if (timeDimension === 'Yearly') {
       rowObject['year'] = getYear(rowData[timeDimensionIndex]);
     }
@@ -410,3 +395,186 @@ export const createDatasetDataToBeInsertedFromEG = async (
   // Add a timeDimension column based on the date of the event.
   // new column name is date, week, month or year depending on the selected timeDimension
 };
+
+export const createCompoundDatasetDataToBeInserted = async (
+  eventFilePath: string,
+  eventGrammar: EventGrammar,
+  datasetGrammar: DatasetGrammar,
+): Promise<cQubeEvent[]> => {
+  const dimensionMapping: DimensionMapping[] = [];
+  dimensionMapping.push(eventGrammar.dimension[0]);
+  const properties = datasetGrammar.schema.properties;
+  delete properties.date;
+  delete properties.avg;
+  delete properties.sum;
+  delete properties.count;
+  delete properties.year;
+
+  const fileContent = await fs.readFile(eventFilePath, 'utf-8');
+  const lines = fileContent.split('\n');
+  const df = [];
+  for (let i = 0; i < lines.length; i++) {
+    df.push(lines[i].split(',').map((value) => value.trim()));
+  }
+
+  const getIndexForHeader = (headers: string[], header: string): number => {
+    return headers.indexOf(header);
+  };
+
+  // Get headers
+  const headers = df[0];
+
+  // Get index for timeDimension
+  const timeDimensionIndex = getIndexForHeader(headers, 'date');
+
+  // Counter index
+  const counterIndex = getIndexForHeader(
+    headers,
+    eventGrammar.instrument_field,
+  );
+
+  const datasetEvents: cQubeEvent[] = [];
+
+  for (let row = 1; row < df.length - 1; row++) {
+    const rowData = df[row];
+    const rowObject = {};
+    rowObject[eventGrammar.instrument_field] = parseInt(rowData[counterIndex]);
+    for (const property in properties) {
+      // TODO: Fix this hack
+      const dimensionIndex = getIndexForHeader(headers, property);
+      rowObject[property] = rowData[dimensionIndex];
+    }
+    if (datasetGrammar.timeDimension.type === 'Daily') {
+      rowObject['date'] = getDate(rowData[timeDimensionIndex]);
+    } else if (datasetGrammar.timeDimension.type === 'Weekly') {
+      rowObject['week'] = getWeek(rowData[timeDimensionIndex]);
+      rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+    } else if (datasetGrammar.timeDimension.type === 'Monthly') {
+      rowObject['month'] = getMonth(rowData[timeDimensionIndex]);
+      rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+    } else if (datasetGrammar.timeDimension.type === 'Yearly') {
+      rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+    }
+    datasetEvents.push({ data: rowObject, spec: eventGrammar });
+  }
+  console.log(datasetEvents[0]);
+  return datasetEvents;
+
+  // remove all columns except propertyName, timeDimension, and dimension.
+  // Add a timeDimension column based on the date of the event.
+  // new column name is date, week, month or year depending on the selected timeDimension
+};
+
+export const createCompoundDatasetGrammars = async (
+  namespace: string,
+  defaultTimeDimension: string,
+  compoundDimension: string[],
+  allDimensionGrammars: DimensionGrammar[],
+  eventGrammarFiles: string[],
+): Promise<DatasetGrammar[]> => {
+  const datasetGrammars: DatasetGrammar[] = [];
+  for (const eventGrammarFile of eventGrammarFiles) {
+    const {
+      eventGrammarDef,
+    }: {
+      eventGrammarDef: EventGrammarCSVFormat[];
+      instrumentField: string;
+    } = await getEGDefFromFile(eventGrammarFile);
+    const dimensionMapping: DimensionMapping[] = [];
+    const properties: Record<string, Record<string, string>> = {};
+    for (const dimension of compoundDimension) {
+      for (const egd of eventGrammarDef) {
+        if (egd.dimensionName === dimension) {
+          const dg: DimensionGrammar = allDimensionGrammars.filter(
+            (v) => v.name === dimension,
+          )[0];
+          const dimensionMappingObject: DimensionMapping = {
+            key: egd.dimensionGrammarKey,
+            dimension: {
+              name: dg,
+              mapped_to: egd.dimensionGrammarKey,
+            },
+          };
+          dimensionMapping.push(dimensionMappingObject);
+          properties[`${dimension}_id`] = {
+            type: 'string',
+          };
+        }
+      }
+    }
+    const name = `${namespace}_${
+      eventGrammarFile.split('/').pop().split('.')[0].split('-')[0]
+    }_${defaultTimeDimension}_${compoundDimension.join('0')}`;
+    // if (name === 'rev_and_monitoring_block_Daily_academicyear0cluster') {
+    //   console.error({
+    //     eventGrammarDef,
+    //     compoundDimension,
+    //     eventGrammarFile,
+    //     eventGrammarFiles,
+    //   });
+    // }
+    const timeDimensionKeySet = {
+      Weekly: 'week',
+      Monthly: 'month',
+      Yearly: 'year',
+      Daily: 'date',
+    };
+    const dataserGrammar: DatasetGrammar = {
+      // content_subject_daily_total_interactions
+      name,
+      description: '',
+      dimensions: dimensionMapping,
+      timeDimension: {
+        key: timeDimensionKeySet[defaultTimeDimension],
+        type: defaultTimeDimension,
+      } as TimeDimension,
+      schema: {
+        title: name,
+        psql_schema: 'datasets',
+        properties: {
+          ...properties,
+        },
+      },
+    };
+    datasetGrammars.push(dataserGrammar);
+  }
+  return datasetGrammars;
+};
+
+function getDGDefsFromEGDefs(eventGrammarDef: EventGrammarCSVFormat[]) {
+  return eventGrammarDef.filter(
+    (value) => value.fieldType === FieldType.dimension,
+  );
+}
+
+export async function getEGDefFromFile(csvFilePath: string) {
+  const fileContent = await fs.readFile(csvFilePath, 'utf-8');
+  const row1 = fileContent.split('\n')[0];
+  const row2 = fileContent.split('\n')[1];
+  const row3 = fileContent.split('\n')[2];
+  const row4 = fileContent.split('\n')[3];
+  const row5 = fileContent.split('\n')[4];
+
+  // Vertical columns for CSV File
+  // | dimensionName |
+  // | dimensionGrammarKey |
+  // | fieldDataType |
+  // | fieldName |
+  // | fieldType |
+  const eventGrammarDef: EventGrammarCSVFormat[] = row5
+    .split(',')
+    .map((value, index) => {
+      return {
+        dimensionName:
+          row1.split(',')[index] === '' ? null : row1.split(',')[index],
+        dimensionGrammarKey:
+          row2.split(',')[index] === '' ? null : row2.split(',')[index],
+        fieldDataType: row3.split(',')[index] as ColumnType,
+        fieldName: row4.split(',')[index],
+        fieldType: row5.split(',')[index] as FieldType,
+      };
+    });
+  // Find text "metric" in trow 5 get it's index and get the value from row 4
+  const instrumentField = row4.split(',')[row5.split(',').indexOf('metric')];
+  return { eventGrammarDef, instrumentField };
+}

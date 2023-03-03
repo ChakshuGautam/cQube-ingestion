@@ -17,7 +17,8 @@ export interface EventGrammar {
   schema: JSONSchema4;
   instrument_field: string;
   is_active: boolean;
-  dimension: DimensionMapping;
+  type?: 'single-dimension' | 'multi-dimension';
+  dimension: DimensionMapping[] | DimensionMapping;
 }
 
 export interface Event {

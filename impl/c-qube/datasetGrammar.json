@@ -1,0 +1,152 @@
+{
+  "name": "rev_and_monitoring_cluster_Monthly_district",
+  "description": "",
+  "dimensions": [
+    {
+      "key": "district_id",
+      "dimension": {
+        "name": {
+          "name": "district",
+          "description": "",
+          "type": "dynamic",
+          "storage": {
+            "indexes": [
+              "name"
+            ],
+            "primaryId": "district_id",
+            "retention": null,
+            "bucket_size": null
+          },
+          "schema": {
+            "title": "district",
+            "psql_schema": "dimensions",
+            "properties": {
+              "district_id": {
+                "type": "string",
+                "unique": true
+              },
+              "district_name": {
+                "type": "string",
+                "unique": true
+              },
+              "latitude": {
+                "type": "string",
+                "unique": true
+              },
+              "longitude": {
+                "type": "string",
+                "unique": true
+              }
+            },
+            "indexes": [
+              {
+                "columns": [
+                  [
+                    "district_name"
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        "mapped_to": "district_id"
+      }
+    }
+  ],
+  "timeDimension": {
+    "key": "month",
+    "type": "Monthly"
+  },
+  "schema": {
+    "title": "rev_and_monitoring_cluster_Monthly_district",
+    "psql_schema": "datasets",
+    "properties": {
+      "district_id": {
+        "type": "string"
+      },
+      "sum": {
+        "type": "number"
+      },
+      "count": {
+        "type": "number"
+      }
+    }
+  }
+}                "unique": true
+              },
+              "district_name": {
+                "type": "string",
+                "unique": true
+              },
+              "latitude": {
+                "type": "string",
+                "unique": true
+              },
+              "longitude": {
+                "type": "string",
+                "unique": true
+              }
+            },
+            "indexes": [
+              {
+                "columns": [
+                  [
+                    "district_name"
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        "mapped_to": "district_id"
+      }
+    }
+  ],
+  "timeDimension": {
+    "key": "year",
+    "type": "Yearly"
+  },
+  "schema": {
+    "title": "rev_and_monitoring_district_Yearly_academicyear0district",
+    "psql_schema": "datasets",
+    "properties": {
+      "academicyear_id": {
+        "type": "string"
+      },
+      "district_id": {
+        "type": "string"
+      },
+      "sum": {
+        "type": "number"
+      },
+      "count": {
+        "type": "number"
+      }
+    }
+  }
+} }
+} ],
+  "timeDimension": {
+    "key": "year",
+    "type": "Yearly"
+  },
+  "schema": {
+    "title": "rev_and_monitoring_cluster_Yearly_academicyear0cluster",
+    "psql_schema": "datasets",
+    "properties": {
+      "academicyear_id": {
+        "type": "string"
+      },
+      "cluster_id": {
+        "type": "string"
+      },
+      "sum": {
+        "type": "number"
+      },
+      "count": {
+        "type": "number"
+      }
+    }
+  }
+} }
+}

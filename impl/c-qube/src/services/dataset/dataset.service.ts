@@ -8,6 +8,10 @@ import {
 import { DatasetGrammar as DatasetGrammarModel } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
 import { QueryBuilderService } from '../query-builder/query-builder.service';
+import { logToFile } from '../../utils/debug';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const fs = require('fs');
 
 @Injectable()
 export class DatasetService {
@@ -32,9 +36,18 @@ export class DatasetService {
           format: 'date',
         },
       };
+    } else if (key === 'year') {
+      return {
+        [key]: {
+          type: 'integer',
+        },
+      };
     }
     return {
       [key]: {
+        type: 'integer',
+      },
+      year: {
         type: 'integer',
       },
     };
@@ -53,6 +66,12 @@ export class DatasetService {
   async createDatasetGrammar(
     datasetGrammar: DatasetGrammar,
   ): Promise<DatasetGrammar> {
+    // save this to datasetGrammar.json
+    logToFile(
+      datasetGrammar,
+      `datasetGrammar-${datasetGrammar.name}_${new Date().valueOf()}.json`,
+    );
+
     return this.prisma.datasetGrammar
       .create({
         data: {
@@ -65,6 +84,13 @@ export class DatasetService {
       })
       .then((model: DatasetGrammarModel) => this.dbModelToDatasetGrammar(model))
       .catch((error) => {
+        fs.writeFile(
+          `./debug/datasetGrammar-${datasetGrammar.name}.error`,
+          error.stack,
+          function (err) {
+            if (err) return console.log(err);
+          },
+        );
         throw error;
       });
   }
@@ -170,7 +196,11 @@ export class DatasetService {
     for (const dur of durs) {
       data.push({ ...dur.updateParams, ...dur.filterParams });
     }
-    await this.insertBulkDatasetData(durs[0].dataset, data);
+    await this.insertBulkDatasetData(durs[0].dataset, data).catch((error) => {
+      console.error(error);
+      console.error(data[0]);
+      console.error(durs[0].dataset.schema.properties);
+    });
   }
   addNonTimeDimension(dimension: DimensionMapping): {
     [k: string]: any;

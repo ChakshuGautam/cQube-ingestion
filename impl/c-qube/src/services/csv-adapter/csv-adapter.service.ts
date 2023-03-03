@@ -17,18 +17,26 @@ import { Pipe } from 'src/types/pipe';
 import { TransformerContext } from 'src/types/transformer';
 import { readFile } from 'fs/promises';
 import {
+  createCompoundDatasetDataToBeInserted,
+  createCompoundDatasetGrammars,
   createDatasetDataToBeInsertedFromEG,
   createDatasetGrammarsFromEG,
   createDimensionGrammarFromCSVDefinition,
   createEventGrammarFromCSVDefinition,
   createSingleDatasetGrammarsFromEG,
+  EventGrammarCSVFormat,
+  getEGDefFromFile,
 } from './csv-adapter.utils';
 import { readdirSync } from 'fs';
+import { logToFile } from '../../utils/debug';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs').promises;
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pl = require('nodejs-polars');
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const _ = require('lodash');
 
 export enum ColumnType {
   string = 'string',
@@ -228,13 +236,15 @@ export class CsvAdapterService {
           },
           description: '',
           instrument_field: 'counter',
-          dimension: {
-            key: '',
-            dimension: {
-              name: dimensionGrammars[i],
-              mapped_to: `${dimensionGrammars[i].name}`,
+          dimension: [
+            {
+              key: '',
+              dimension: {
+                name: dimensionGrammars[i],
+                mapped_to: `${dimensionGrammars[i].name}`,
+              },
             },
-          } as DimensionMapping,
+          ] as DimensionMapping[],
           is_active: true,
           schema: {
             properties: {
@@ -376,6 +386,7 @@ export class CsvAdapterService {
     const regexEventGrammar = /\-event\.grammar.csv$/i;
     for (let j = 0; j < config?.programs.length; j++) {
       const inputFiles = readdirSync(config?.programs[j].input?.files);
+      // For 1TimeDimension + 1EventCounter + 1Dimension
       for (let i = 0; i < inputFiles?.length; i++) {
         if (regexEventGrammar.test(inputFiles[i])) {
           // console.log(config?.programs[j].input?.files + `/${inputFiles[i]}`);
@@ -402,6 +413,77 @@ export class CsvAdapterService {
       eventGrammars,
     );
 
+    // Create EventGrammars for Whitelisted Compound Dimensions
+    // For 1TimeDimension + 1EventCounter + (1+Dimensions)
+    const compoundDatasetGrammars: {
+      dg: DatasetGrammar;
+      egFile: string;
+    }[] = [];
+    for (let j = 0; j < config?.programs.length; j++) {
+      const inputFiles = readdirSync(config?.programs[j].input?.files);
+      for (let i = 0; i < inputFiles?.length; i++) {
+        const compoundDimensions: string[] =
+          config.programs[j].dimensions.whitelisted;
+        for (let k = 0; k < compoundDimensions.length; k++) {
+          const eventGrammarFiles = [];
+          const compoundDimensionsToBeInEG = compoundDimensions[k].split(',');
+          // Find relevant Event Grammar Files that include all compound dimensions
+          if (regexEventGrammar.test(inputFiles[i])) {
+            // console.log(config?.programs[j].input?.files + `/${inputFiles[i]}`);
+            const filePathForEventGrammar =
+              config?.programs[j].input?.files + `/${inputFiles[i]}`;
+            const fileContentForEventGrammar = await fs.readFile(
+              filePathForEventGrammar,
+              'utf-8',
+            );
+            const dimensionsInEG = fileContentForEventGrammar
+              .split('\n')[0]
+              .split(',')
+              .filter((x) => x !== '');
+
+            if (
+              compoundDimensionsToBeInEG.every(
+                (x) => dimensionsInEG.indexOf(x) > -1,
+              )
+            ) {
+              // console.error({
+              //   compoundDimensionsToBeInEG,
+              //   dimensionsInEG,
+              //   filePathForEventGrammar,
+              // });
+              eventGrammarFiles.push(filePathForEventGrammar);
+            }
+          }
+          //iterate over all defaultTimeDimension
+          if (eventGrammarFiles.length > 0) {
+            for (let l = 0; l < defaultTimeDimensions.length; l++) {
+              const dgsCompound: DatasetGrammar[] =
+                await createCompoundDatasetGrammars(
+                  config.programs[j].namespace,
+                  defaultTimeDimensions[l],
+                  compoundDimensionsToBeInEG,
+                  dimensions,
+                  _.uniq(eventGrammarFiles),
+                );
+              datasetGrammars.push(...dgsCompound);
+              for (let m = 0; m < dgsCompound.length; m++) {
+                compoundDatasetGrammars.push({
+                  dg: dgsCompound[m],
+                  egFile: eventGrammarFiles[m],
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+
+    logToFile(
+      'datasetGrammars',
+      datasetGrammars.map((i) => i.name),
+      'datasetGrammars.file',
+    );
+
     //   Ingest DatasetGrammar
     //   -- Generate Datasets using the DimensionGrammar and EventGrammar
     //   -- Insert them into DB
@@ -422,6 +504,7 @@ export class CsvAdapterService {
     ) => {
       //console.debug('callback', err, events.length);
     };
+
     for (let j = 0; j < config?.programs.length; j++) {
       const inputFiles = readdirSync(config?.programs[j].input?.files);
       for (let i = 0; i < inputFiles?.length; i++) {
@@ -434,7 +517,7 @@ export class CsvAdapterService {
           for (let k = 0; k < eventGrammar.length; k++) {
             for (let l = 0; l < defaultTimeDimensions.length; l++) {
               const datasetGrammar = createSingleDatasetGrammarsFromEG(
-                'rev_and_monitoring',
+                config?.programs[j].namespace,
                 defaultTimeDimensions[l],
                 eventGrammar[k],
               );
@@ -471,6 +554,57 @@ export class CsvAdapterService {
           }
         }
       }
+    }
+
+    // Ingest Compound DatasetGrammar
+    for (let m = 0; m < compoundDatasetGrammars.length; m++) {
+      const {
+        instrumentField,
+      }: {
+        eventGrammarDef: EventGrammarCSVFormat[];
+        instrumentField: string;
+      } = await getEGDefFromFile(compoundDatasetGrammars[m].egFile);
+      const compundEventGrammar: EventGrammar = {
+        name: '',
+        description: '',
+        dimension: [],
+        instrument_field: instrumentField,
+        is_active: true,
+        schema: {},
+        instrument: {
+          type: InstrumentType.COUNTER,
+          name: 'counter',
+        },
+      };
+      const events: Event[] = await createCompoundDatasetDataToBeInserted(
+        compoundDatasetGrammars[m].egFile.replace('grammar', 'data'),
+        compundEventGrammar,
+        compoundDatasetGrammars[m].dg,
+      );
+      // Create Pipes
+      const pipe: Pipe = {
+        event: compundEventGrammar,
+        transformer: defaultTransformers[0],
+        dataset: compoundDatasetGrammars[m].dg,
+      };
+      const transformContext: TransformerContext = {
+        dataset: compoundDatasetGrammars[m].dg,
+        events: events,
+        isChainable: false,
+        pipeContext: {},
+      };
+
+      const datasetUpdateRequest: DatasetUpdateRequest[] =
+        pipe.transformer.transformSync(
+          callback,
+          transformContext,
+          events,
+        ) as DatasetUpdateRequest[];
+
+      // console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
+      await this.datasetService.processDatasetUpdateRequest(
+        datasetUpdateRequest,
+      );
     }
   }
 
