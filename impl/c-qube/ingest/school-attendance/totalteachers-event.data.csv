@@ -1,4 +1,4 @@
-date,district_id,block_id,cluster_id,school_id,school_category,grade,total_teachers
+date,district_id,block_id,cluster_id,school_id,school_category,grade_id,total_teachers
 2023-02-28,101,10101,101010111,1000000001,secondary,9,43
 2023-02-28,101,10101,101010112,1000000009,primary,2,42
 2023-02-28,101,10101,101010112,1000000010,primary,5,42

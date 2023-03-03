@@ -343,6 +343,9 @@ export class CsvAdapterService {
     );
     s.stop('✅ 2. Config parsing completed');
 
+    // Verify all file names
+    // TODO: Check if there is no random file name outside of regexes.
+
     //   Ingest DimensionGrammar
     //   -- Get all files that match the regex
     //   -- Invoke createDimensionGrammarFromCSVDefinition with filePath
@@ -370,9 +373,9 @@ export class CsvAdapterService {
           await this.dimensionService
             .createDimensionGrammar(dimensionGrammar)
             .then((s) => {
-              console.info(
-                chalk.blue('Added Dimension Spec!', dimensionGrammar.name),
-              );
+              // console.info(
+              //   chalk.blue('Added Dimension Spec!', dimensionGrammar.name),
+              // );
             })
             .catch((e) => {
               console.info(
@@ -386,9 +389,9 @@ export class CsvAdapterService {
           await this.dimensionService
             .createDimension(dimensionGrammar)
             .then((s) => {
-              console.info(
-                chalk.blue('Added Dimension Table!', dimensionGrammar.name),
-              );
+              // console.info(
+              //   chalk.blue('Added Dimension Table!', dimensionGrammar.name),
+              // );
             })
             .catch((e) => {
               console.info(
@@ -420,9 +423,9 @@ export class CsvAdapterService {
                 }),
               )
               .then((s) => {
-                console.log(
-                  chalk.blue('Added Dimension Data!', dimensionGrammar.name),
-                );
+                // console.log(
+                //   chalk.blue('Added Dimension Data!', dimensionGrammar.name),
+                // );
               })
               .catch((e) => {
                 console.error('Error in adding', dimensionGrammar.name);
@@ -438,6 +441,7 @@ export class CsvAdapterService {
     //   Ingest EventGrammar
     //   -- Get all files that match the regex
     //   -- Read the CSV
+    s.start('🚧 4. Processing Event Grammars');
     const eventGrammars: EventGrammar[] = [];
     const regexEventGrammar = /\-event\.grammar.csv$/i;
     for (let j = 0; j < config?.programs.length; j++) {
@@ -469,6 +473,8 @@ export class CsvAdapterService {
         ),
       );
     }
+    console.log(chalk.blue('Dataset Grammars Created', datasetGrammars.length));
+    s.stop('✅ 4. Event Grammars have been ingested');
 
     // Create EventGrammars for Whitelisted Compound Dimensions
     // For 1TimeDimension + 1EventCounter + (1+Dimensions)
