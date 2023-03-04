@@ -23,9 +23,9 @@ export const createDimensionGrammarFromCSVDefinition = async (
 ): Promise<DimensionGrammar> => {
   // read csvPath and get first row using file-reader
   const fileContent = await fs.readFile(csvFilePath, 'utf-8');
-  const row1 = fileContent.split('\n')[0];
-  const row2 = fileContent.split('\n')[1];
-  const row3 = fileContent.split('\n')[2];
+  const row1 = fileContent.split('\n')[0].trim();
+  const row2 = fileContent.split('\n')[1].trim();
+  const row3 = fileContent.split('\n')[2].trim();
 
   // Naming convention for eventis => `<event name>-event.csv`
   // Naming comvention for dimension is => `<dimension name>-dimenstion.csv`
@@ -206,7 +206,9 @@ export const createEventGrammarFromCSVDefinition = async (
     const eventName =
       csvFilePath.split('/').pop().split('.')[0].split('-')[0] +
       '_' +
-      dimensionGrammarDefs[i].dimensionName;
+      dimensionGrammarDefs[i].dimensionName +
+      '_' +
+      mapping.dimensionGrammarKey;
 
     const eventGrammar = createEventGrammar(
       eventName,
@@ -253,7 +255,7 @@ export const createSingleDatasetGrammarsFromEG = (
   const propetyName = `${eventGrammars.dimension[0]?.dimension.name.name}_id`;
   const name = `${folderName}_${
     eventGrammars.name.split('_')[0]
-  }_${defaultTimeDimension}_${eventGrammars.dimension[0]?.dimension.name.name}`;
+  }_${defaultTimeDimension}_${eventGrammars.dimension[0]?.dimension.mapped_to}`;
   const timeDimensionKeySet = {
     Weekly: 'week',
     Monthly: 'month',
@@ -413,7 +415,7 @@ export const createCompoundDatasetDataToBeInserted = async (
   delete properties.year;
 
   const fileContent = await fs.readFile(eventFilePath, 'utf-8');
-  const lines = fileContent.split('\n');
+  const lines = fileContent.split('\n').trim();
   const df = [];
   for (let i = 0; i < lines.length; i++) {
     df.push(lines[i].split(',').map((value) => value.trim()));
@@ -550,11 +552,11 @@ function getDGDefsFromEGDefs(eventGrammarDef: EventGrammarCSVFormat[]) {
 
 export async function getEGDefFromFile(csvFilePath: string) {
   const fileContent = await fs.readFile(csvFilePath, 'utf-8');
-  const row1 = fileContent.split('\n')[0];
-  const row2 = fileContent.split('\n')[1];
-  const row3 = fileContent.split('\n')[2];
-  const row4 = fileContent.split('\n')[3];
-  const row5 = fileContent.split('\n')[4];
+  const row1 = fileContent.split('\n')[0].trim();
+  const row2 = fileContent.split('\n')[1].trim();
+  const row3 = fileContent.split('\n')[2].trim();
+  const row4 = fileContent.split('\n')[3].trim();
+  const row5 = fileContent.split('\n')[4].trim();
 
   // Vertical columns for CSV File
   // | dimensionName |

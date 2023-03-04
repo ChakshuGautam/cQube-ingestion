@@ -12,7 +12,15 @@
         "location": "./output/school-attendance"
       },
       "dimensions": {
-        "whitelisted": [],
+        "whitelisted": [
+          "gender,district",
+          "gender,block",
+          "gender,cluster",
+          "gender,school",
+          "school_category,district",
+          "school_category,block",
+          "school_category,cluster"
+        ],
         "blacklisted": []
       }
     }

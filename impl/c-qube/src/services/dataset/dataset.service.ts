@@ -84,13 +84,16 @@ export class DatasetService {
       })
       .then((model: DatasetGrammarModel) => this.dbModelToDatasetGrammar(model))
       .catch((error) => {
-        fs.writeFile(
-          `./debug/datasetGrammar-${datasetGrammar.name}.error`,
-          error.stack,
-          function (err) {
-            if (err) return console.log(err);
-          },
-        );
+        console.error(datasetGrammar.name);
+        console.error(JSON.stringify(datasetGrammar, null, 2));
+        console.error(error);
+        // fs.writeFile(
+        //   `./debug/datasetGrammar-${datasetGrammar.name}.error`,
+        //   error.stack,
+        //   function (err) {
+        //     if (err) return console.log(err);
+        //   },
+        // );
         throw error;
       });
   }
@@ -152,16 +155,24 @@ export class DatasetService {
     const indexQuery: string[] = this.qbService.generateIndexStatement(
       datasetGrammar.schema,
     );
-    await this.prisma.$queryRawUnsafe(createQuery).catch((error) => {
-      console.error(datasetGrammar.schema.properties);
-      console.error(error);
-      console.error(createQuery);
-    });
-
-    // iterate over indexQuery and execute each query
-    for (const query of indexQuery) {
-      await this.prisma.$queryRawUnsafe(query);
-    }
+    await this.prisma
+      .$queryRawUnsafe(createQuery)
+      .catch(async (error) => {
+        // console.error(datasetGrammar.schema.properties);
+        // console.error(error);
+        delete datasetGrammar.schema.fk;
+        const createQuery = this.qbService.generateCreateStatement(
+          datasetGrammar.schema,
+          autoPrimaryKey,
+        );
+        await this.prisma.$queryRawUnsafe(createQuery);
+      })
+      .then(async (model: DatasetGrammarModel) => {
+        // iterate over indexQuery and execute each query
+        for (const query of indexQuery) {
+          await this.prisma.$queryRawUnsafe(query);
+        }
+      });
   }
 
   async insertDatasetData(datasetGrammar: DatasetGrammar, data): Promise<void> {

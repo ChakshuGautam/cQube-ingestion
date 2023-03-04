@@ -94,7 +94,12 @@ export class DimensionService {
     const indexQuery: string[] = this.qbService.generateIndexStatement(
       dimensionGrammar.schema,
     );
-    await this.prisma.$queryRawUnsafe(createQuery);
+    await this.prisma.$queryRawUnsafe(createQuery).catch((e) => {
+      console.error(dimensionGrammar.name);
+      console.error(JSON.stringify(dimensionGrammar, null, 2));
+      console.error({ createQuery });
+      console.error({ indexQuery });
+    });
 
     // iterate over indexQuery and execute each query
     for (const query of indexQuery) {

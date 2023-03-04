@@ -78,7 +78,15 @@ export class EventService {
           },
         },
       })
-      .then((model: EventGrammarModel) => this.dbModelToEventGrammar(model));
+      .catch((e) => {
+        console.error('ERROR', e);
+        console.error('ERROR', JSON.stringify(eventGrammar, null, 2));
+        //TODO: Fix this
+        return eventGrammar;
+      })
+      .then((model: EventGrammarModel) => {
+        return this.dbModelToEventGrammar(model);
+      });
   }
 
   async getEventGrammar(dimensionId: number): Promise<EventGrammar | null> {

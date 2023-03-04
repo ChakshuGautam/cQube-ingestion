@@ -333,7 +333,7 @@ export class CsvAdapterService {
     s.stop('✅ 1. The Data has been Nuked');
 
     const defaultTimeDimensions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
-    const datasetGrammars: DatasetGrammar[] = [];
+    let datasetGrammars: DatasetGrammar[] = [];
 
     // Parse the config
     s.start('🚧 2. Reading your config');
@@ -397,6 +397,7 @@ export class CsvAdapterService {
               // );
             })
             .catch((e) => {
+              console.log(e);
               console.info(
                 chalk.blue(
                   'Error in adding Dimension Table!',
@@ -476,8 +477,9 @@ export class CsvAdapterService {
         ),
       );
     }
-    console.log(chalk.blue('Dataset Grammars Created', datasetGrammars.length));
+    // TODO: DatasetGrammar and EventGrammar should be empty.
     s.stop('✅ 4. Event Grammars have been ingested');
+    datasetGrammars = _.uniq(datasetGrammars, 'name');
 
     // Create EventGrammars for Whitelisted Compound Dimensions
     // For 1TimeDimension + 1EventCounter + (1+Dimensions)
@@ -550,6 +552,8 @@ export class CsvAdapterService {
       'datasetGrammars.file',
     );
 
+    datasetGrammars = _.uniq(datasetGrammars, 'name');
+
     //   Ingest DatasetGrammar
     //   -- Generate Datasets using the DimensionGrammar and EventGrammar
     //   -- Insert them into DB
@@ -605,22 +609,26 @@ export class CsvAdapterService {
                 pipeContext: {},
               };
 
-              const datasetUpdateRequest: DatasetUpdateRequest[] =
-                pipe.transformer.transformSync(
-                  callback,
-                  transformContext,
-                  events,
-                ) as DatasetUpdateRequest[];
-
-              // console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
-              await this.datasetService.processDatasetUpdateRequest(
-                datasetUpdateRequest,
-              );
+              try {
+                const datasetUpdateRequest: DatasetUpdateRequest[] =
+                  pipe.transformer.transformSync(
+                    callback,
+                    transformContext,
+                    events,
+                  ) as DatasetUpdateRequest[];
+                // console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
+                await this.datasetService.processDatasetUpdateRequest(
+                  datasetUpdateRequest,
+                );
+              } catch (e) {
+                console.error(e);
+              }
             }
           }
         }
       }
     }
+    return;
 
     // Ingest Compound DatasetGrammar
     for (let m = 0; m < compoundDatasetGrammars.length; m++) {

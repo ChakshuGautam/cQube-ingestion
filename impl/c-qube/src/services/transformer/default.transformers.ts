@@ -50,6 +50,10 @@ export const defaultTransformers: Transformer[] = [
         }
 
         // TODO: Change the above date string to regex
+        // console.log(
+        //   eventData[0],
+        //   datasetGrammar.dimensions.map((x) => x.key),
+        // );
 
         const newDF: DataFrame = pl.readRecords(eventData, {
           inferSchemaLength: 10,
