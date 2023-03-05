@@ -94,7 +94,8 @@ export class DatasetService {
         //     if (err) return console.log(err);
         //   },
         // );
-        throw error;
+        // throw error;
+        return datasetGrammar;
       });
   }
 
@@ -165,7 +166,10 @@ export class DatasetService {
           datasetGrammar.schema,
           autoPrimaryKey,
         );
-        await this.prisma.$queryRawUnsafe(createQuery);
+        console.log(createQuery);
+        await this.prisma.$queryRawUnsafe(createQuery).catch((e) => {
+          console.error('Failed again');
+        });
       })
       .then(async (model: DatasetGrammarModel) => {
         // iterate over indexQuery and execute each query

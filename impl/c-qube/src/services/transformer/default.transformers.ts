@@ -53,6 +53,7 @@ export const defaultTransformers: Transformer[] = [
         // console.log(
         //   eventData[0],
         //   datasetGrammar.dimensions.map((x) => x.key),
+        //   datasetGrammar.name,
         // );
 
         const newDF: DataFrame = pl.readRecords(eventData, {

@@ -255,7 +255,7 @@ export const createSingleDatasetGrammarsFromEG = (
   const propetyName = `${eventGrammars.dimension[0]?.dimension.name.name}_id`;
   const name = `${folderName}_${
     eventGrammars.name.split('_')[0]
-  }_${defaultTimeDimension}_${eventGrammars.dimension[0]?.dimension.mapped_to}`;
+  }_${defaultTimeDimension}_${eventGrammars.dimension[0]?.dimension.name.name}`;
   const timeDimensionKeySet = {
     Weekly: 'week',
     Monthly: 'month',
@@ -415,7 +415,7 @@ export const createCompoundDatasetDataToBeInserted = async (
   delete properties.year;
 
   const fileContent = await fs.readFile(eventFilePath, 'utf-8');
-  const lines = fileContent.split('\n').trim();
+  const lines = fileContent.split('\n');
   const df = [];
   for (let i = 0; i < lines.length; i++) {
     df.push(lines[i].split(',').map((value) => value.trim()));
@@ -485,6 +485,9 @@ export const createCompoundDatasetGrammars = async (
     } = await getEGDefFromFile(eventGrammarFile);
     const dimensionMapping: DimensionMapping[] = [];
     const properties: Record<string, Record<string, string>> = {};
+    const name = `${namespace}_${
+      eventGrammarFile.split('/').pop().split('.')[0].split('-')[0]
+    }_${defaultTimeDimension}_${compoundDimension.join('0')}`;
     for (const dimension of compoundDimension) {
       for (const egd of eventGrammarDef) {
         if (egd.dimensionName === dimension) {
@@ -499,23 +502,24 @@ export const createCompoundDatasetGrammars = async (
             },
           };
           dimensionMapping.push(dimensionMappingObject);
+          console.error({ dimensionMapping });
           properties[`${dimension}_id`] = {
             type: 'string',
           };
+          // TODO: Fix this hack.
+          break;
         }
       }
     }
-    const name = `${namespace}_${
-      eventGrammarFile.split('/').pop().split('.')[0].split('-')[0]
-    }_${defaultTimeDimension}_${compoundDimension.join('0')}`;
-    // if (name === 'rev_and_monitoring_block_Daily_academicyear0cluster') {
-    //   console.error({
-    //     eventGrammarDef,
-    //     compoundDimension,
-    //     eventGrammarFile,
-    //     eventGrammarFiles,
-    //   });
-    // }
+    if (name === 'school_attendance_totalstudent_Daily_gender0school') {
+      console.error({
+        eventGrammarDef,
+        compoundDimension,
+        eventGrammarFile,
+        eventGrammarFiles,
+        dimensionMapping,
+      });
+    }
     const timeDimensionKeySet = {
       Weekly: 'week',
       Monthly: 'month',

@@ -575,6 +575,8 @@ export class CsvAdapterService {
       //console.debug('callback', err, events.length);
     };
 
+    console.log('Adding data to dataset tables');
+
     for (let j = 0; j < config?.programs.length; j++) {
       const inputFiles = readdirSync(config?.programs[j].input?.files);
       for (let i = 0; i < inputFiles?.length; i++) {
@@ -628,7 +630,6 @@ export class CsvAdapterService {
         }
       }
     }
-    return;
 
     // Ingest Compound DatasetGrammar
     for (let m = 0; m < compoundDatasetGrammars.length; m++) {

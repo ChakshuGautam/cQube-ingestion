@@ -17,9 +17,9 @@
           "gender,block",
           "gender,cluster",
           "gender,school",
-          "school_category,district",
-          "school_category,block",
-          "school_category,cluster"
+          "schoolcategory,district",
+          "schoolcategory,block",
+          "schoolcategory,cluster"
         ],
         "blacklisted": []
       }
