@@ -1,14 +1,27 @@
 {
   "programs": [
     {
-      "name": "Review and Monitoring",
-      "description": "Review and Monitoring",
+      "name": "School Attendance",
+      "namespace": "school_attendance",
+      "description": "School Attendance",
       "shouldIngestToDB": true,
       "input": {
-        "files": "./ingest/rev-and-monitor"
+        "files": "./ingest/school-attendance"
       },
       "output": {
-        "location": "output/rev-and-monitor"
+        "location": "./output/school-attendance"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "gender,district",
+          "gender,block",
+          "gender,cluster",
+          "gender,school",
+          "schoolcategory,district",
+          "schoolcategory,block",
+          "schoolcategory,cluster"
+        ],
+        "blacklisted": []
       }
     }
   ]

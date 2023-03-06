@@ -52,7 +52,7 @@ export class EventService {
   async createEventGrammar(eventGrammar: EventGrammar): Promise<EventGrammar> {
     const dimensionGrammar: DimensionGrammarModel =
       await this.dimensionService.getDimensionGrammaModelByName(
-        eventGrammar.dimension.dimension.name.name,
+        eventGrammar.dimension[0].dimension.name.name,
       );
     return this.prisma.eventGrammar
       .create({
@@ -62,13 +62,15 @@ export class EventService {
           schema: eventGrammar.schema,
           instrumentField: eventGrammar.instrument_field,
           isActive: eventGrammar.is_active,
-          dimensionMapping: JSON.stringify({
-            key: eventGrammar.dimension.key,
-            dimension: {
-              name: dimensionGrammar.id,
-              mapped_to: eventGrammar.dimension.dimension.mapped_to,
+          dimensionMapping: JSON.stringify([
+            {
+              key: eventGrammar.dimension[0].key,
+              dimension: {
+                name: dimensionGrammar.id,
+                mapped_to: eventGrammar.dimension[0].dimension.mapped_to,
+              },
             },
-          }),
+          ]),
           instrument: {
             connect: {
               name: 'COUNTER', //TODO: Change this to eventGrammar.instrument.name
@@ -76,7 +78,15 @@ export class EventService {
           },
         },
       })
-      .then((model: EventGrammarModel) => this.dbModelToEventGrammar(model));
+      .catch((e) => {
+        console.error('ERROR', e);
+        console.error('ERROR', JSON.stringify(eventGrammar, null, 2));
+        //TODO: Fix this
+        return eventGrammar;
+      })
+      .then((model: EventGrammarModel) => {
+        return this.dbModelToEventGrammar(model);
+      });
   }
 
   async getEventGrammar(dimensionId: number): Promise<EventGrammar | null> {

@@ -94,7 +94,12 @@ export class DimensionService {
     const indexQuery: string[] = this.qbService.generateIndexStatement(
       dimensionGrammar.schema,
     );
-    await this.prisma.$queryRawUnsafe(createQuery);
+    await this.prisma.$queryRawUnsafe(createQuery).catch((e) => {
+      console.error(dimensionGrammar.name);
+      console.error(JSON.stringify(dimensionGrammar, null, 2));
+      console.error({ createQuery });
+      console.error({ indexQuery });
+    });
 
     // iterate over indexQuery and execute each query
     for (const query of indexQuery) {
@@ -156,14 +161,6 @@ export class DimensionService {
     dimensionGrammar: DimensionGrammar,
     data: any[],
   ): Promise<void> {
-    // data = data.map((item) => {
-    //   return {
-    //     name: item.name.replace(/\s+\)/g, ')'),
-    //     id: item.id,
-    //   };
-    // });
-    // data = _.uniqBy(data, 'name');
-
     const insertQuery = this.qbService.generateBulkInsertStatement(
       dimensionGrammar.schema,
       data,
@@ -174,18 +171,6 @@ export class DimensionService {
       if (data.length < 50) {
         console.log(data);
       }
-      // save data to CSV
-      // const csvWriter = createCsvWriter({
-      //   path: `fixtures/${dimensionGrammar.name}.csv`,
-      //   header: [
-      //     { id: 'name', title: 'name' },
-      //     { id: 'id', title: 'id' },
-      //   ],
-      // });
-      // await csvWriter.writeRecords(data).then(() => {
-      //   console.log('...Done');
-      // });
-
       console.error(dimensionGrammar.name);
       console.error(err);
     });

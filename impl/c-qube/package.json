@@ -21,15 +21,18 @@
     "cli": "ts-node src/console.ts"
   },
   "dependencies": {
+    "@clack/prompts": "^0.6.1",
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
     "@prisma/client": "4.8.1",
     "@types/json-schema": "^7.0.11",
+    "chalk": "4.1.2",
     "csv-parser": "^3.0.0",
     "csv-writer": "^1.6.0",
     "lodash": "^4.17.21",
     "nodejs-polars": "^0.7.2",
+    "picocolors": "^1.0.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
     "to-json-schema": "^0.2.5"

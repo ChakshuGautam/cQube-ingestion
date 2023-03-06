@@ -34,6 +34,7 @@ services:
       ## uncomment next line to set an admin secret
       # HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
       HASURA_GRAPHQL_MIGRATIONS_DISABLE_TRANSACTION: "true"
+      HASURA_GRAPHQL_CONSOLE_ASSETS_DIR: /srv/console-assets
 
   pgpool-serv:
     image: bitnami/pgpool
