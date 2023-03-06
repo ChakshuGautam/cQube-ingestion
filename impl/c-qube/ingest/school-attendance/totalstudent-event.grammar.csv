@@ -1,4 +1,4 @@
-,district,block,cluster,school,school,schoolcategory,gender,
+,district,block,cluster,school,grade,schoolcategory,gender,
 ,district_id,block_id,cluster_id,school_id,grade_id,schoolcategory_id,gender_id,
 date,string,string,string,string,integer,string,string,integer
 date,district_id,block_id,cluster_id,school_id,grade_id,schoolcategory_id,gender_id,total_students
