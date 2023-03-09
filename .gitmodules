@@ -1,0 +1,6 @@
+[submodule "impl/spec-ms"]
+	path = impl/spec-ms
+	url = https://github.com/dhanush-2397/spec-ms.git
+[submodule "impl/ingestion-ms"]
+	path = impl/ingestion-ms
+	url = https://github.com/dhanush-2397/spec-ms.git
