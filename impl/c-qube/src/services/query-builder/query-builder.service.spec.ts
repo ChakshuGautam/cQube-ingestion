@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JSONSchema4 } from 'json-schema';
 import { QueryBuilderService } from './query-builder.service';
+import { QueryBuilderSchema } from './types/QueryBuilderSchema';
+import { UpdateStatementData } from './types/UpdateStatementData';
 
 describe('QueryBuilderService', () => {
   let service: QueryBuilderService;
@@ -239,6 +241,92 @@ describe('QueryBuilderService', () => {
         name VARCHAR(255),
         date_created TIMESTAMP
       );`),
+    );
+  });
+
+  it('generates a "Update" statement with where condition value as string', () => {
+    const jsonSchema = {
+      title: 'my_table',
+      psql_schema: 'my_schema',
+      properties: {
+        id: { type: 'integer' },
+        name: { type: 'string', maxLength: 255 },
+        date_created: { type: 'string', format: 'date-time' },
+        date_updated: { type: 'string', format: 'date-time' },
+        isAdult: { type: 'string', maxLength: 1 },
+      },
+      indexes: [
+        { columns: [['name', 'date_created']] },
+        { columns: [['name'], ['date_created']] },
+      ],
+    };
+    const data: UpdateStatementData = {
+      properties: {
+        isAdult: 'Y',
+        date_updated: '2023-03-10T15:52:22.418Z',
+      },
+      conditions: {
+        age: {
+          operator: '>=',
+          type: 'string',
+          value: '18',
+        },
+      },
+    };
+
+    const updateStatement = service.generateUpdateStatement(
+      jsonSchema as JSONSchema4 | QueryBuilderSchema,
+      data,
+    );
+
+    expect(updateStatement).toBe(
+      service.cleanStatement(`UPDATE my_schema.my_table
+      SET  isAdult = 'Y',
+        date_updated = '2023-03-10T15:52:22.418Z'
+      WHERE  age >= '18' ;`),
+    );
+  });
+
+  it('generates a "Update" statement with where condition value as number', () => {
+    const jsonSchema = {
+      title: 'my_table',
+      psql_schema: 'my_schema',
+      properties: {
+        id: { type: 'integer' },
+        name: { type: 'string', maxLength: 255 },
+        date_created: { type: 'string', format: 'date-time' },
+        date_updated: { type: 'string', format: 'date-time' },
+        isAdult: { type: 'string', maxLength: 1 },
+      },
+      indexes: [
+        { columns: [['name', 'date_created']] },
+        { columns: [['name'], ['date_created']] },
+      ],
+    };
+    const data: UpdateStatementData = {
+      properties: {
+        isAdult: 'Y',
+        date_updated: '2023-03-10T15:52:22.418Z',
+      },
+      conditions: {
+        age: {
+          operator: '>',
+          type: 'number',
+          value: '18',
+        },
+      },
+    };
+
+    const updateStatement = service.generateUpdateStatement(
+      jsonSchema as JSONSchema4 | QueryBuilderSchema,
+      data,
+    );
+
+    expect(updateStatement).toBe(
+      service.cleanStatement(`UPDATE my_schema.my_table
+      SET  isAdult = 'Y',
+        date_updated = '2023-03-10T15:52:22.418Z'
+      WHERE  age > 18 ;`),
     );
   });
 });

@@ -195,11 +195,19 @@ export class QueryBuilderService {
     query = query.slice(0, -2); // remove last comma and newline
 
     const conditions = Object.keys(data.conditions);
+    console.log('conditions: ', conditions);
     if (conditions.length > 0) {
       query += '\nWHERE';
-      for (const condition in conditions) {
-        query += `  ${condition}${data.conditions[condition]}' and\n`;
-      }
+      // for (const condition in conditions) {
+
+      // }
+      conditions.forEach((condition) => {
+        const op = data.conditions[condition].operator;
+        const type = data.conditions[condition].type;
+        const value = data.conditions[condition].value;
+        query += `  ${condition} ${op} ${type === 'number' ? value : "'" + value + "'"
+          }  and\n`;
+      });
       query = query.slice(0, -5); // remove last 'and' and newline
     }
 
@@ -233,7 +241,11 @@ testObj.generateUpdateStatement(
       date_updated: new Date().toISOString(),
     },
     conditions: {
-      age: '>=18',
+      age: {
+        operator: '>=',
+        type: 'string',
+        value: '18',
+      },
     },
   },
 );

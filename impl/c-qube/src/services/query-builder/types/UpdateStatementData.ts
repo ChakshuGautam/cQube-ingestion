@@ -3,7 +3,11 @@ export class UpdateStatementData {
     [k: string]: string;
   };
   conditions: {
-    [k: string]: string;
+    [k: string]: {
+      operator: string;
+      type: string;
+      value: string;
+    };
   };
 }
 
