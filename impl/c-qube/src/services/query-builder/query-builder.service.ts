@@ -218,34 +218,34 @@ export class QueryBuilderService {
   }
 }
 
-const testObj = new QueryBuilderService();
-testObj.generateUpdateStatement(
-  {
-    title: 'my_table',
-    psql_schema: 'my_schema',
-    properties: {
-      id: { type: 'integer' },
-      name: { type: 'string', maxLength: 255 },
-      date_created: { type: 'string', format: 'date-time' },
-      date_updated: { type: 'string', format: 'date-time' },
-      isAdult: { type: 'string', maxLength: 1 },
-    },
-    indexes: [
-      { columns: [['name', 'date_created']] },
-      { columns: [['name'], ['date_created']] },
-    ],
-  },
-  {
-    properties: {
-      isAdult: 'Y',
-      date_updated: new Date().toISOString(),
-    },
-    conditions: {
-      age: {
-        operator: '>=',
-        type: 'string',
-        value: '18',
-      },
-    },
-  },
-);
+// const testObj = new QueryBuilderService();
+// testObj.generateUpdateStatement(
+//   {
+//     title: 'my_table',
+//     psql_schema: 'my_schema',
+//     properties: {
+//       id: { type: 'integer' },
+//       name: { type: 'string', maxLength: 255 },
+//       date_created: { type: 'string', format: 'date-time' },
+//       date_updated: { type: 'string', format: 'date-time' },
+//       isAdult: { type: 'string', maxLength: 1 },
+//     },
+//     indexes: [
+//       { columns: [['name', 'date_created']] },
+//       { columns: [['name'], ['date_created']] },
+//     ],
+//   },
+//   {
+//     properties: {
+//       isAdult: 'Y',
+//       date_updated: new Date().toISOString(),
+//     },
+//     conditions: {
+//       age: {
+//         operator: '>=',
+//         type: 'string',
+//         value: '18',
+//       },
+//     },
+//   },
+// );
