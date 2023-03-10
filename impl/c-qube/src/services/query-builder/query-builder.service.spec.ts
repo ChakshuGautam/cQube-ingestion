@@ -244,13 +244,6 @@ describe('QueryBuilderService', () => {
     );
   });
 
-  /**
-   * Test cases below are for UPDATE statements generation
-   * Test cases cover the following request types:
-   * 1. Update with where condition value as string
-   * 2. Update with where condition value as number
-   *
-   */
   it('generates a "Update" statement with where condition value as string', () => {
     const jsonSchema = {
       title: 'my_table',

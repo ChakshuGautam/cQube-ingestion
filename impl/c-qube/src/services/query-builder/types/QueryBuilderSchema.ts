@@ -16,5 +16,5 @@ export class QueryBuilderSchema {
       column: string;
     };
   }[];
-  indexes?: { columns: string[], [k: string]: string[] }[];
+  indexes?: { columns: string[][];[k: string]: string[][] }[];
 }
