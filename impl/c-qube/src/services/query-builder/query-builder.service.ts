@@ -173,78 +173,57 @@ export class QueryBuilderService {
     schema: JSONSchema4 | QueryBuilderSchema,
     data: UpdateStatementData,
   ): string {
-    /**
-    const example = {
-      properties: {
-        isAdult: 'Y',
-      },
-      conditions: {
-        age: '>=18'
-      }
-    }
-     */
     const tableName = schema.title;
     const psqlSchema = schema.psql_schema;
 
-    // TODO: check if the keys of data.properties are a subset of schema.properties or not
+    // check if the keys of data.properties and data.conditions are a subset of schema.properties or not
+    const schemaPropertiesSet = new Set(Object.keys(schema.properties));
+    const dataPropertiesSet = new Set(Object.keys(data.properties));
+    const conditionPropertiesSet = new Set(Object.keys(data.conditions));
+
+    const dataPropIntersection = new Set();
+    const conditionPropIntersection = new Set();
+    for (const schemaProp of schemaPropertiesSet) {
+      if (dataPropertiesSet.has(schemaProp))
+        dataPropIntersection.add(schemaProp);
+      if (conditionPropertiesSet.has(schemaProp))
+        conditionPropIntersection.add(schemaProp);
+    }
+
+    if (
+      dataPropIntersection.size !== dataPropertiesSet.size ||
+      conditionPropIntersection.size !== conditionPropertiesSet.size
+    ) {
+      throw new Error(
+        `The properties of the update statement are not a subset of the schema properties`,
+      );
+    }
 
     let query = `UPDATE ${psqlSchema}.${tableName} SET `;
     for (const key in data.properties) {
-      query += `${key} = '${data.properties[key]}', `;
+      const type = schema.properties[key].type;
+      const value = data.properties[key].value;
+      query += `${key} = ${type === 'string' ? "'" + value + "'" : value}, `;
     }
-    query = query.slice(0, -2); // remove last comma and newline
+    query = query.slice(0, -2); // remove last comma and space
 
     const conditions = Object.keys(data.conditions);
     console.log('conditions: ', conditions);
     if (conditions.length > 0) {
       query += ' WHERE ';
-      // for (const condition in conditions) {
 
-      // }
       conditions.forEach((condition) => {
         const op = data.conditions[condition].operator;
         const type = data.conditions[condition].type;
         const value = data.conditions[condition].value;
-        query += `${condition} ${op} ${type === 'number' ? value : "'" + value + "'"
+        query += `${condition} ${op} ${type === 'number' || type === 'boolean' ? value : "'" + value + "'"
           } and `;
       });
-      query = query.slice(0, -5); // remove last 'and' and newline
+      query = query.slice(0, -5); // remove last 'and' and space
     }
 
     query += ';';
-    console.log('query:\n', query);
 
     return query;
   }
 }
-
-// testObj.generateUpdateStatement(
-//   {
-//     title: 'my_table',
-//     psql_schema: 'my_schema',
-//     properties: {
-//       id: { type: 'integer' },
-//       name: { type: 'string', maxLength: 255 },
-//       date_created: { type: 'string', format: 'date-time' },
-//       date_updated: { type: 'string', format: 'date-time' },
-//       isAdult: { type: 'string', maxLength: 1 },
-//     },
-//     indexes: [
-//       { columns: [['name', 'date_created']] },
-//       { columns: [['name'], ['date_created']] },
-//     ],
-//   },
-//   {
-//     properties: {
-//       isAdult: 'Y',
-//       date_updated: new Date().toISOString(),
-//     },
-//     conditions: {
-//       age: {
-//         operator: '>=',
-//         type: 'string',
-//         value: '18',
-//       },
-//     },
-//   },
-// );

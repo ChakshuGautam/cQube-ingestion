@@ -1,12 +1,16 @@
 export class UpdateStatementData {
   properties: {
-    [k: string]: string;
+    [k: string]: {
+      type: string;
+      value: string | number | boolean;
+      format?: string;
+    };
   };
   conditions: {
     [k: string]: {
       operator: string;
       type: string;
-      value: string;
+      value: string | number | boolean;
     };
   };
 }

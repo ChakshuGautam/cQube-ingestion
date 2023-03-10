@@ -244,6 +244,13 @@ describe('QueryBuilderService', () => {
     );
   });
 
+  /**
+   * Test cases below are for UPDATE statements generation
+   * Test cases cover the following request types:
+   * 1. Update with where condition value as string
+   * 2. Update with where condition value as number
+   *
+   */
   it('generates a "Update" statement with where condition value as string', () => {
     const jsonSchema = {
       title: 'my_table',
@@ -254,6 +261,7 @@ describe('QueryBuilderService', () => {
         date_created: { type: 'string', format: 'date-time' },
         date_updated: { type: 'string', format: 'date-time' },
         isAdult: { type: 'string', maxLength: 1 },
+        age: { type: 'number' },
       },
       indexes: [
         { columns: [['name', 'date_created']] },
@@ -262,8 +270,14 @@ describe('QueryBuilderService', () => {
     };
     const data: UpdateStatementData = {
       properties: {
-        isAdult: 'Y',
-        date_updated: '2023-03-10T15:52:22.418Z',
+        isAdult: {
+          type: 'string',
+          value: 'Y',
+        },
+        date_updated: {
+          type: 'string',
+          value: '2023-03-10T15:52:22.418Z',
+        },
       },
       conditions: {
         age: {
@@ -296,6 +310,7 @@ describe('QueryBuilderService', () => {
         date_created: { type: 'string', format: 'date-time' },
         date_updated: { type: 'string', format: 'date-time' },
         isAdult: { type: 'string', maxLength: 1 },
+        age: { type: 'number' },
       },
       indexes: [
         { columns: [['name', 'date_created']] },
@@ -304,8 +319,14 @@ describe('QueryBuilderService', () => {
     };
     const data: UpdateStatementData = {
       properties: {
-        isAdult: 'Y',
-        date_updated: '2023-03-10T15:52:22.418Z',
+        isAdult: {
+          type: 'string',
+          value: 'Y',
+        },
+        date_updated: {
+          type: 'string',
+          value: '2023-03-10T15:52:22.418Z',
+        },
       },
       conditions: {
         age: {
@@ -326,5 +347,260 @@ describe('QueryBuilderService', () => {
         `UPDATE my_schema.my_table SET isAdult = 'Y', date_updated = '2023-03-10T15:52:22.418Z' WHERE age > 18;`,
       ),
     );
+  });
+
+  it('generates a "Update" statement with where condition value as boolean', () => {
+    const jsonSchema = {
+      title: 'my_table',
+      psql_schema: 'my_schema',
+      properties: {
+        id: { type: 'integer' },
+        name: { type: 'string', maxLength: 255 },
+        date_created: { type: 'string', format: 'date-time' },
+        date_updated: { type: 'string', format: 'date-time' },
+        isAdult: { type: 'string', maxLength: 1 },
+        someRandomIndicator: { type: 'boolean' },
+      },
+      indexes: [
+        { columns: [['name', 'date_created']] },
+        { columns: [['name'], ['date_created']] },
+      ],
+    };
+    const data: UpdateStatementData = {
+      properties: {
+        isAdult: {
+          type: 'string',
+          value: 'Y',
+        },
+        date_updated: {
+          type: 'string',
+          value: '2023-03-10T15:52:22.418Z',
+        },
+      },
+      conditions: {
+        someRandomIndicator: {
+          operator: '=',
+          type: 'boolean',
+          value: false as boolean,
+        },
+      },
+    };
+
+    const updateStatement = service.generateUpdateStatement(
+      jsonSchema as JSONSchema4 | QueryBuilderSchema,
+      data,
+    );
+
+    expect(updateStatement).toBe(
+      service.cleanStatement(
+        `UPDATE my_schema.my_table SET isAdult = 'Y', date_updated = '2023-03-10T15:52:22.418Z' WHERE someRandomIndicator = false;`,
+      ),
+    );
+  });
+
+  it('generates a "Update" statement without a WHERE clause', () => {
+    const jsonSchema = {
+      title: 'my_table',
+      psql_schema: 'my_schema',
+      properties: {
+        id: { type: 'integer' },
+        name: { type: 'string', maxLength: 255 },
+        date_created: { type: 'string', format: 'date-time' },
+        date_updated: { type: 'string', format: 'date-time' },
+        isAdult: { type: 'string', maxLength: 1 },
+      },
+      indexes: [
+        { columns: [['name', 'date_created']] },
+        { columns: [['name'], ['date_created']] },
+      ],
+    };
+    const data: UpdateStatementData = {
+      properties: {
+        isAdult: {
+          type: 'string',
+          value: 'Y',
+        },
+        date_updated: {
+          type: 'string',
+          value: '2023-03-10T15:52:22.418Z',
+        },
+      },
+      conditions: {},
+    };
+
+    const updateStatement = service.generateUpdateStatement(
+      jsonSchema as JSONSchema4 | QueryBuilderSchema,
+      data,
+    );
+
+    expect(updateStatement).toBe(
+      service.cleanStatement(
+        `UPDATE my_schema.my_table SET isAdult = 'Y', date_updated = '2023-03-10T15:52:22.418Z';`,
+      ),
+    );
+  });
+
+  it('generates a "Update" statement with multiple update conditions', () => {
+    const jsonSchema = {
+      title: 'my_table',
+      psql_schema: 'my_schema',
+      properties: {
+        id: { type: 'integer' },
+        name: { type: 'string', maxLength: 255 },
+        date_created: { type: 'string', format: 'date-time' },
+        date_updated: { type: 'string', format: 'date-time' },
+        isAdult: { type: 'string', maxLength: 1 },
+        someRandomIndicator: { type: 'boolean' },
+        age: { type: 'number' },
+      },
+      indexes: [
+        { columns: [['name', 'date_created']] },
+        { columns: [['name'], ['date_created']] },
+      ],
+    };
+    const data: UpdateStatementData = {
+      properties: {
+        isAdult: {
+          type: 'string',
+          value: 'Y',
+        },
+        date_updated: {
+          type: 'string',
+          value: '2023-03-10T15:52:22.418Z',
+        },
+      },
+      conditions: {
+        age: {
+          operator: '>',
+          type: 'number',
+          value: '18',
+        },
+        someRandomIndicator: {
+          operator: '=',
+          type: 'boolean',
+          value: true,
+        },
+      },
+    };
+
+    const updateStatement = service.generateUpdateStatement(
+      jsonSchema as JSONSchema4 | QueryBuilderSchema,
+      data,
+    );
+
+    expect(updateStatement).toBe(
+      service.cleanStatement(
+        `UPDATE my_schema.my_table SET isAdult = 'Y', date_updated = '2023-03-10T15:52:22.418Z' WHERE age > 18 and someRandomIndicator = true;`,
+      ),
+    );
+  });
+
+  it('throws because of wrong properties', () => {
+    const jsonSchema = {
+      title: 'my_table',
+      psql_schema: 'my_schema',
+      properties: {
+        id: { type: 'integer' },
+        name: { type: 'string', maxLength: 255 },
+        date_created: { type: 'string', format: 'date-time' },
+        someRandomIndicator: { type: 'boolean' },
+        age: { type: 'number' },
+      },
+      indexes: [
+        { columns: [['name', 'date_created']] },
+        { columns: [['name'], ['date_created']] },
+      ],
+    };
+    const data: UpdateStatementData = {
+      properties: {
+        isAdult: {
+          type: 'string',
+          value: 'Y',
+        },
+        date_updated: {
+          type: 'string',
+          value: '2023-03-10T15:52:22.418Z',
+        },
+      },
+      conditions: {
+        age: {
+          operator: '>',
+          type: 'number',
+          value: '18',
+        },
+        someRandomIndicator: {
+          operator: '=',
+          type: 'boolean',
+          value: true,
+        },
+      },
+    };
+
+    try {
+      const updateStatement = service.generateUpdateStatement(
+        jsonSchema as JSONSchema4 | QueryBuilderSchema,
+        data,
+      );
+    } catch (e) {
+      expect(e).toBeInstanceOf(Error);
+      expect(e.message).toBe(
+        'The properties of the update statement are not a subset of the schema properties',
+      );
+    }
+  });
+
+  it('throws because of wrong condition properties', () => {
+    const jsonSchema = {
+      title: 'my_table',
+      psql_schema: 'my_schema',
+      properties: {
+        id: { type: 'integer' },
+        name: { type: 'string', maxLength: 255 },
+        date_created: { type: 'string', format: 'date-time' },
+        date_updated: { type: 'string', format: 'date-time' },
+        isAdult: { type: 'string', maxLength: 1 },
+        someRandomIndicator: { type: 'boolean' },
+      },
+      indexes: [
+        { columns: [['name', 'date_created']] },
+        { columns: [['name'], ['date_created']] },
+      ],
+    };
+    const data: UpdateStatementData = {
+      properties: {
+        isAdult: {
+          type: 'string',
+          value: 'Y',
+        },
+        date_updated: {
+          type: 'string',
+          value: '2023-03-10T15:52:22.418Z',
+        },
+      },
+      conditions: {
+        age: {
+          operator: '>',
+          type: 'number',
+          value: '18',
+        },
+        someRandomIndicator: {
+          operator: '=',
+          type: 'boolean',
+          value: true,
+        },
+      },
+    };
+
+    try {
+      const updateStatement = service.generateUpdateStatement(
+        jsonSchema as JSONSchema4 | QueryBuilderSchema,
+        data,
+      );
+    } catch (e) {
+      expect(e).toBeInstanceOf(Error);
+      expect(e.message).toBe(
+        'The properties of the update statement are not a subset of the schema properties',
+      );
+    }
   });
 });

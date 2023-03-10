@@ -5,12 +5,8 @@ export class QueryBuilderSchema {
     [key: string]: {
       type: string;
       format?: string;
-      description?: string;
-      enum?: string[];
-      fk?: {
-        table: string;
-        column?: string;
-      };
+      maxLength?: number;
+      unique?: boolean;
     };
   };
   fk?: {
