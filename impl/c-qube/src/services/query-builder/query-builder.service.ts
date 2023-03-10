@@ -29,7 +29,7 @@ export class QueryBuilderService {
   }
 
   addFKConstraintDuringCreation(
-    schema: JSONSchema4,
+    schema: JSONSchema4 | QueryBuilderSchema,
     createStatement: string,
   ): string {
     createStatement = this.cleanStatement(createStatement);
@@ -46,7 +46,10 @@ export class QueryBuilderService {
     return this.cleanStatement(createStatement);
   }
 
-  generateCreateStatement(schema: JSONSchema4, autoPrimaryKey = false): string {
+  generateCreateStatement(
+    schema: JSONSchema4 | QueryBuilderSchema,
+    autoPrimaryKey = false,
+  ): string {
     const tableName = schema.title;
     const psqlSchema = schema.psql_schema;
     const primaryKeySegment = autoPrimaryKey ? '\n id SERIAL PRIMARY KEY,' : '';
@@ -54,7 +57,7 @@ export class QueryBuilderService {
 
     const properties = schema.properties;
     for (const property in properties) {
-      const column: JSONSchema4 = properties[property];
+      const column = properties[property];
       createStatement += `  ${property} `;
       if (column.type === 'string' && column.format === 'date-time') {
         createStatement += 'TIMESTAMP';
@@ -94,7 +97,9 @@ export class QueryBuilderService {
     return this.cleanStatement(createStatement);
   }
 
-  generateIndexStatement(schema: JSONSchema4): string[] | null {
+  generateIndexStatement(
+    schema: JSONSchema4 | QueryBuilderSchema,
+  ): string[] | null {
     const psqlSchema = schema.psql_schema;
     const indexStatements = [];
     if (schema.indexes) {
@@ -112,7 +117,10 @@ export class QueryBuilderService {
     return indexStatements.map((statement) => this.cleanStatement(statement));
   }
 
-  generateInsertStatement(schema: JSONSchema4, data: any): string {
+  generateInsertStatement(
+    schema: JSONSchema4 | QueryBuilderSchema,
+    data: any,
+  ): string {
     const tableName = schema.title;
     const psqlSchema = schema.psql_schema;
     const fields = [];
@@ -133,7 +141,10 @@ export class QueryBuilderService {
     return this.cleanStatement(query);
   }
 
-  generateBulkInsertStatement(schema: JSONSchema4, data: any[]): string {
+  generateBulkInsertStatement(
+    schema: JSONSchema4 | QueryBuilderSchema,
+    data: any[],
+  ): string {
     const tableName = schema.title;
     const psqlSchema = schema.psql_schema;
     const fields = [];
