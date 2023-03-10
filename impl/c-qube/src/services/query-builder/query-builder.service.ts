@@ -188,16 +188,16 @@ export class QueryBuilderService {
 
     // TODO: check if the keys of data.properties are a subset of schema.properties or not
 
-    let query = `UPDATE ${psqlSchema}.${tableName}\nSET`;
+    let query = `UPDATE ${psqlSchema}.${tableName} SET `;
     for (const key in data.properties) {
-      query += `  ${key} = '${data.properties[key]}',\n`;
+      query += `${key} = '${data.properties[key]}', `;
     }
     query = query.slice(0, -2); // remove last comma and newline
 
     const conditions = Object.keys(data.conditions);
     console.log('conditions: ', conditions);
     if (conditions.length > 0) {
-      query += '\nWHERE';
+      query += ' WHERE ';
       // for (const condition in conditions) {
 
       // }
@@ -205,8 +205,8 @@ export class QueryBuilderService {
         const op = data.conditions[condition].operator;
         const type = data.conditions[condition].type;
         const value = data.conditions[condition].value;
-        query += `  ${condition} ${op} ${type === 'number' ? value : "'" + value + "'"
-          }  and\n`;
+        query += `${condition} ${op} ${type === 'number' ? value : "'" + value + "'"
+          } and `;
       });
       query = query.slice(0, -5); // remove last 'and' and newline
     }
@@ -218,7 +218,6 @@ export class QueryBuilderService {
   }
 }
 
-// const testObj = new QueryBuilderService();
 // testObj.generateUpdateStatement(
 //   {
 //     title: 'my_table',

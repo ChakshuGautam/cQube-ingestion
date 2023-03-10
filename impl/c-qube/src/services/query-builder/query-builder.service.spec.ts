@@ -280,10 +280,9 @@ describe('QueryBuilderService', () => {
     );
 
     expect(updateStatement).toBe(
-      service.cleanStatement(`UPDATE my_schema.my_table
-      SET  isAdult = 'Y',
-        date_updated = '2023-03-10T15:52:22.418Z'
-      WHERE  age >= '18' ;`),
+      service.cleanStatement(
+        `UPDATE my_schema.my_table SET isAdult = 'Y', date_updated = '2023-03-10T15:52:22.418Z' WHERE age >= '18';`,
+      ),
     );
   });
 
@@ -323,10 +322,9 @@ describe('QueryBuilderService', () => {
     );
 
     expect(updateStatement).toBe(
-      service.cleanStatement(`UPDATE my_schema.my_table
-      SET  isAdult = 'Y',
-        date_updated = '2023-03-10T15:52:22.418Z'
-      WHERE  age > 18 ;`),
+      service.cleanStatement(
+        `UPDATE my_schema.my_table SET isAdult = 'Y', date_updated = '2023-03-10T15:52:22.418Z' WHERE age > 18;`,
+      ),
     );
   });
 });
