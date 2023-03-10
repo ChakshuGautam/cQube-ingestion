@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JSONSchema4 } from 'json-schema';
+import { QueryBuilderSchema } from './types/QueryBuilderSchema';
+import { UpdateStatementData } from './types/UpdateStatementData';
 
 type fk = {
   column: string;
@@ -167,7 +169,71 @@ export class QueryBuilderService {
     return this.cleanStatement(query);
   }
 
-  generateUpdateStatement(schema: JSONSchema4, data: any): string[] {
-    throw new Error('Method not implemented.');
+  generateUpdateStatement(
+    schema: JSONSchema4 | QueryBuilderSchema,
+    data: UpdateStatementData,
+  ): string {
+    /**
+    const example = {
+      properties: {
+        isAdult: 'Y',
+      },
+      conditions: {
+        age: '>=18'
+      }
+    }
+     */
+    const tableName = schema.title;
+    const psqlSchema = schema.psql_schema;
+
+    // TODO: check if the keys of data.properties are a subset of schema.properties or not
+
+    let query = `UPDATE ${psqlSchema}.${tableName}\nSET`;
+    for (const key in data.properties) {
+      query += `  ${key} = '${data.properties[key]}',\n`;
+    }
+    query = query.slice(0, -2); // remove last comma and newline
+
+    const conditions = Object.keys(data.conditions);
+    if (conditions.length > 0) {
+      query += '\nWHERE';
+      for (const condition in conditions) {
+        query += `  ${condition}${data.conditions[condition]}' and\n`;
+      }
+      query = query.slice(0, -5); // remove last 'and' and newline
+    }
+
+    query += ';';
+    console.log('query:\n', query);
+
+    return query;
   }
 }
+
+const testObj = new QueryBuilderService();
+testObj.generateUpdateStatement(
+  {
+    title: 'my_table',
+    psql_schema: 'my_schema',
+    properties: {
+      id: { type: 'integer' },
+      name: { type: 'string', maxLength: 255 },
+      date_created: { type: 'string', format: 'date-time' },
+      date_updated: { type: 'string', format: 'date-time' },
+      isAdult: { type: 'string', maxLength: 1 },
+    },
+    indexes: [
+      { columns: [['name', 'date_created']] },
+      { columns: [['name'], ['date_created']] },
+    ],
+  },
+  {
+    properties: {
+      isAdult: 'Y',
+      date_updated: new Date().toISOString(),
+    },
+    conditions: {
+      age: '>=18',
+    },
+  },
+);
