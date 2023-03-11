@@ -1,6 +1,6 @@
 [submodule "impl/spec-ms"]
 	path = impl/spec-ms
-	url = https://github.com/dhanush-2397/spec-ms.git
+	url = https://github.com/Sunbird-cQube/spec-ms.git
 [submodule "impl/ingestion-ms"]
 	path = impl/ingestion-ms
-	url = https://github.com/dhanush-2397/spec-ms.git
+	url = https://github.com/Sunbird-cQube/ingestion-ms.git
