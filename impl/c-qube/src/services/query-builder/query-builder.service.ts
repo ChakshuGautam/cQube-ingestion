@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JSONSchema4 } from 'json-schema';
-import { QueryBuilderSchema } from './types/QueryBuilderSchema';
-import { UpdateStatementData } from './types/UpdateStatementData';
+import { QueryBuilderSchema } from '../../types/QueryBuilderSchema';
+import { UpdateStatementData } from '../../types/UpdateStatementData';
 
 type fk = {
   column: string;

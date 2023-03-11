@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JSONSchema4 } from 'json-schema';
 import { QueryBuilderService } from './query-builder.service';
-import { QueryBuilderSchema } from './types/QueryBuilderSchema';
-import { UpdateStatementData } from './types/UpdateStatementData';
+import { QueryBuilderSchema } from '../../types/QueryBuilderSchema';
+import { UpdateStatementData } from '../../types/UpdateStatementData';
 
 describe('QueryBuilderService', () => {
   let service: QueryBuilderService;
