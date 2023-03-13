@@ -1,0 +1,29 @@
+state_id,district_id,category_name,category_value
+12,101,PTR,48.74
+12,102,PTR,41.95
+22,201,PTR,47.85
+22,202,PTR,49.79
+12,101,% schools having toilet,99.4
+12,102,% schools having toilet,99.3
+22,201,% schools having toilet,98.5
+22,202,% schools having toilet,99.6
+12,101,% schools having drinking water,99.2
+12,102,% schools having drinking water,100
+22,201,% schools having drinking water,98.2
+22,202,% schools having drinking water,99.6
+12,101,% schools having electricity,79.4
+12,102,% schools having electricity,99.9
+22,201,% schools having electricity,71.4
+22,202,% schools having electricity,88.2
+12,101,% schools having library,21.7
+12,102,% schools having library,22.7
+22,201,% schools having library,17.5
+22,202,% schools having library,63.2
+12,101,% govt aided schools received textbook,17.2
+12,102,% govt aided schools received textbook,30.9
+22,201,% govt aided schools received textbook,12.8
+22,202,% govt aided schools received textbook,52.2
+12,101,% schools with Ramp,58.8
+12,102,% schools with Ramp,58
+22,201,% schools with Ramp,66.6
+22,202,% schools with Ramp,74

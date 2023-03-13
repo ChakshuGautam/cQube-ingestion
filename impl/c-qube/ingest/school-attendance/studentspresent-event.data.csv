@@ -1,4 +1,4 @@
-date,district_id,block_id,cluster_id,school_id,grade_id,schoolcategory_id,gender_id,students_marked_present
+date,district_id,block_id,cluster_id,school_id,grade_id,school_category_id,gender,students_marked_present
 28/02/23,101,10101,101010111,1000000008,4,sc_1,female,18
 28/02/23,101,10101,101010111,1000000006,7,sc_2,male,18
 28/02/23,101,10101,101010111,1000000005,9,sc_3,female,20

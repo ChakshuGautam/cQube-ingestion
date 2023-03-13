@@ -1,4 +1,4 @@
-date,grade,school_id,schoolcategory_id,cluster_id,block_id,district_id,student_category,gender_id,academicyear_id,cwsn,students_enrolled
+date,grade_id,school_id,school_category_id,cluster_id,block_id,district_id,student_category,gender,academicyear_id,cwsn,students_enrolled
 02/01/2023,11,1000000005,sc_4,101010111,10101,101,obc,male,2023-24,3,36
 02/01/2023,9,1000000003,sc_3,101010111,10101,101,general,male,2023-24,5,23
 02/01/2023,6,1000000026,sc_2,101010115,10101,101,st,female,2023-24,4,20

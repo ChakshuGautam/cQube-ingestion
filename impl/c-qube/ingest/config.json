@@ -44,6 +44,80 @@
         ],
         "blacklisted": []
       }
+    },
+    {
+      "name": "UDISE",
+      "namespace": "udise",
+      "description": "UDISE",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/udise"
+      },
+      "output": {
+        "location": "output/udise"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "district,udisecategory",
+          "state,udisecategory"
+        ],
+        "blacklisted": []
+      }
+    },
+    {
+      "name": "NAS",
+      "namespace": "nas",
+      "description": "NAS",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/pgi"
+      },
+      "output": {
+        "location": "output/pgi"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "district,nasindicator,nassubject,grade",
+          "state,nasindicator,nassubject,grade"
+        ],
+        "blacklisted": []
+      }
+    },
+    {
+      "name": "PGI",
+      "namespace": "pgi",
+      "description": "PGI",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/pgi"
+      },
+      "output": {
+        "location": "output/pgi"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "district,category",
+          "state,category"
+        ],
+        "blacklisted": []
+      }
+    },
+    {
+      "name": "PM-Poshan",
+      "namespace": "pm-poshan",
+      "description": "PM-Poshan",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/pm-poshan"
+      },
+      "output": {
+        "location": "output/pgi"
+      },
+      "dimensions": {
+        "whitelisted": [],
+        "blacklisted": []
+      }
     }
+
   ]
 }
