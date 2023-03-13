@@ -1,5 +1,5 @@
 state,district,lo,subject,grade,
-state_id,district_id,lo_name,subject_name,grade,
+state_id,district_id,lo_name,subject,grade,
 string,string,string,string,string,integer
-state_id,district_id,lo_name,subject_name,grade,performance
+state_id,district_id,lo_name,subject,grade,performance
 dimension,dimension,dimension,dimension,dimension,metric

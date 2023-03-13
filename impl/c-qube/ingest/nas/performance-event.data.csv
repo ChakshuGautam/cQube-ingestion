@@ -1,4 +1,4 @@
-state_id,district_id,subject_name,grade_name,lo_code,performance
+state_id,district_id,subject,grade,lo_code,performance
 12,101,Language,Grade 3,L304,63.63
 12,101,Language,Grade 3,L312,56.84
 12,101,Math,Grade 3,M301,39.31
