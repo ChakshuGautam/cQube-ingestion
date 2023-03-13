@@ -1,5 +1,0 @@
-state,district,
-state_id,district_id,
-string,string,string
-state_id,district_id,onboarded_on_pmposhan_status
-dimension,dimenstion,metric
