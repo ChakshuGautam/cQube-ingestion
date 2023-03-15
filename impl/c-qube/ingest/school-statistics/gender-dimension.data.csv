@@ -1,4 +1,4 @@
 gender_id,gender
-male,male
-male,female
-others,others
+1,male
+2,female
+3,others
