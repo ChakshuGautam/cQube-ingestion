@@ -33,6 +33,7 @@
     "csv-writer": "^1.6.0",
     "lodash": "^4.17.21",
     "nodejs-polars": "^0.7.2",
+    "nodejs-polars-linux-x64-gnu": "^0.7.2",
     "picocolors": "^1.0.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
