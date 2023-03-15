@@ -1,4 +1,11 @@
 {
+  "dimensions": {
+    "namespace": "dimensions",
+    "fileNameFormat": "${dimensionName}.${index}.dimensions.data.csv",
+    "input": {
+      "files": "./ingest/dimensions"
+    }
+  },
   "programs": [
     {
       "name": "Review and Monitoring",
@@ -118,6 +125,5 @@
         "blacklisted": []
       }
     }
-
   ]
 }
