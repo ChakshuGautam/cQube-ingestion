@@ -1,5 +1,0 @@
-state,district,category,
-state_id,district_id,category_name,
-string,string,string,integer
-state_id,district_id,category_name,category_value
-dimension,dimension,dimension,metric

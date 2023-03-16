@@ -1,3 +1,0 @@
-PK,Index,,,,,,,,,
-string,string,string,integer,string,string,string,string,string,string,string
-school_id,school_name,schoolcategory_id,grade_id,cluster_id,cluster_name,block_id,block_name,district_id,district_name,latitude,longitude

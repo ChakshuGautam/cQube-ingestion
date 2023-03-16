@@ -11,6 +11,7 @@ export interface Instrument {
 }
 
 export interface EventGrammar {
+  file?: string;
   name: string;
   instrument: Instrument;
   description: string;

@@ -156,17 +156,18 @@ export class DatasetService {
     const indexQuery: string[] = this.qbService.generateIndexStatement(
       datasetGrammar.schema,
     );
+    // console.error(datasetGrammar.name, { createQuery, indexQuery });
     await this.prisma
       .$queryRawUnsafe(createQuery)
       .catch(async (error) => {
         // console.error(datasetGrammar.schema.properties);
-        // console.error(error);
+        console.error('ERROR', datasetGrammar.name, datasetGrammar.schema.fk);
         delete datasetGrammar.schema.fk;
         const createQuery = this.qbService.generateCreateStatement(
           datasetGrammar.schema,
           autoPrimaryKey,
         );
-        console.log(createQuery);
+        console.log('Query2', createQuery);
         await this.prisma.$queryRawUnsafe(createQuery).catch((e) => {
           console.error('Failed again');
         });
