@@ -1,4 +1,4 @@
-indicator_id,indicator_code,indicator_name
+lo_id,lo_code,lo_name
 1,L304,"Reads small texts with comprehension i.e., identifies main ideas, details,sequence and draws conclusions"
 2,L312,"Reads printed scripts on the classroom walls: poems, posters, charts etc."
 3,M301,Reads and writes numbers up to 999 using place value
@@ -115,8 +115,7 @@ indicator_id,indicator_code,indicator_name
 114,M1004,Demonstrates strategies of finding roots and determining the nature of roots of a quadratic equation.
 115,M1005,Develops strategies to apply the concept of A.P. to daily life situations. Works out ways to differentiate between congruent and similar figures.
 116,M1006,"Establishes properties for similarity of two triangles logically using different geometric criteria established earlier such as, Basic Proportionality Theorem, etc."
-117,M1007,"Derives formulae to establish relations for geometrical shapes in the context of a coordinate plane, such as, finding the distance between two given points, to determine the coordinates of a point between any two given points, to find the area of a triangle
-        etc."
+117,M1007,"Derives formulae to establish relations for geometrical shapes in the context of a coordinate plane, such as, finding the distance between two given points, to determine the coordinates of a point between any two given points, to find the area of a triangle etc."
 118,M1008,Determines all trigonometric ratios with respect to a given acute angle (of a right triangle) and uses them in solving problems in daily life contexts like finding heights of different structures or distance from them.
 119,M1009,Derives proofs of theorems related to the tangents of circles.
 120,M1010,Examines the steps of geometrical constructions and reason out each step
@@ -136,11 +135,7 @@ indicator_id,indicator_code,indicator_name
 134,SST1002,"Classifies and compares events, facts, data, and figures."
 135,SST1003,"Explains cause and effect relationship between phenomena, events, and their occurrence."
 136,SST1004,Analyses and evaluates information.
-137,SST1005,"Interprets: Maps, texts, symbols, cartoons, photographs, posters, newspaper clippings, climatic
-        regions, changes in maps brought out by various treaties in Europe, sea and land links of the
-        trade from India to West Asia, South East Asia and other parts of the world, pie and bar diagrams
-        related to gross domestic product, production in different sectors and industries, employment and
-        population in India"
+137,SST1005,"Interprets: Maps, texts, symbols, cartoons, photographs, posters, newspaper clippings, climatic regions, changes in maps brought out by various treaties in Europe, sea and land links of the trade from India to West Asia, South East Asia and other parts of the world, pie and bar diagrams related to gross domestic product, production in different sectors and industries, employment and population in India"
 138,SST1006,Draws interlinkages within Social Science.
 139,SST1007,"Identifies assumptions, biases, prejudices, or stereotypes about various aspects."
 140,SST1008,"Demonstrates inquisitiveness, enquiry."

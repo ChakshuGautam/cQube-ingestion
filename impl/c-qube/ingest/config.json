@@ -1,4 +1,7 @@
 {
+  "globals": {
+    "onlyCreateWhitelisted": true
+  },
   "dimensions": {
     "namespace": "dimensions",
     "fileNameFormat": "${dimensionName}.${index}.dimensions.data.csv",
@@ -8,20 +11,26 @@
   },
   "programs": [
     {
-      "name": "PGI",
-      "namespace": "pgi",
-      "description": "PGI",
+      "name": "School Attendance",
+      "namespace": "sch_att",
+      "description": "School Attendance",
       "shouldIngestToDB": true,
       "input": {
-        "files": "./ingest/programs/pgi"
+        "files": "./ingest/programs/school-attendance"
       },
       "./output": {
-        "location": "./output/programs/pgi"
+        "location": "././output/programs/school-attendance"
       },
       "dimensions": {
         "whitelisted": [
-          "district,category",
-          "state,category"
+          "gender,district",
+          "gender,block",
+          "gender,cluster",
+          "gender,school",
+          "gender,school,grade",
+          "schoolcategory,district",
+          "schoolcategory,block",
+          "schoolcategory,cluster"
         ],
         "blacklisted": []
       }
@@ -39,6 +48,64 @@
       },
       "dimensions": {
         "whitelisted": [],
+        "blacklisted": []
+      }
+    },
+    {
+      "name": "NAS",
+      "namespace": "nas",
+      "description": "NAS",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/programs/nas"
+      },
+      "./output": {
+        "location": "./output/programs/nas"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "district,lo,subject,grade",
+          "state,lo,subject,grade"
+        ],
+        "blacklisted": []
+      }
+    },
+    {
+      "name": "UDISE",
+      "namespace": "udise",
+      "description": "UDISE",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/programs/udise"
+      },
+      "./output": {
+        "location": "./output/programs/udise"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "district,categoryudise",
+          "state,categoryudise"
+        ],
+        "blacklisted": []
+      }
+    },
+    {
+      "name": "Review and Monitoring",
+      "namespace": "rev_and_monitoring",
+      "description": "Review and Monitoring",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/programs/rev-and-monitor"
+      },
+      "./output": {
+        "location": "./output/programs/rev-and-monitor"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "academicyear,district",
+          "academicyear,block",
+          "academicyear,cluster"
+        ],
         "blacklisted": []
       }
     }

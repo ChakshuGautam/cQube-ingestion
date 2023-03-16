@@ -77,10 +77,10 @@
       "description": "NAS",
       "shouldIngestToDB": true,
       "input": {
-        "files": "./ingest/programs/pgi"
+        "files": "./ingest/programs/nas"
       },
       "./output": {
-        "location": "./output/programs/pgi"
+        "location": "./output/programs/nas"
       },
       "dimensions": {
         "whitelisted": [

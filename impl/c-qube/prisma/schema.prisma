@@ -37,7 +37,7 @@ model DatasetGrammar {
   name          String    @unique
   description   String?
   dimensions    Json
-  timeDimension Json
+  timeDimension Json?
   schema        Json
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
