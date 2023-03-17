@@ -1,16 +1,16 @@
-state_id,grade,subject,medium,board,category,content_name,mime_type,avg_play_time_in_mins_on_app_and_portal
-12,Class 1,English,English,CBSE,ETB,Naming Familiar Objects,Document,1.58
-12,Class 1,English,English,CBSE,ETB,ASSESSMENTS,Document,3.77
-12,Class 2,English,English,CBSE,ETB,Remedial Teaching Material,Document,2.32
-12,Class 3,English,English,CBSE,ETB,Remedial teaching,Document,1.9
-12,Class 3,Environmental Studies,English,CBSE,ETB,The Plant Fairy,Document,4.21
-12,Class 3,Environmental Studies,English,CBSE,ETB,WATER O WATER,Document,5.14
-12,Class 4,English,English,CBSE,ETB,MIME,Document,1.28
-12,Class 6,Geography,English,CBSE,ETB,Geography: Class- VI,Document,1.99
-12,Class 6,History,English,CBSE,ETB,Class- VI History:  Question Bank with Answer,video,1.91
-12,Class 6,Social Science,English,CBSE,ETB,Class-VI Social Science Energised Material,video,3.54
-12,Class 6,"['Political Science/Civics', 'Social Science']",English,CBSE,ETB,Social and Political Life- Class- VI,video,4.98
-12,Class 7,History,English,CBSE,ETB,Our Pasts-II,video,2.09
-12,Class 7,Political Science/Civics,English,CBSE,ETB,Social and Political Life-II,video,1.2
-12,Class 8,Geography,English,CBSE,ETB,Lesson Plan,video,3.34
-12,Class 8,History,English,CBSE,ETB,Lesson Plan,video,1.68
+state_id,grade,subject,avg_play_time_in_mins_on_app_and_portal
+12,Class 1,English,1.58
+12,Class 1,English,3.77
+12,Class 2,English,2.32
+12,Class 3,English,1.9
+12,Class 3,Environmental Studies,4.21
+12,Class 3,Environmental Studies,5.14
+12,Class 4,English,1.28
+12,Class 6,Geography,1.99
+12,Class 6,History,1.91
+12,Class 6,Social Science,3.54
+12,Class 6,"['Political Science/Civics', 'Social Science']",4.98
+12,Class 7,History,2.09
+12,Class 7,Political Science/Civics,1.2
+12,Class 8,Geography,3.34
+12,Class 8,History,1.68

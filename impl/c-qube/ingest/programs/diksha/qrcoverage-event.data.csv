@@ -1,40 +1,40 @@
-textbook_id,textbook_name,grade,subject,medium,day_of_created_on,qr_coverage
-1,English 1,Class 1,English,English,“ Feb 8,15
-2,English 2,Class 1,English,English,“ Feb 8,15
-3,English 3,Class 1,English,English,“ Feb 8,15
-4,English 4,Class 2,English,English,“ Feb 8,25
-5,English 5,Class 2,English,English,“ Feb 8,25
-6,English 6,Class 2,English,English,“ Feb 8,25
-7,Hindi 1,Class 3,Hindi,English,“ Feb 8,28
-8,Hindi 2,Class 3,Hindi,English,“ Feb 17,28
-9,Hindi 3,Class 4,Hindi,English,“ Feb 17,30
-10,Hindi 4,Class 4,Hindi,English,“ Feb 17,30
-11,Hindi 5,Class 5,Hindi,English,“ Feb 17,30
-12,Hindi 6,Class 5,Hindi,English,“ Feb 17,30
-13,Hindi 7,Class 4,Mathematics,English,“ Feb 17,15
-14,Hindi 1,Class 6,Mathematics,Hindi,“ Feb 17,15
-15,Hindi 2,Class 6,Mathematics,Hindi,“ Feb 17,15
-16,Hindi 3,Class 3,Mathematics,Hindi,“ Feb 17,15
-17,Hindi 1,Class 7,Mathematics,Hindi,“ Feb 17,15
-18,Hindi 2,Class 7,Mathematics,Hindi,“ Feb 17,50
-19,Hindi 3,Class 8,Mathematics,Hindi,“ Mar 5,50
-20,Hindi 4,Class 8,Mathematics,Hindi,“ Mar 5,50
-21,Math 1,Class 9,Mathematics,Hindi,“ Mar 5,50
-22,Math 2,Class 10,Mathematics,Hindi,“ Mar 5,50
-23,Math 3,Class 11,Physics,Hindi,“ Mar 5,50
-24,Math 4,Class 12,Physics,Hindi,“ Mar 5,50
-25,Math 5,Class 9,Physics,Hindi,“ Mar 5,50
-26,Math 1,Class 9,Physics,Hindi,“ Mar 5,50
-27,Math 2,Class 10,Physics,Hindi,“ Mar 5,50
-28,Math 3,Class 10,Physics,Hindi,“ Jan 12,45
-29,Math 4,Class 11,Kannada,Hindi,“ Jan 12,45
-30,Math 5,Class 11,Kannada,Hindi,“ Jan 12,45
-31,English 1,Class 12,Kannada,Hindi,“ Jan 12,45
-32,English 2,Class 12,Geography,English,“ Jan 12,45
-33,English 3,Class 12,Geography,English,“ Feb 8,45
-34,English 4,Class 3,Geography,English,“ Feb 8,45
-35,English 5,Class 3,Geography,English,“ Feb 8,45
-36,English 6,Class 3,Geography,English,“ Feb 8,25
-37,Hindi 1,Class 4,English,English,“ Feb 8,25
-38,Hindi 2,Class 4,English,Hindi,“ Feb 8,25
-39,Hindi 3,Class 5,English,Hindi,“ Feb 8,25
+textbook_id,textbook_name,grade,subject,medium,qr_coverage
+1,English 1,Class 1,English,English,15
+2,English 2,Class 1,English,English,15
+3,English 3,Class 1,English,English,15
+4,English 4,Class 2,English,English,25
+5,English 5,Class 2,English,English,25
+6,English 6,Class 2,English,English,25
+7,Hindi 1,Class 3,Hindi,English,28
+8,Hindi 2,Class 3,Hindi,English,28
+9,Hindi 3,Class 4,Hindi,English,30
+10,Hindi 4,Class 4,Hindi,English,30
+11,Hindi 5,Class 5,Hindi,English,30
+12,Hindi 6,Class 5,Hindi,English,30
+13,Hindi 7,Class 4,Mathematics,English,15
+14,Hindi 1,Class 6,Mathematics,Hindi,15
+15,Hindi 2,Class 6,Mathematics,Hindi,15
+16,Hindi 3,Class 3,Mathematics,Hindi,15
+17,Hindi 1,Class 7,Mathematics,Hindi,15
+18,Hindi 2,Class 7,Mathematics,Hindi,50
+19,Hindi 3,Class 8,Mathematics,Hindi,50
+20,Hindi 4,Class 8,Mathematics,Hindi,50
+21,Math 1,Class 9,Mathematics,Hindi,50
+22,Math 2,Class 10,Mathematics,Hindi,50
+23,Math 3,Class 11,Physics,Hindi,50
+24,Math 4,Class 12,Physics,Hindi,50
+25,Math 5,Class 9,Physics,Hindi,50
+26,Math 1,Class 9,Physics,Hindi,50
+27,Math 2,Class 10,Physics,Hindi,50
+28,Math 3,Class 10,Physics,Hindi,45
+29,Math 4,Class 11,Kannada,Hindi,45
+30,Math 5,Class 11,Kannada,Hindi,45
+31,English 1,Class 12,Kannada,Hindi,45
+32,English 2,Class 12,Geography,English,45
+33,English 3,Class 12,Geography,English,45
+34,English 4,Class 3,Geography,English,45
+35,English 5,Class 3,Geography,English,45
+36,English 6,Class 3,Geography,English,25
+37,Hindi 1,Class 4,English,English,25
+38,Hindi 2,Class 4,English,Hindi,25
+39,Hindi 3,Class 5,English,Hindi,25
