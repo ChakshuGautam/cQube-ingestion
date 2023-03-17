@@ -1,0 +1,5 @@
+state,grade,subject,medium,,,,,
+state_id,grade,subject,medium,,,,,
+string,string,string,string,string,string,string,string,integer
+state_id,grade,subject,medium,board,category,content_name,mime_type,avg_play_time_in_mins_on_app_and_portal
+dimension,dimension,dimension,dimension,dimension,dimension,dimension,dimension,metric
