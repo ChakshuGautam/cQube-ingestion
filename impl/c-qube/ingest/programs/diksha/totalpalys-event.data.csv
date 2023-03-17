@@ -1,44 +1,43 @@
 state_id,grade,subject,medium,board,category,content_name,mime_type,total_no_of_plays_app_and_portal
-11,Class 1,English,English,CBSE,ETB,ASSESSMENTS,Document,540
-12,Class 1,English,English,CBSE,ETB,Remedial Teaching Material,Document,552
-13,Class 1,English,English,CBSE,ETB,Remedial teaching,Document,653
-14,Class 2,English,English,CBSE,ETB,The Plant Fairy,Document,345
-15,Class 2,English,English,STATE,ETB,WATER O WATER,Document,456
-16,Class 2,English,English,STATE,ETB,MIME,Document,447
-17,Class 3,English,English,STATE,ETB,Geography: Class- VI,Document,1145
-18,Class 3,English,English,STATE,ETB,Class- VI History:  Question Bank with Answer,Document,3421
-19,Class 4,Hindi,English,STATE,ETB,Class-VI Social Science Energised Material,Document,624
-20,Class 4,Hindi,English,STATE,ETB,ASSESSMENTS,Document,732
-21,Class 4,Hindi,English,CBSE,ETB,Remedial Teaching Material,Document,489
-22,Class 4,Hindi,English,CBSE,ETB,Remedial teaching,Document,2563
-23,Class 5,Hindi,English,CBSE,ETB,The Plant Fairy,Document,4632
-24,Class 5,Hindi,Hindi,CBSE,ETB,WATER O WATER,Document,3985
-25,Class 5,Hindi,Hindi,CBSE,ETB,MIME,Document,637
-26,Class 5,Hindi,Hindi,CBSE,ETB,Geography: Class- VI,Document,680
-27,Class 6,Hindi,Hindi,CBSE,ETB,Class- VI History:  Question Bank with Answer,Document,750
-28,Class 6,Hindi,Hindi,CBSE,ETB,Class-VI Social Science Energised Material,Document,743
-29,Class 6,Mathematics,Hindi,CBSE,ETB,ASSESSMENTS,Document,247
-30,Class 6,Mathematics,Hindi,CBSE,ETB,Remedial Teaching Material,Document,6352
-31,Class 6,Mathematics,Hindi,CBSE,ETB,Remedial teaching,Document,3421
-32,Class 6,Mathematics,Hindi,CBSE,ETB,The Plant Fairy,Document,624
-33,Class 7,Mathematics,Hindi,CBSE,ETB,WATER O WATER,Document,732
-34,Class 7,Mathematics,Hindi,CBSE,ETB,MIME,Document,489
-35,Class 7,Mathematics,Hindi,CBSE,ETB,ASSESSMENTS,Document,2563
-36,Class 7,Mathematics,Hindi,CBSE,ETB,Remedial Teaching Material,Document,4632
-37,Class 8,Mathematics,Hindi,STATE,ETB,Remedial teaching,Document,3985
-38,Class 8,Mathematics,Hindi,STATE,ETB,The Plant Fairy,Document,637
-39,Class 8,Mathematics,Hindi,STATE,ETB,WATER O WATER,Document,680
-40,Class 8,Mathematics,Hindi,STATE,ETB,MIME,Document,750
-41,Class 8,Geography,Hindi,CBSE,ETB,ASSESSMENTS,Document,743
-42,Class 9,Geography,English,CBSE,ETB,Remedial Teaching Material,Document,247
-43,Class 9,Geography,English,CBSE,ETB,Remedial teaching,Document,6352
-44,Class 9,Geography,English,CBSE,ETB,The Plant Fairy,Document,1376
-45,Class 9,Geography,English,CBSE,ETB,WATER O WATER,Document,3781
-46,Class 10,Ecnomics,English,CBSE,ETB,MIME,Document,840
-47,Class 10,Ecnomics,English,CBSE,ETB,ASSESSMENTS,Document,620
-48,Class 11,Ecnomics,English,CBSE,ETB,Remedial Teaching Material,Document,333
-49,Class 11,Ecnomics,English,CBSE,ETB,Remedial teaching,Document,115
-50,Class 12,Ecnomics,English,CBSE,ETB,The Plant Fairy,Document,743
-51,Class 12,Ecnomics,English,CBSE,ETB,WATER O WATER,Document,5423
-52,Class 12,Ecnomics,English,CBSE,ETB,MIME,Document,445
-53,Class 12,Ecnomics,English,CBSE,ETB,Geography: Class- VI,Document,322
+12,Class 1,English,English,CBSE,ETB,ASSESSMENTS,Document,540
+12,Class 1,English,English,CBSE,ETB,Remedial teaching,Document,653
+12,Class 2,English,English,CBSE,ETB,The Plant Fairy,Document,345
+12,Class 2,English,English,STATE,ETB,WATER O WATER,Document,456
+12,Class 2,English,English,STATE,ETB,MIME,Document,447
+12,Class 3,English,English,STATE,ETB,Geography: Class- VI,Document,1145
+12,Class 3,English,English,STATE,ETB,Class- VI History:  Question Bank with Answer,Document,3421
+12,Class 4,Hindi,English,STATE,ETB,Class-VI Social Science Energised Material,Document,624
+12,Class 4,Hindi,English,STATE,ETB,ASSESSMENTS,Document,732
+12,Class 4,Hindi,English,CBSE,ETB,Remedial Teaching Material,Document,489
+12,Class 4,Hindi,English,CBSE,ETB,Remedial teaching,Document,2563
+12,Class 5,Hindi,English,CBSE,ETB,The Plant Fairy,Document,4632
+12,Class 5,Hindi,Hindi,CBSE,ETB,WATER O WATER,Document,3985
+12,Class 5,Hindi,Hindi,CBSE,ETB,MIME,Document,637
+12,Class 5,Hindi,Hindi,CBSE,ETB,Geography: Class- VI,Document,680
+12,Class 6,Hindi,Hindi,CBSE,ETB,Class- VI History:  Question Bank with Answer,Document,750
+12,Class 6,Hindi,Hindi,CBSE,ETB,Class-VI Social Science Energised Material,Document,743
+12,Class 6,Mathematics,Hindi,CBSE,ETB,ASSESSMENTS,Document,247
+12,Class 6,Mathematics,Hindi,CBSE,ETB,Remedial Teaching Material,Document,6352
+12,Class 6,Mathematics,Hindi,CBSE,ETB,Remedial teaching,Document,3421
+12,Class 6,Mathematics,Hindi,CBSE,ETB,The Plant Fairy,Document,624
+12,Class 7,Mathematics,Hindi,CBSE,ETB,WATER O WATER,Document,732
+12,Class 7,Mathematics,Hindi,CBSE,ETB,MIME,Document,489
+12,Class 7,Mathematics,Hindi,CBSE,ETB,ASSESSMENTS,Document,2563
+12,Class 7,Mathematics,Hindi,CBSE,ETB,Remedial Teaching Material,Document,4632
+12,Class 8,Mathematics,Hindi,STATE,ETB,Remedial teaching,Document,3985
+12,Class 8,Mathematics,Hindi,STATE,ETB,The Plant Fairy,Document,637
+12,Class 8,Mathematics,Hindi,STATE,ETB,WATER O WATER,Document,680
+12,Class 8,Mathematics,Hindi,STATE,ETB,MIME,Document,750
+12,Class 8,Geography,Hindi,CBSE,ETB,ASSESSMENTS,Document,743
+12,Class 9,Geography,English,CBSE,ETB,Remedial Teaching Material,Document,247
+12,Class 9,Geography,English,CBSE,ETB,Remedial teaching,Document,6352
+12,Class 9,Geography,English,CBSE,ETB,The Plant Fairy,Document,1376
+12,Class 9,Geography,English,CBSE,ETB,WATER O WATER,Document,3781
+12,Class 10,Ecnomics,English,CBSE,ETB,MIME,Document,840
+12,Class 10,Ecnomics,English,CBSE,ETB,ASSESSMENTS,Document,620
+12,Class 11,Ecnomics,English,CBSE,ETB,Remedial Teaching Material,Document,333
+12,Class 11,Ecnomics,English,CBSE,ETB,Remedial teaching,Document,115
+12,Class 12,Ecnomics,English,CBSE,ETB,The Plant Fairy,Document,743
+12,Class 12,Ecnomics,English,CBSE,ETB,WATER O WATER,Document,5423
+12,Class 12,Ecnomics,English,CBSE,ETB,MIME,Document,445
+12,Class 12,Ecnomics,English,CBSE,ETB,Geography: Class- VI,Document,322
