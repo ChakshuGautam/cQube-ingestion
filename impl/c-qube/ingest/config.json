@@ -108,6 +108,65 @@
         ],
         "blacklisted": []
       }
+    },
+    {
+      "name": "DIKSHA",
+      "namespace": "diksha",
+      "description": "DIKSHA",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/programs/diksha"
+      },
+      "./output": {
+        "location": "./output/programs/diksha"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "state_id,grade,subject,medium,board,content_name,mime_type,category",
+          "tb_id,grade,subject,medium",
+          "textbook_id,textbook_name,grade,subject,medium,day_of_created_on"
+        ],
+        "blacklisted": []
+      }
+    },
+    {
+      "name": "PGI",
+      "namespace": "pgi",
+      "description": "PGI",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/programs/pgi"
+      },
+      "./output": {
+        "location": "./output/programs/pgi"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "state_id,district_id,category_name",
+          "state_id,category_name"
+        ],
+        "blacklisted": []
+      }
+    },
+    {
+      "name": "NISHTHA",
+      "namespace": "nishtha",
+      "description": "NISHTHA",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/programs/nishtha"
+      },
+      "./output": {
+        "location": "./output/programs/nishtha"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "state_id,district_id,program_name",
+          "state_id,program_name,course_name",
+          "state_id,program_name"
+        ],
+        "blacklisted": []
+      }
     }
   ]
 }
