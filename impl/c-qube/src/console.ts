@@ -33,6 +33,11 @@ async function bootstrap() {
       await csvAdapterService.ingest();
       outro(`You're all set!`);
       break;
+    case 'ingest-data':
+      intro(`Starting Data Ingestion Process`);
+      await csvAdapterService.ingestData();
+      outro(`You're all set!`);
+      break;
     case 'nuke-db':
       await csvAdapterService.nuke();
       break;

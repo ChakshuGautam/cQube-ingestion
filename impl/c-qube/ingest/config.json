@@ -47,7 +47,9 @@
         "location": "./output/programs/pm-poshan"
       },
       "dimensions": {
-        "whitelisted": [],
+        "whitelisted": [
+          "district,categorypm"
+        ],
         "blacklisted": []
       }
     },
