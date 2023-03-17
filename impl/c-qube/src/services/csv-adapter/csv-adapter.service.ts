@@ -335,7 +335,6 @@ export class CsvAdapterService {
     await this.nuke();
     s.stop('✅ 1. The Data has been Nuked');
 
-    const defaultTimeDimensions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
     let datasetGrammarsGlobal: DatasetGrammar[] = [];
 
     // Parse the config
@@ -344,6 +343,8 @@ export class CsvAdapterService {
     const config = JSON.parse(
       await readFile(ingestionFolder + '/config.json', 'utf8'),
     );
+    const regexEventGrammar = /\-event\.grammar.csv$/i;
+    const defaultTimeDimensions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
     s.stop('✅ 2. Config parsing completed');
 
     // Verify all file names
@@ -450,7 +451,6 @@ export class CsvAdapterService {
     //   -- Read the CSV
     s.start('🚧 4. Processing Event Grammars');
     const eventGrammarsGlobal: EventGrammar[] = [];
-    const regexEventGrammar = /\-event\.grammar.csv$/i;
     for (let j = 0; j < config?.programs.length; j++) {
       const inputFiles = readdirSync(config?.programs[j].input?.files);
       // For 1TimeDimension + 1EventCounter + 1Dimension
@@ -607,10 +607,27 @@ export class CsvAdapterService {
     );
 
     s.stop('✅ 5. Dataset Grammars have been ingested');
+  }
 
-    return;
+  public async ingestData() {
+    const s = spinner();
+    s.start('🚧 1. Deleting Old Data');
+    await this.nukeDatasets();
+    s.stop('✅ 1. The Data has been Nuked');
 
-    s.start('🚧 6. Ingest Events');
+    // Parse the config
+    s.start('🚧 2. Reading your config');
+    const ingestionFolder = './ingest';
+    const config = JSON.parse(
+      await readFile(ingestionFolder + '/config.json', 'utf8'),
+    );
+    const regexEventGrammar = /\-event\.grammar.csv$/i;
+    const defaultTimeDimensions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
+    const dimensionGrammarFolder = config?.dimensions.input?.files;
+
+    s.stop('✅ 2. Config parsing completed');
+    // Ingest Compound DatasetGrammar
+    s.start('🚧 3. Ingest Events');
 
     // Insert events into the datasets
     const callback = (
@@ -621,8 +638,6 @@ export class CsvAdapterService {
       //console.debug('callback', err, events.length);
     };
 
-    console.log('Adding data to dataset tables');
-
     for (let j = 0; j < config?.programs.length; j++) {
       const inputFiles = readdirSync(config?.programs[j].input?.files);
       for (let i = 0; i < inputFiles?.length; i++) {
@@ -630,9 +645,14 @@ export class CsvAdapterService {
           // console.log(config?.programs[j].input?.files + `/${inputFiles[i]}`);
           const eventGrammarFile =
             config?.programs[j].input?.files + `/${inputFiles[i]}`;
+          const eventGrammarFileName =
+            config?.programs[j].input?.files + `/${inputFiles[i]}`;
+          const ifTimeDimensionPresent = await isTimeDimensionPresent(
+            eventGrammarFileName,
+          );
           const eventGrammar = await createEventGrammarFromCSVDefinition(
-            eventGrammarFile,
-            config?.programs[j].input?.files,
+            eventGrammarFileName,
+            dimensionGrammarFolder,
             config?.programs[j].namespace,
           );
           for (let k = 0; k < eventGrammar.length; k++) {
@@ -681,58 +701,7 @@ export class CsvAdapterService {
         }
       }
     }
-
-    // Ingest Compound DatasetGrammar
-    for (let m = 0; m < compoundDatasetGrammars.length; m++) {
-      const {
-        instrumentField,
-      }: {
-        eventGrammarDef: EventGrammarCSVFormat[];
-        instrumentField: string;
-      } = await getEGDefFromFile(compoundDatasetGrammars[m].egFile);
-      const compundEventGrammar: EventGrammar = {
-        name: '',
-        description: '',
-        dimension: [],
-        instrument_field: instrumentField,
-        is_active: true,
-        schema: {},
-        instrument: {
-          type: InstrumentType.COUNTER,
-          name: 'counter',
-        },
-      };
-      const events: Event[] = await createCompoundDatasetDataToBeInserted(
-        compoundDatasetGrammars[m].egFile.replace('grammar', 'data'),
-        compundEventGrammar,
-        compoundDatasetGrammars[m].dg,
-      );
-      // Create Pipes
-      const pipe: Pipe = {
-        event: compundEventGrammar,
-        transformer: defaultTransformers[0],
-        dataset: compoundDatasetGrammars[m].dg,
-      };
-      const transformContext: TransformerContext = {
-        dataset: compoundDatasetGrammars[m].dg,
-        events: events,
-        isChainable: false,
-        pipeContext: {},
-      };
-
-      const datasetUpdateRequest: DatasetUpdateRequest[] =
-        pipe.transformer.transformSync(
-          callback,
-          transformContext,
-          events,
-        ) as DatasetUpdateRequest[];
-
-      // console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
-      await this.datasetService.processDatasetUpdateRequest(
-        datasetUpdateRequest,
-      );
-    }
-    s.stop('🚧 6. Ingest Events');
+    s.stop('✅ 2. Config parsing completed');
   }
 
   public async nuke() {
@@ -758,6 +727,21 @@ export class CsvAdapterService {
 
       const datasets: any[] = await this.prisma
         .$queryRaw`select 'drop table if exists "' || tablename || '" cascade;'
+        from pg_tables where schemaname = 'datasets';`;
+      for (let i = 0; i < datasets.length; i++) {
+        const parts = datasets[i]['?column?'].split('"');
+        const query = parts[0] + '"datasets"."' + parts[1] + '"' + parts[2];
+        await this.prisma.$executeRawUnsafe(query);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  public async nukeDatasets() {
+    try {
+      const datasets: any[] = await this.prisma
+        .$queryRaw`select 'truncate table "' || tablename || '" cascade;'
         from pg_tables where schemaname = 'datasets';`;
       for (let i = 0; i < datasets.length; i++) {
         const parts = datasets[i]['?column?'].split('"');
