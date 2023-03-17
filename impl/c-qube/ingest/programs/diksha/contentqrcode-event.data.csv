@@ -1,0 +1,71 @@
+textbook_id,textbook_name,grade,subject,medium,day_of_created_on,qr_codes_linked_to_content
+1,English 1,Class 1,Kannada,English,“ Jan 7,50
+2,English 2,Class 2,Kannada,English,“ Jan 7,50
+3,English 3,Class 3,Kannada,English,“ Jan 7,50
+4,English 4,Class 4,Kannada,English,“ Jan 7,100
+5,English 5,Class 5,Kannada,English,“ Jan 7,100
+6,Hindi 1,Class 6,Kannada,English,“ Jan 7,100
+7,Hindi 2,Class 7,English,Hindi,“ Jan 7,100
+8,Hindi 3,Class 8,English,Hindi,“ Feb 5,100
+9,Hindi 4,Class 9,English,Hindi,“ Feb 5,100
+10,Hindi 5,Class 10,English,Hindi,“ Feb 5,100
+11,Hindi 6,Class 11,Hindi,Hindi,“ Feb 5,100
+12,Hindi 7,Class 11,Hindi,Hindi,“ Feb 5,100
+13,Math 1,Class 11,Hindi,Hindi,“ Feb 5,100
+14,Math 2,Class 11,Hindi,Hindi,“ Feb 5,100
+15,Math 3,Class 11,Hindi,Kannada,“ Mar 8 ,100
+16,Math 4,Class 11,Hindi,Kannada,“ Mar 8 ,100
+17,Math 5,Class 12,Economics,Kannada,“ Mar 8 ,100
+18,Math 6,Class 12,Economics,Kannada,“ Mar 8 ,100
+19,Math 7,Class 12,Economics,Kannada,“ Mar 8 ,100
+20,Social 1,Class 12,Economics,Kannada,“ Mar 8 ,50
+21,Social 2,Class 1,Geography,Kannada,“ Mar 8 ,50
+22,Social 3,Class 1,Geography,Kannada,“ Mar 8 ,50
+23,Social 4,Class 1,Geography,Urdu,“ Feb 11,100
+24,Social 5,Class 1,Geography,Urdu,“ Feb 11,100
+25,Biology 1,Class 2,Geography,Urdu,“ Feb 11,100
+26,Biology 2,Class 2,Geography,Urdu,“ Feb 11,100
+27,Biology 3,Class 2,Urdu,English,“ Feb 11,100
+28,Biology 4,Class 2,Urdu,English,“ Feb 11,100
+29,Chemistry 1,Class 3,Urdu,English,“ Feb 11,100
+30,Chemistry,Class 3,Urdu,English,“ Feb 11,100
+31,English 1,Class 3,Mathematics,English,“ Feb 11,100
+32,English 2,Class 3,Mathematics,English,“ Feb 11,100
+33,English 3,Class 4,Mathematics,English,“ Feb 11,100
+34,English 4,Class 4,Mathematics,English,“ Feb 11,100
+35,English 5,Class 4,Mathematics,English,“ Feb 11,100
+36,Math 1,Class 4,Mathematics,English,“ Jan 9,100
+37,Math 2,Class 5,Mathematics,English,“ Jan 9,100
+38,Math 3,Class 5,Mathematics,English,“ Jan 9,100
+39,Math 4,Class 5,Kannada,Hindi,“ Jan 9,50
+40,Math 5,Class 5,Kannada,Hindi,“ Jan 9,50
+41,Math 6,Class 6,Kannada,Hindi,“ Jan 9,50
+42,Math 7,Class 6,Kannada,Hindi,“ Jan 9,50
+43,Math 8,Class 6,English,Hindi,“ Jan 9,100
+44,Math 9,Class 6,English,Hindi,“ Jan 9,100
+45,Hindi 6,Class 7,English,Hindi,“ Jan 9,100
+46,Kannada 1,Class 7,English,Hindi,“ Jan 9,100
+47,Kannada 2,Class 7,Geography,Hindi,“ Jan 9,100
+48,Kannada 3,Class 7,Geography,Hindi,“ Jan 9,100
+49,Kannada 4,Class 8,Geography,Hindi,“ Jan 9,100
+50,Kannada 5,Class 8,Economics,Hindi,“ Jan 9,100
+51,Kannada 6,Class 8,Economics,Hindi,“ Jan 9,100
+52,Social 1,Class 8,English,Hindi,“ Jan 9,100
+53,Social 2,Class 8,English,Hindi,“ Jan 9,100
+54,Social 3,Class 8,English,Hindi,“ Feb 17,100
+55,Social 4,Class 9,English,Kannada,“ Feb 17,100
+56,Social 5,Class 9,Urdu,Kannada,“ Feb 17,100
+57,Hindi 7,Class 9,Urdu,Kannada,“ Feb 17,100
+58,Hindi 8,Class 9,Urdu,Kannada,“ Feb 17,100
+59,Hindi 9,Class 9,Urdu,Kannada,“ Feb 17,100
+60,Chemistry 3,Class 9,English,Kannada,“ Feb 17,100
+61,Chemistry 4,Class 9,English,Kannada,“ Feb 17,100
+62,Chemistry 5,Class 9,English,Kannada,“ Feb 17,100
+63,Environment 1,Class 10,English,Hindi,“ Feb 17,100
+64,Environment 2,Class 10,English,Hindi,“ Feb 17,100
+65,Environment 3,Class 10,English,Hindi,“ Feb 17,100
+66,Environment 4,Class 10,Economics,Hindi,“ Feb 17,100
+67,Environment 5,Class 10,Economics,Hindi,“ Feb 17,100
+68,Environment 6,Class 10,Economics,Hindi,“ Feb 17,100
+69,Chemistry 6,Class 10,Economics,Hindi,“ Feb 17,100
+70,Chemistry 7,Class 11,Economics,Hindi,“ Feb 17,100

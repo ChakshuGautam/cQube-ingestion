@@ -1,4 +1,4 @@
-state,district,lo,subject,grade,
+state,district,lo,subjectnas,gradenas,
 state_id,district_id,lo_code,subject,grade,
 string,string,string,string,string,integer
 state_id,district_id,lo_code,subject,grade,performance

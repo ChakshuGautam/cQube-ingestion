@@ -1,0 +1,5 @@
+state,district,nishthaprogram,
+state_id,district_id,program_name,
+string,string,string,integer
+state_id,district_id,program_name,perc_certification
+dimension,dimension,dimension,metric

@@ -1,5 +1,0 @@
-,medium,grade,subject,
-,medium,grade,subject,
-string,string,string,string,integer
-tb_id,medium,grade,subject,resource_count
-dimension,dimension,dimension,dimension,metric
