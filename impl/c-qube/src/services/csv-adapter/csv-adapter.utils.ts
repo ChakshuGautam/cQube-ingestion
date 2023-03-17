@@ -23,8 +23,10 @@ export const createDimensionGrammarFromCSVDefinition = async (
 ): Promise<DimensionGrammar> => {
   // read csvPath and get first row using file-reader
   const fileContent = await fs.readFile(csvFilePath, 'utf-8');
+  console.log(fileContent,':::::::::::::CONTENT')
   const row1 = fileContent.split('\n')[0].trim();
   const row2 = fileContent.split('\n')[1].trim();
+  console.log(row2,':::::::::::::::::row2')
   const row3 = fileContent.split('\n')[2].trim();
 
   // Naming convention for eventis => `<event name>-event.csv`
@@ -731,9 +733,7 @@ function getDGDefsFromEGDefs(eventGrammarDef: EventGrammarCSVFormat[]) {
 
 export async function getEGDefFromFile(csvFilePath: string) {
   const fileContent = await fs.readFile(csvFilePath, 'utf-8');
-  console.log(fileContent,':::::::::::::::::::')
   const row1 = fileContent.split('\n')[0].trim();
-  console.log(row1,':::::::::::::::::::')
   const row2 = fileContent.split('\n')[1].trim();
   const row3 = fileContent.split('\n')[2].trim();
   const row4 = fileContent.split('\n')[3].trim();
