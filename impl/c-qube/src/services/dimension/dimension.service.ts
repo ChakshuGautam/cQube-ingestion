@@ -103,7 +103,11 @@ export class DimensionService {
 
     // iterate over indexQuery and execute each query
     for (const query of indexQuery) {
-      await this.prisma.$queryRawUnsafe(query);
+      await this.prisma.$queryRawUnsafe(query).catch((e) => {
+        console.error(dimensionGrammar.name);
+        console.error(query);
+        console.error(e);
+      });
     }
   }
 
@@ -168,6 +172,7 @@ export class DimensionService {
 
     await this.prisma.$queryRawUnsafe(insertQuery).catch(async (err) => {
       console.log('After', dimensionGrammar.name, data.length);
+      console.error(insertQuery);
       if (data.length < 50) {
         console.log(data);
       }

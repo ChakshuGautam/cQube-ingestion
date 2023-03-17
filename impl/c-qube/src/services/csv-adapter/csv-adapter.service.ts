@@ -19,13 +19,16 @@ import { readFile } from 'fs/promises';
 import {
   createCompoundDatasetDataToBeInserted,
   createCompoundDatasetGrammars,
+  createCompoundDatasetGrammarsWithoutTimeDimensions,
   createDatasetDataToBeInsertedFromEG,
   createDatasetGrammarsFromEG,
+  createDatasetGrammarsFromEGWithoutTimeDimension,
   createDimensionGrammarFromCSVDefinition,
   createEventGrammarFromCSVDefinition,
   createSingleDatasetGrammarsFromEG,
   EventGrammarCSVFormat,
   getEGDefFromFile,
+  isTimeDimensionPresent,
 } from './csv-adapter.utils';
 import { readdirSync } from 'fs';
 import { logToFile } from '../../utils/debug';
@@ -333,7 +336,7 @@ export class CsvAdapterService {
     s.stop('✅ 1. The Data has been Nuked');
 
     const defaultTimeDimensions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
-    let datasetGrammars: DatasetGrammar[] = [];
+    let datasetGrammarsGlobal: DatasetGrammar[] = [];
 
     // Parse the config
     s.start('🚧 2. Reading your config');
@@ -356,86 +359,86 @@ export class CsvAdapterService {
     s.start('🚧 3. Processing Dimensions');
     const insertDimensionDataPromises = [];
     const dimensions: DimensionGrammar[] = [];
+    const dimensionGrammarFolder = config?.dimensions.input?.files;
     const regexDimensionGrammar = /\-dimension\.grammar.csv$/i;
-    const regexDimensionData = /\-dimension\.data.csv$/i;
-    for (let j = 0; j < config?.programs.length; j++) {
-      const inputFiles = readdirSync(config?.programs[j].input?.files);
-      for (let i = 0; i < inputFiles?.length; i++) {
-        // Create a function to get all files in the folder
-        // Create a function to use regex to match the file
-        if (regexDimensionGrammar.test(inputFiles[i])) {
-          const dimensionGrammar =
-            await createDimensionGrammarFromCSVDefinition(
-              config?.programs[j].input?.files + `/${inputFiles[i]}`,
+    const inputFilesForDimensions = readdirSync(dimensionGrammarFolder);
+    for (let i = 0; i < inputFilesForDimensions?.length; i++) {
+      // Create a function to get all files in the folder
+      // Create a function to use regex to match the file
+      if (regexDimensionGrammar.test(inputFilesForDimensions[i])) {
+        const currentDimensionGrammarFileName =
+          dimensionGrammarFolder + `/${inputFilesForDimensions[i]}`;
+        const dimensionGrammar = await createDimensionGrammarFromCSVDefinition(
+          currentDimensionGrammarFileName,
+        );
+        const dimensionDataFileName = currentDimensionGrammarFileName.replace(
+          'grammar',
+          'data',
+        );
+        const df: DataFrame = pl.readCSV(dimensionDataFileName);
+        dimensions.push(dimensionGrammar);
+        await this.dimensionService
+          .createDimensionGrammar(dimensionGrammar)
+          .then((s) => {
+            // console.info(
+            //   chalk.blue('Added Dimension Spec!', dimensionGrammar.name),
+            // );
+          })
+          .catch((e) => {
+            console.info(
+              chalk.blue(
+                'Error in adding Dimension Spec!',
+                dimensionGrammar.name,
+                e,
+              ),
             );
-          const dimensionDataFile = inputFiles[i].replace('grammar', 'data');
-          const df: DataFrame = pl.readCSV(
-            config?.programs[j].input?.files + `/${dimensionDataFile}`,
-          );
-          dimensions.push(dimensionGrammar);
-          await this.dimensionService
-            .createDimensionGrammar(dimensionGrammar)
-            .then((s) => {
-              // console.info(
-              //   chalk.blue('Added Dimension Spec!', dimensionGrammar.name),
-              // );
-            })
-            .catch((e) => {
-              console.info(
-                chalk.blue(
-                  'Error in adding Dimension Spec!',
-                  dimensionGrammar.name,
-                  e,
-                ),
-              );
-            });
-          await this.dimensionService
-            .createDimension(dimensionGrammar)
-            .then((s) => {
-              // console.info(
-              //   chalk.blue('Added Dimension Table!', dimensionGrammar.name),
-              // );
-            })
-            .catch((e) => {
-              console.log(e);
-              console.info(
-                chalk.blue(
-                  'Error in adding Dimension Table!',
-                  dimensionGrammar.name,
-                ),
-              );
-            });
+          });
+        await this.dimensionService
+          .createDimension(dimensionGrammar)
+          .then((s) => {
+            // console.info(
+            //   chalk.blue('Added Dimension Table!', dimensionGrammar.name),
+            // );
+          })
+          .catch((e) => {
+            console.log(e);
+            console.info(
+              chalk.blue(
+                'Error in adding Dimension Table!',
+                dimensionGrammar.name,
+              ),
+            );
+          });
 
-          const allHeaders = df.columns;
-          // Ingest Data
-          //   Ingest DimensionData
-          //   -- Get all files that match the regex
-          //   -- Read the CSV
-          insertDimensionDataPromises.push(
-            this.dimensionService
-              .insertBulkDimensionDataV2(
-                dimensionGrammar,
-                df.rows().map((r, index) => {
-                  const data = {};
-                  for (let i = 0; i < allHeaders.length; i++) {
-                    data[allHeaders[i]] = r[i];
-                  }
-                  return {
-                    id: index,
-                    ...data,
-                  };
-                }),
-              )
-              .then((s) => {
-                // console.log(
-                //   chalk.blue('Added Dimension Data!', dimensionGrammar.name),
-                // );
-              })
-              .catch((e) => {
-                console.error('Error in adding', dimensionGrammar.name);
+        const allHeaders = df.columns;
+        // Ingest Data
+        //   Ingest DimensionData
+        //   -- Get all files that match the regex
+        //   -- Read the CSV
+        insertDimensionDataPromises.push(
+          this.dimensionService
+            .insertBulkDimensionDataV2(
+              dimensionGrammar,
+              df.rows().map((r, index) => {
+                const data = {};
+                for (let i = 0; i < allHeaders.length; i++) {
+                  data[allHeaders[i]] = r[i];
+                }
+                return {
+                  id: index,
+                  ...data,
+                };
               }),
-          );
-        }
+            )
+            .then((s) => {
+              // console.log(
+              //   chalk.blue('Added Dimension Data!', dimensionGrammar.name),
+              // );
+            })
+            .catch((e) => {
+              console.error('Error in adding', dimensionGrammar.name);
+            }),
+        );
       }
     }
 
@@ -446,7 +449,7 @@ export class CsvAdapterService {
     //   -- Get all files that match the regex
     //   -- Read the CSV
     s.start('🚧 4. Processing Event Grammars');
-    const eventGrammars: EventGrammar[] = [];
+    const eventGrammarsGlobal: EventGrammar[] = [];
     const regexEventGrammar = /\-event\.grammar.csv$/i;
     for (let j = 0; j < config?.programs.length; j++) {
       const inputFiles = readdirSync(config?.programs[j].input?.files);
@@ -454,11 +457,18 @@ export class CsvAdapterService {
       for (let i = 0; i < inputFiles?.length; i++) {
         if (regexEventGrammar.test(inputFiles[i])) {
           // console.log(config?.programs[j].input?.files + `/${inputFiles[i]}`);
-          const eventGrammar = await createEventGrammarFromCSVDefinition(
-            config?.programs[j].input?.files + `/${inputFiles[i]}`,
-            config?.programs[j].input?.files,
+          const eventGrammarFileName =
+            config?.programs[j].input?.files + `/${inputFiles[i]}`;
+          // console.log(eventGrammarFileName);
+          const ifTimeDimensionPresent = await isTimeDimensionPresent(
+            eventGrammarFileName,
           );
-          eventGrammars.push(...eventGrammar);
+          const eventGrammar = await createEventGrammarFromCSVDefinition(
+            eventGrammarFileName,
+            dimensionGrammarFolder,
+            config?.programs[j].namespace,
+          );
+          eventGrammarsGlobal.push(...eventGrammar);
           for (let i = 0; i < eventGrammar.length; i++) {
             await this.eventService
               .createEventGrammar(eventGrammar[i])
@@ -466,23 +476,28 @@ export class CsvAdapterService {
                 console.error(e);
               });
           }
+          if (ifTimeDimensionPresent) {
+            const dgs1 = await createDatasetGrammarsFromEG(
+              config.programs[j].namespace,
+              defaultTimeDimensions,
+              eventGrammar,
+            );
+            datasetGrammarsGlobal.push(...dgs1);
+          } else {
+            const dgs2 = await createDatasetGrammarsFromEGWithoutTimeDimension(
+              config.programs[j].namespace,
+              eventGrammar,
+            );
+            datasetGrammarsGlobal.push(...dgs2);
+          }
         }
       }
-      datasetGrammars.push(
-        ...createDatasetGrammarsFromEG(
-          config.programs[j].namespace,
-          dimensions,
-          defaultTimeDimensions,
-          eventGrammars,
-        ),
-      );
     }
-    // TODO: DatasetGrammar and EventGrammar should be empty.
     s.stop('✅ 4. Event Grammars have been ingested');
-    datasetGrammars = _.uniq(datasetGrammars, 'name');
 
     // Create EventGrammars for Whitelisted Compound Dimensions
     // For 1TimeDimension + 1EventCounter + (1+Dimensions)
+    s.start('🚧 5. Processing Dataset Grammars');
     const compoundDatasetGrammars: {
       dg: DatasetGrammar;
       egFile: string;
@@ -524,20 +539,44 @@ export class CsvAdapterService {
           }
           //iterate over all defaultTimeDimension
           if (eventGrammarFiles.length > 0) {
+            const egfWithTD = [];
+            const egfWithoutTD = [];
+            for (
+              let egfIndex = 0;
+              egfIndex < eventGrammarFiles.length;
+              egfIndex++
+            ) {
+              if (await isTimeDimensionPresent(eventGrammarFiles[egfIndex])) {
+                egfWithTD.push(eventGrammarFiles[egfIndex]);
+              } else {
+                egfWithoutTD.push(eventGrammarFiles[egfIndex]);
+              }
+            }
+            const dgsCompoundWithoutTD: DatasetGrammar[] =
+              await createCompoundDatasetGrammarsWithoutTimeDimensions(
+                config.programs[j].namespace,
+                compoundDimensionsToBeInEG,
+                dimensions,
+                _.uniq(egfWithoutTD),
+              );
+            datasetGrammarsGlobal.push(...dgsCompoundWithoutTD);
+            // console.log({ egfWithTD, egfWithoutTD, dgsCompoundWithoutTD });
+
             for (let l = 0; l < defaultTimeDimensions.length; l++) {
-              const dgsCompound: DatasetGrammar[] =
+              const dgsCompoundWithTD: DatasetGrammar[] =
                 await createCompoundDatasetGrammars(
                   config.programs[j].namespace,
                   defaultTimeDimensions[l],
                   compoundDimensionsToBeInEG,
                   dimensions,
-                  _.uniq(eventGrammarFiles),
+                  _.uniq(egfWithTD),
                 );
-              datasetGrammars.push(...dgsCompound);
-              for (let m = 0; m < dgsCompound.length; m++) {
+
+              datasetGrammarsGlobal.push(...dgsCompoundWithTD);
+              for (let m = 0; m < dgsCompoundWithTD.length; m++) {
                 compoundDatasetGrammars.push({
-                  dg: dgsCompound[m],
-                  egFile: eventGrammarFiles[m],
+                  dg: dgsCompoundWithTD[m],
+                  egFile: egfWithTD[m],
                 });
               }
             }
@@ -545,26 +584,33 @@ export class CsvAdapterService {
         }
       }
     }
+    datasetGrammarsGlobal = _.uniqBy(datasetGrammarsGlobal, 'name');
 
     logToFile(
       'datasetGrammars',
-      datasetGrammars.map((i) => i.name),
+      datasetGrammarsGlobal.map((i) => i.name),
       'datasetGrammars.file',
     );
-
-    datasetGrammars = _.uniq(datasetGrammars, 'name');
 
     //   Ingest DatasetGrammar
     //   -- Generate Datasets using the DimensionGrammar and EventGrammar
     //   -- Insert them into DB
     await Promise.all(
-      datasetGrammars.map((x) => this.datasetService.createDatasetGrammar(x)),
+      datasetGrammarsGlobal.map((x) =>
+        this.datasetService.createDatasetGrammar(x),
+      ),
     );
 
     // Create Empty Dataset Tables
     await Promise.all(
-      datasetGrammars.map((x) => this.datasetService.createDataset(x)),
+      datasetGrammarsGlobal.map((x) => this.datasetService.createDataset(x)),
     );
+
+    s.stop('✅ 5. Dataset Grammars have been ingested');
+
+    return;
+
+    s.start('🚧 6. Ingest Events');
 
     // Insert events into the datasets
     const callback = (
@@ -582,21 +628,26 @@ export class CsvAdapterService {
       for (let i = 0; i < inputFiles?.length; i++) {
         if (regexEventGrammar.test(inputFiles[i])) {
           // console.log(config?.programs[j].input?.files + `/${inputFiles[i]}`);
+          const eventGrammarFile =
+            config?.programs[j].input?.files + `/${inputFiles[i]}`;
           const eventGrammar = await createEventGrammarFromCSVDefinition(
-            config?.programs[j].input?.files + `/${inputFiles[i]}`,
+            eventGrammarFile,
             config?.programs[j].input?.files,
+            config?.programs[j].namespace,
           );
           for (let k = 0; k < eventGrammar.length; k++) {
             for (let l = 0; l < defaultTimeDimensions.length; l++) {
-              const datasetGrammar = createSingleDatasetGrammarsFromEG(
+              const datasetGrammar = await createSingleDatasetGrammarsFromEG(
                 config?.programs[j].namespace,
                 defaultTimeDimensions[l],
                 eventGrammar[k],
+                eventGrammarFile,
               );
               const events: Event[] = await createDatasetDataToBeInsertedFromEG(
                 config?.programs[j].input?.files,
                 defaultTimeDimensions[l],
                 eventGrammar[k],
+                eventGrammarFile,
               );
               // Create Pipes
               const pipe: Pipe = {
@@ -681,6 +732,7 @@ export class CsvAdapterService {
         datasetUpdateRequest,
       );
     }
+    s.stop('🚧 6. Ingest Events');
   }
 
   public async nuke() {

@@ -18,7 +18,7 @@ export interface DatasetGrammar {
   name: string;
   description: string;
   dimensions: DimensionMapping[];
-  timeDimension: TimeDimension;
+  timeDimension?: TimeDimension;
   schema: JSONSchema4;
 }
 

@@ -84,9 +84,9 @@ export class DatasetService {
       })
       .then((model: DatasetGrammarModel) => this.dbModelToDatasetGrammar(model))
       .catch((error) => {
-        console.error(datasetGrammar.name);
-        console.error(JSON.stringify(datasetGrammar, null, 2));
-        console.error(error);
+        // console.error(datasetGrammar.name);
+        // console.error(JSON.stringify(datasetGrammar, null, 2));
+        // console.error(error);
         // fs.writeFile(
         //   `./debug/datasetGrammar-${datasetGrammar.name}.error`,
         //   error.stack,
@@ -141,13 +141,21 @@ export class DatasetService {
         });
       }
     }
-    timeDimensionKey = datasetGrammar.timeDimension.key;
     // Add aggregates to schema
-    datasetGrammar.schema.properties = {
-      ...datasetGrammar.schema.properties,
-      ...this.counterAggregates(),
-      ...this.addDateDimension(timeDimensionKey),
-    };
+    if (datasetGrammar.timeDimension) {
+      timeDimensionKey = datasetGrammar.timeDimension.key;
+
+      datasetGrammar.schema.properties = {
+        ...datasetGrammar.schema.properties,
+        ...this.counterAggregates(),
+        ...this.addDateDimension(timeDimensionKey),
+      };
+    } else {
+      datasetGrammar.schema.properties = {
+        ...datasetGrammar.schema.properties,
+        ...this.counterAggregates(),
+      };
+    }
 
     const createQuery = this.qbService.generateCreateStatement(
       datasetGrammar.schema,
@@ -156,20 +164,26 @@ export class DatasetService {
     const indexQuery: string[] = this.qbService.generateIndexStatement(
       datasetGrammar.schema,
     );
+    // console.error(datasetGrammar.name, { createQuery, indexQuery });
     await this.prisma
       .$queryRawUnsafe(createQuery)
       .catch(async (error) => {
         // console.error(datasetGrammar.schema.properties);
-        // console.error(error);
-        delete datasetGrammar.schema.fk;
-        const createQuery = this.qbService.generateCreateStatement(
-          datasetGrammar.schema,
-          autoPrimaryKey,
+        console.error(
+          'ERROR',
+          datasetGrammar.name,
+          datasetGrammar.schema.fk,
+          error,
         );
-        console.log(createQuery);
-        await this.prisma.$queryRawUnsafe(createQuery).catch((e) => {
-          console.error('Failed again');
-        });
+        // delete datasetGrammar.schema.fk;
+        // const createQuery = this.qbService.generateCreateStatement(
+        //   datasetGrammar.schema,
+        //   autoPrimaryKey,
+        // );
+        // console.log('Query2', createQuery);
+        // await this.prisma.$queryRawUnsafe(createQuery).catch((e) => {
+        //   console.error('Failed again');
+        // });
       })
       .then(async (model: DatasetGrammarModel) => {
         // iterate over indexQuery and execute each query

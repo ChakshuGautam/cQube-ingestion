@@ -44,7 +44,7 @@
     - 1/N for expected Dimension and Dataset Data to be ingested
     - 1/N for global steps that need to be done for total ingested data
     - Global list of things that need to be done
-7. Ability to pause and resume the schema ingestion pipeline
+7. Ability to pause and resume and the schema ingestion pipeline
 
 ## Query Builder
 1. Ability to manage retries

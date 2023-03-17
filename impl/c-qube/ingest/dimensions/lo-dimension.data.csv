@@ -1,0 +1,145 @@
+lo_id,lo_code,lo_name
+1,L304,"Reads small texts with comprehension i.e., identifies main ideas, details,sequence and draws conclusions"
+2,L312,"Reads printed scripts on the classroom walls: poems, posters, charts etc."
+3,M301,Reads and writes numbers up to 999 using place value
+4,M302,Compares numbers up to 999 based on their place values
+5,M303,Solves simple daily life problems using addition and subtraction of three digit numbers with and without regrouping
+6,M304,Constructs and uses the multiplication facts (up till 10) in daily life situations
+7,M305,Analyses and applies an appropriate number operation in the situation/ context
+8,M306,Explains the meaning of division facts by equal grouping/sharing and finds it by repeated subtraction
+9,M309,"Identifies and makes 2D-shapes by paper folding. paper cutting on the dot grid, using straight lines etc."
+10,M311,Fills a given region leaving no gaps using a tile of a given shape
+11,M312,Estimates and measures length and distance using standard units like centimeters or meters & identifies relationships
+12,M317,Reads the time correctly to the hour using a clock/watch
+13,M318,Extends patterns in simple shapes and numbers
+14,M319,"Records data using tally marks, represents pictorially and draws"
+15,EVS302,"Identifies simple features (e.g. movement, at places found/ kept, eating habits, sounds) of animals and birds in the immediate surroundings."
+16,EVS303,Identifies relationships with and among family members
+17,EVS304,"Identifies objects, signs (vessels, stoves, transport, means of communication, transport, signboards etc.), places (types of houses/shelters, bus stand, petrol pump etc.) activities (works people do, cooking processes, etc.) at home/school/ neighborhoods"
+18,EVS305,"Describes need of food for people of different age groups, animals/birds, availability of food and water and use of water at home and surroundings."
+19,EVS307,"Groups objects, birds, animals, features, activities according to differences/ similarities using different senses. (e.g. appearance/place of living/ food/ movement/ likes-dislikes/ any other features)"
+20,EVS309,"Identifies directions, location of objects/places in simple maps using signs/symbols/ verbally"
+21,EVS310,"Guesses properties, estimates quantities of materials/activities in daily life and verifies using symbols/non-standard units"
+22,EVS311,"Records observations, experiences, information on objects/activities/places visited in different ways and predicts patterns etc"
+23,EVS313,"Observes rules in games (local, indoor, outdoor)"
+24,EVS314,"Voices opinion on good/bad touch , stereotypes for tasks/play/food in family w.r.t gender, misuse/wastage of food and water in family and school."
+25,L508,"Reads text with comprehension, locates details and sequence of events"
+26,M401,Applies operations of numbers in daily life situations
+27,M412,"Explores the area and perimeter of simple geometrical shapes (triangle, rectangle, square) in terms of given shape as a unit"
+28,M418,Calculates time intervals/duration of familiar daily life events by using forward or backward counting/addition and subtraction
+29,M421,Represent the collected information in tables and bar graphs and draws inferences from these
+30,M501,Reads and writes numbers bigger than 1000 being used in her/his surroundings
+31,M504,"Estimates sum, difference, product and quotient of numbers and verifies the same using different strategies like using standard algorithms or breaking a number and then using operation"
+32,M505,Finds the number corresponding to part of a collection
+33,M506,Identifies and forms equivalent fractions of a given fraction
+34,M508,Converts fractions into decimals and vice versa
+35,M509,"Classifies angles into right angle, acute angle, obtuse angle and represents the same by drawing and tracing"
+36,M512,"Relates different commonly used larger and smaller units of length, weight and volume and converts larger units to smaller units and vice versa"
+37,M513,Estimates the volume of a solid body in known units.
+38,M514,"Applies the four fundamental arithmetic operations in solving problems involving money, length, mass, capacity and time intervals"
+39,M515,Identifies the pattern in triangular numbers and square number
+40,M516,Collects data related to various daily life situations. represents it in tabular form and as bar graphs and interprets it
+41,EVS403,Identifies relationship with and among family members in extended family
+42,EVS410,"Records observations/experiences/information for objects, activities, phenomena, places visited in different ways and predicts patterns and activities/ phenomena"
+43,EVS501,"Explains the super senses and unusual features (sight, smell, hear, sleep, sound, etc.) of animals and their responses to light, sound, food etc."
+44,EVS503,"Describes the interdependence among animals, plants and humans"
+45,EVS504,"Explains the role and functions of different institutions in daily life (Bank, Panchayat, cooperatives. police station, etc.)"
+46,EVS505,"Establishes linkages among terrain, climate, resources (food, water, shelter, livelihood) and cultural life. (e.g. life in distant/difficult areas like hot/cold deserts)"
+47,EVS506,"Groups objects, materials, activities for features/properties such as shape, taste, color , texture, sound, traits etc."
+48,EVS507,"Traces the changes in practices, customs, techniques of past and present through coins, paintings, monuments, museum etc. and interacting with elders"
+49,EVS508,"Guesses (properties, conditions of phenomena), estimates spatial quantities (distance, area, volume, weight etc. ) and time in simple standard units and verifies using simple tools/set ups"
+50,EVS509,"Records observations/experiences/information in an organized manner (e.g. in tables/ sketches/ bar graphs/ pie charts) and predicts patterns in activities/ phenomena (e.g. floating, sinking, mixing, evaporation , germination, spoilage) to establish relation between cause and effect."
+51,EVS510,"Identifies signs, directions, location of different objects/landmarks of a locality / place visited in maps and predicts directions w.r.t. positions at different places for a location"
+52,EVS512,Voices opinions on issues observed/experienced and relates practices/happenings to larger issues of society
+53,EVS513,"Suggests ways for hygiene, health, managing waste. disaster/emergency situations and protecting/saving resources"
+54,L813,"Read textual/non-textual materials with comprehension and identifies the details, characters, main idea and sequence of ideas and events while reading"
+55,M601,Solves problems involving large numbers by applying appropriate operations
+56,M606,Solves problems on daily life situations involving addition and subtraction of fractions / decimals
+57,M620,"Finds out the perimeter and area of rectangular objects in the surroundings like floor of the class room, surfaces of a chalk box etc."
+58,M621,"Arranges given/collected information in the form of table, pictograph and bar graph and interprets them"
+59,M702,Interprets the division and multiplication of fractions
+60,M705,Solves problems related to daily life situations involving rational numbers
+61,M706,Uses exponential form of numbers to simplify problems involving multiplication and division of large numbers
+62,M707,Adds/subtracts algebraic expressions
+63,M710,Solves problems related to conversion of percentage to fraction and decimal and vice versa
+64,M717,Finds out approximate area of closed shapes by using unit square grid/graph sheet
+65,M719,"Finds various representative values for simple data from her/his daily life contexts like mean, median and mode"
+66,M721,Interprets data using bar graph such as consumption of electricity is more in winters than summer
+67,M801,"Generalizes properties of addition, subtraction, multiplication and division of rational numbers through patterns"
+68,M802,Finds rational numbers between two given rational numbers
+69,M803,"Proves divisibility rules of 2, 3,4, 5, 6, 9 and 11"
+70,M804,"Finds squares,cubes,square roots and cube roots of numbers using different methods"
+71,M808,uses various algebric identities in solving problem of daily life.
+72,M812,Verifies properties of parallelogram and establishes the relationship between them through reasoning
+73,M818,Find surface area and volume of cuboidal and cylindrical object
+74,M819,Draws and interprets bar charts and pie charts
+75,SCI703,Classifies materials and organisms based on properties/characteristics
+76,SCI704,Conducts simple investigation to seek answers to queries
+77,SCI705,Relates processes and phenomenon with causes
+78,SCI708,"Measures and calculates e.g.. temperature; pulse rate; speed of moving objects; time period of a simple pendulum, etc."
+79,SCI710,Plots and interprets graphs
+80,SCI711,Constructs models using materials from surroundings and explains their working
+81,SCI801,"Differentiates materials, organism and processes"
+82,SCI804,Relates processes and phenomenon with causes
+83,SCI805,Explains processes and phenomenon
+84,SCI807,"Measures angles of incidence and reflection, etc."
+85,SCI811,Applies learning of scientific concepts in day-to-day life
+86,SCI813,Makes efforts to protect environment
+87,SST605,"Identifies latitudes and longitudes, e.g., poles, equator, tropics, States /Ws of India and other neighboring countries on globe and the world map"
+88,SST610,"Locates important historical sites, places on an outline map of India."
+89,SST625,Describes the functioning of rural and urban local government bodies in sectors like health and education
+90,SST703,Explains preventive actions to be undertaken in the event of disasters
+91,SST704,Describes formation of landforms due to various factors
+92,SST722,Explains the significance of equality in democracy
+93,SST726,Describes the process of election to the legislative assembly
+94,SST731,Explains the functioning of media with appropriate examples from newspapers
+95,SST733,Differentiates between different kinds of markets
+96,SST734,Traces how goods travel through various market places
+97,SST802,"Describes major crops, types of farming and agricultural practices in her/his own areaistate"
+98,SST805,Locates distribution of important minerals e.g. coal and mineral oil on the world map
+99,SST807,Justifies judicious use of natural resources
+100,SST809,Draws interrelationship between types of farming and development in different regions of the world
+101,SST810,Distinguishes the modern period from the medieval and the ancient periods through the use of sources
+102,SST815,"Explains the origin, nature and spread of the revolt of 1857 and the lessons learned from it."
+103,SST816,Analyses the decline of pre-existing urban centers and handicraft industries and the development of new urban centers and industries in India during the colonial period
+104,SST818,"Analyses the issues related to caste, women, widow remarriage, child marriage, social reforms and the laws and policies of colonial administration towards these issues"
+105,SST823,Applies the knowledge of the Fundamental Rights to find out about their violation. protection and promotion in a given situation
+106,SST827,"Describes the process of making a law. (e.g. Domestic Violence Act, RTI Act, RTE Act)"
+107,SST831,"Identifies the role of Government in providing public facilities such as water, sanitation, road, electricity etc, and recognizes their availability"
+108,SST833,Draws bar diagram to show population of different countries/India/states
+109,E1007,"Reads, comprehends and responds to complex texts independently."
+110,MIL1011,"������������������������������ ��������� ��������������� ������������������ ������ ��������������������������� ������������ ���������������, ���������������,������������������ ������ ���������������-��������������� ������ ������������ ������������ ������������"
+111,M1001,"Generalises properties of numbers and relations among them studied earlier to evolve results, such as, Euclid���s division algorithm, Fundamental Theorem of Arithmetic and applies them to solve problems related to real life contexts."
+112,M1002,Develops a relationship between algebraic and graphical methods of finding the zeroes of a polynomial.
+113,M1003,Finds solutions of pairs of linear equations in two variables using graphical and different algebraic methods.
+114,M1004,Demonstrates strategies of finding roots and determining the nature of roots of a quadratic equation.
+115,M1005,Develops strategies to apply the concept of A.P. to daily life situations. Works out ways to differentiate between congruent and similar figures.
+116,M1006,"Establishes properties for similarity of two triangles logically using different geometric criteria established earlier such as, Basic Proportionality Theorem, etc."
+117,M1007,"Derives formulae to establish relations for geometrical shapes in the context of a coordinate plane, such as, finding the distance between two given points, to determine the coordinates of a point between any two given points, to find the area of a triangle etc."
+118,M1008,Determines all trigonometric ratios with respect to a given acute angle (of a right triangle) and uses them in solving problems in daily life contexts like finding heights of different structures or distance from them.
+119,M1009,Derives proofs of theorems related to the tangents of circles.
+120,M1010,Examines the steps of geometrical constructions and reason out each step
+121,M1011,"Finds surface areas and volumes of objects in the surroundings by visualising them as a combination of different solids like cylinder and a cone, cylinder and a hemisphere, combination of different cubes, etc."
+122,M1012,"Calculates mean, median and mode for different sets of data related with real life contexts."
+123,SCI1001,"Differentiates materials, objects, organisms, phenomena, and processes, based on, properties and characteristics."
+124,SCI1002,"Classifies materials, objects, organisms, phenomena, and processes, based on properties and characteristics."
+125,SCI1003,Relates processes and phenomena with causes and effects
+126,SCI1004,Explains processes and phenomena.
+127,SCI1005,"Analyses and interprets data, graphs, and figures"
+128,SCI1006,Calculates using the data given
+129,SCI1007,"Uses scientific conventions to represent units of various quantities, symbols, formulae, and equations."
+130,SCI1008,Applies learning to hypothetical situations
+131,SCI1009,Applies scientific concepts in daily life and solving problems
+132,SCI1010,"Derives formulae, equations, and laws"
+133,SST1001,"Recognises and retrieves facts, figures, and narrate processes."
+134,SST1002,"Classifies and compares events, facts, data, and figures."
+135,SST1003,"Explains cause and effect relationship between phenomena, events, and their occurrence."
+136,SST1004,Analyses and evaluates information.
+137,SST1005,"Interprets: Maps, texts, symbols, cartoons, photographs, posters, newspaper clippings, climatic regions, changes in maps brought out by various treaties in Europe, sea and land links of the trade from India to West Asia, South East Asia and other parts of the world, pie and bar diagrams related to gross domestic product, production in different sectors and industries, employment and population in India"
+138,SST1006,Draws interlinkages within Social Science.
+139,SST1007,"Identifies assumptions, biases, prejudices, or stereotypes about various aspects."
+140,SST1008,"Demonstrates inquisitiveness, enquiry."
+141,SST1009,"Constructs views, arguments, and ideas on the basis of collected or given information."
+142,SST1010,Extrapolates and predicts events and phenomena.
+143,SST1011,Illustrates decision making/problem solving skills.
+144,SST1012,Shows sensitivity and appreciation skills.

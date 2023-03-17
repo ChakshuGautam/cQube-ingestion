@@ -1,4 +1,11 @@
 {
+  "dimensions": {
+    "namespace": "dimensions",
+    "fileNameFormat": "${dimensionName}.${index}.dimensions.data.csv",
+    "input": {
+      "files": "./ingest/dimensions"
+    }
+  },
   "programs": [
     {
       "name": "Review and Monitoring",
@@ -6,10 +13,10 @@
       "description": "Review and Monitoring",
       "shouldIngestToDB": true,
       "input": {
-        "files": "./ingest/rev-and-monitor"
+        "files": "./ingest/programs/rev-and-monitor"
       },
-      "output": {
-        "location": "output/rev-and-monitor"
+      "./output": {
+        "location": "./output/programs/rev-and-monitor"
       },
       "dimensions": {
         "whitelisted": [
@@ -17,6 +24,104 @@
           "academicyear,block",
           "academicyear,cluster"
         ],
+        "blacklisted": []
+      }
+    },
+    {
+      "name": "School Attendance",
+      "namespace": "school_attendance",
+      "description": "School Attendance",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/programs/school-attendance"
+      },
+      "./output": {
+        "location": "././output/programs/school-attendance"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "gender,district",
+          "gender,block",
+          "gender,cluster",
+          "gender,school",
+          "gender,school,grade",
+          "schoolcategory,district",
+          "schoolcategory,block",
+          "schoolcategory,cluster"
+        ],
+        "blacklisted": []
+      }
+    },
+    {
+      "name": "UDISE",
+      "namespace": "udise",
+      "description": "UDISE",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/programs/udise"
+      },
+      "./output": {
+        "location": "./output/programs/udise"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "district,udisecategory",
+          "state,udisecategory"
+        ],
+        "blacklisted": []
+      }
+    },
+    {
+      "name": "NAS",
+      "namespace": "nas",
+      "description": "NAS",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/programs/nas"
+      },
+      "./output": {
+        "location": "./output/programs/nas"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "district,nasindicator,nassubject,grade",
+          "state,nasindicator,nassubject,grade"
+        ],
+        "blacklisted": []
+      }
+    },
+    {
+      "name": "PGI",
+      "namespace": "pgi",
+      "description": "PGI",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/programs/pgi"
+      },
+      "./output": {
+        "location": "./output/programs/pgi"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "district,category",
+          "state,category"
+        ],
+        "blacklisted": []
+      }
+    },
+    {
+      "name": "PM-Poshan",
+      "namespace": "pm-poshan",
+      "description": "PM-Poshan",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/programs/pm-poshan"
+      },
+      "./output": {
+        "location": "./output/programs/pgi"
+      },
+      "dimensions": {
+        "whitelisted": [],
         "blacklisted": []
       }
     }

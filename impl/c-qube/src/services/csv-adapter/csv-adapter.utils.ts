@@ -112,6 +112,7 @@ export const createEventGrammar = (
   mapping: EventDimensionMapping,
   columns: Column[],
   instrumentField: string,
+  csvFilePath: string,
 ): EventGrammar => {
   const properties = {};
   for (let i = 0; i < columns.length; i++) {
@@ -121,6 +122,7 @@ export const createEventGrammar = (
     };
   }
   const eventGrammar: EventGrammar = {
+    file: csvFilePath,
     name: eventName,
     instrument: {
       type: InstrumentType.COUNTER,
@@ -163,6 +165,7 @@ export type EventGrammarCSVFormat = {
 export const createEventGrammarFromCSVDefinition = async (
   csvFilePath: string,
   dimensionFileBasePath: string,
+  programNamespace: string,
 ): Promise<EventGrammar[]> => {
   const eventGrammars: EventGrammar[] = [];
 
@@ -204,6 +207,8 @@ export const createEventGrammarFromCSVDefinition = async (
     // Naming convention for eventis => `<event name>-event.csv`
     // Naming comvention for dimension is => `<dimension name>-dimenstion.csv`
     const eventName =
+      programNamespace +
+      '_' +
       csvFilePath.split('/').pop().split('.')[0].split('-')[0] +
       '_' +
       dimensionGrammarDefs[i].dimensionName +
@@ -215,6 +220,7 @@ export const createEventGrammarFromCSVDefinition = async (
       mapping,
       eventColumns,
       instrumentField,
+      csvFilePath,
     );
 
     // console.log(JSON.stringify(eventGrammar, null, 2));
@@ -225,44 +231,139 @@ export const createEventGrammarFromCSVDefinition = async (
   return eventGrammars;
 };
 
-export const createDatasetGrammarsFromEG = (
+export const createDatasetGrammarsFromEG = async (
   folderName: string,
-  dimensionGrammars: DimensionGrammar[],
   defaultTimeDimensions: string[],
   eventGrammars: EventGrammar[],
-): DatasetGrammar[] => {
+): Promise<DatasetGrammar[]> => {
   const datasetGrammars: DatasetGrammar[] = [];
   for (let j = 0; j < defaultTimeDimensions.length; j++) {
     for (let k = 0; k < eventGrammars.length; k++) {
-      const datasetGrammar: DatasetGrammar = createSingleDatasetGrammarsFromEG(
-        folderName,
-        defaultTimeDimensions[j],
-        eventGrammars[k],
-      );
+      const datasetGrammar: DatasetGrammar =
+        await createSingleDatasetGrammarsFromEG(
+          folderName,
+          defaultTimeDimensions[j],
+          eventGrammars[k],
+          eventGrammars[k].file,
+        );
       datasetGrammars.push(datasetGrammar);
     }
   }
   return datasetGrammars;
 };
 
-export const createSingleDatasetGrammarsFromEG = (
+export const createDatasetGrammarsFromEGWithoutTimeDimension = async (
+  folderName: string,
+  eventGrammars: EventGrammar[],
+): Promise<DatasetGrammar[]> => {
+  const datasetGrammars: DatasetGrammar[] = [];
+  for (let k = 0; k < eventGrammars.length; k++) {
+    const datasetGrammar: DatasetGrammar =
+      await createSingleDatasetGrammarsFromEGWithoutTimeDimension(
+        folderName,
+        eventGrammars[k],
+      );
+    datasetGrammars.push(datasetGrammar);
+  }
+  return datasetGrammars;
+};
+
+export const createSingleDatasetGrammarsFromEGWithoutTimeDimension = async (
+  folderName: string,
+  eventGrammar: EventGrammar,
+): Promise<DatasetGrammar> => {
+  const dimensionMapping: DimensionMapping[] = [];
+  dimensionMapping.push(eventGrammar.dimension[0]);
+
+  // Get Property Name
+  const propertyName = await getPropertyforDatasetGrammarFromEG(eventGrammar);
+
+  const name = `${folderName}_${eventGrammar.instrument_field}_${eventGrammar.dimension[0]?.dimension.name.name}`;
+  const datasetGrammar: DatasetGrammar = {
+    // content_subject_daily_total_interactions
+    name,
+    description: '',
+    dimensions: dimensionMapping,
+    schema: {
+      title: name,
+      psql_schema: 'datasets',
+      properties: {
+        [propertyName]: {
+          type: 'string',
+        },
+        sum: {
+          type: 'number',
+        },
+        count: {
+          type: 'number',
+        },
+      },
+    },
+  };
+  return datasetGrammar;
+};
+
+export const getPropertyforDatasetGrammarFromEG = async (
+  eventGrammar: EventGrammar,
+): Promise<string> => {
+  // Get Property Name
+  let propertyName = `${eventGrammar.dimension[0].dimension.name.name}_id`;
+  const {
+    eventGrammarDef,
+  }: {
+    eventGrammarDef: EventGrammarCSVFormat[];
+    instrumentField: string;
+  } = await getEGDefFromFile(eventGrammar.file);
+  for (let i = 0; i < eventGrammarDef.length; i++) {
+    if (
+      eventGrammarDef[i].fieldType === FieldType.dimension &&
+      eventGrammarDef[i].dimensionName ===
+        eventGrammar.dimension[0].dimension.name.name
+    ) {
+      propertyName = eventGrammarDef[i].fieldName;
+    }
+  }
+  return propertyName;
+};
+
+export const getPropertyforDatasetGrammarFromEGForCompoundDatasets = async (
+  eventGrammarDef: EventGrammarCSVFormat[],
+  name: string,
+): Promise<string> => {
+  // Get Property Name
+  let propertyName;
+  for (let i = 0; i < eventGrammarDef.length; i++) {
+    if (
+      eventGrammarDef[i].fieldType === FieldType.dimension &&
+      eventGrammarDef[i].dimensionGrammarKey === name
+    ) {
+      propertyName = eventGrammarDef[i].fieldName;
+    }
+  }
+  return propertyName;
+};
+
+export const createSingleDatasetGrammarsFromEG = async (
   folderName: string,
   defaultTimeDimension: string,
-  eventGrammars: EventGrammar,
-): DatasetGrammar => {
+  eventGrammar: EventGrammar,
+  eventGrammarFile?: string,
+): Promise<DatasetGrammar> => {
   const dimensionMapping: DimensionMapping[] = [];
-  dimensionMapping.push(eventGrammars.dimension[0]);
-  const propetyName = `${eventGrammars.dimension[0]?.dimension.name.name}_id`;
-  const name = `${folderName}_${
-    eventGrammars.name.split('_')[0]
-  }_${defaultTimeDimension}_${eventGrammars.dimension[0]?.dimension.name.name}`;
+  dimensionMapping.push(eventGrammar.dimension[0]);
+
+  // Get Property Name
+  const propertyName = await getPropertyforDatasetGrammarFromEG(eventGrammar);
+
+  const name = `${folderName}_${eventGrammar.instrument_field}_${defaultTimeDimension}_${eventGrammar.dimension[0]?.dimension.name.name}`;
   const timeDimensionKeySet = {
     Weekly: 'week',
     Monthly: 'month',
     Yearly: 'year',
     Daily: 'date',
   };
-  const dataserGrammar: DatasetGrammar = {
+  // console.log('Dataset creation info', eventGrammarFile, name, propertyName);
+  const datasetGrammar: DatasetGrammar = {
     // content_subject_daily_total_interactions
     name,
     description: '',
@@ -275,7 +376,7 @@ export const createSingleDatasetGrammarsFromEG = (
       title: name,
       psql_schema: 'datasets',
       properties: {
-        [propetyName]: {
+        [propertyName]: {
           type: 'string',
         },
         sum: {
@@ -287,7 +388,7 @@ export const createSingleDatasetGrammarsFromEG = (
       },
     },
   };
-  return dataserGrammar;
+  return datasetGrammar;
 };
 
 // Parse date in the following format: 02/01/23
@@ -336,13 +437,19 @@ export const createDatasetDataToBeInsertedFromEG = async (
   folderName: string,
   timeDimension: string,
   eventGrammar: EventGrammar,
+  eventGrammarFile: string,
 ): Promise<cQubeEvent[]> => {
   const dimensionMapping: DimensionMapping[] = [];
   dimensionMapping.push(eventGrammar.dimension[0]);
-  const propetyName = `${eventGrammar.dimension[0].dimension.name.name}_id`;
+  const {
+    eventGrammarDef,
+  }: {
+    eventGrammarDef: EventGrammarCSVFormat[];
+    instrumentField: string;
+  } = await getEGDefFromFile(eventGrammarFile);
+  const propertyName = await getPropertyforDatasetGrammarFromEG(eventGrammar);
 
-  const filePath =
-    folderName + '/' + eventGrammar.name.split('_')[0] + '-event.data.csv';
+  const filePath = eventGrammar.file.replace('grammar', 'data');
   // const df: DataFrame = pl.readCSV(filePath);
   // let dfModified: DataFrame;
 
@@ -361,7 +468,7 @@ export const createDatasetDataToBeInsertedFromEG = async (
   const headers = df[0];
 
   // Get index for non time dimension
-  const dimenstionIndex = getIndexForHeader(headers, propetyName);
+  const dimenstionIndex = getIndexForHeader(headers, propertyName);
 
   // Get index for timeDimension
   const timeDimensionIndex = getIndexForHeader(headers, 'date');
@@ -377,7 +484,7 @@ export const createDatasetDataToBeInsertedFromEG = async (
     const rowData = df[row];
     const rowObject = {};
     rowObject[eventGrammar.instrument_field] = parseInt(rowData[counterIndex]);
-    rowObject[propetyName] = rowData[dimenstionIndex];
+    rowObject[propertyName] = rowData[dimenstionIndex];
     // rowObject[eventGrammars.dimension.dimension.name.name] =
     // rowData[dimenstionIndex];
     if (timeDimension === 'Daily') {
@@ -502,11 +609,16 @@ export const createCompoundDatasetGrammars = async (
             },
           };
           dimensionMapping.push(dimensionMappingObject);
-          console.error({ dimensionMapping });
-          properties[`${dimension}_id`] = {
+          // console.error({ dimensionMapping });
+          const propertyName =
+            await getPropertyforDatasetGrammarFromEGForCompoundDatasets(
+              eventGrammarDef,
+              egd.dimensionGrammarKey,
+            );
+          properties[propertyName] = {
             type: 'string',
           };
-          // TODO: Fix this hack.
+          // console.log('🎉', dg.name, egd.dimensionGrammarKey, propertyName);
           break;
         }
       }
@@ -548,6 +660,69 @@ export const createCompoundDatasetGrammars = async (
   return datasetGrammars;
 };
 
+export const createCompoundDatasetGrammarsWithoutTimeDimensions = async (
+  namespace: string,
+  compoundDimension: string[],
+  allDimensionGrammars: DimensionGrammar[],
+  eventGrammarFiles: string[],
+): Promise<DatasetGrammar[]> => {
+  const datasetGrammars: DatasetGrammar[] = [];
+  for (const eventGrammarFile of eventGrammarFiles) {
+    const {
+      eventGrammarDef,
+    }: {
+      eventGrammarDef: EventGrammarCSVFormat[];
+      instrumentField: string;
+    } = await getEGDefFromFile(eventGrammarFile);
+    const dimensionMapping: DimensionMapping[] = [];
+    const properties: Record<string, Record<string, string>> = {};
+    const name = `${namespace}_${
+      eventGrammarFile.split('/').pop().split('.')[0].split('-')[0]
+    }_${compoundDimension.join('0')}`;
+    for (const dimension of compoundDimension) {
+      for (const egd of eventGrammarDef) {
+        if (egd.dimensionName === dimension) {
+          const dg: DimensionGrammar = allDimensionGrammars.filter(
+            (v) => v.name === dimension,
+          )[0];
+          const dimensionMappingObject: DimensionMapping = {
+            key: egd.dimensionGrammarKey,
+            dimension: {
+              name: dg,
+              mapped_to: egd.dimensionGrammarKey,
+            },
+          };
+          dimensionMapping.push(dimensionMappingObject);
+          // console.error({ dimensionMapping });
+          const propertyName =
+            await getPropertyforDatasetGrammarFromEGForCompoundDatasets(
+              eventGrammarDef,
+              egd.dimensionGrammarKey,
+            );
+          properties[propertyName] = {
+            type: 'string',
+          };
+        }
+      }
+    }
+    const datasetGrammar: DatasetGrammar = {
+      // content_subject_daily_total_interactions
+      name,
+      description: '',
+      dimensions: dimensionMapping,
+      schema: {
+        title: name,
+        psql_schema: 'datasets',
+        properties: {
+          ...properties,
+        },
+      },
+    };
+    datasetGrammars.push(datasetGrammar);
+  }
+  return datasetGrammars;
+};
+
 function getDGDefsFromEGDefs(eventGrammarDef: EventGrammarCSVFormat[]) {
   return eventGrammarDef.filter(
     (value) => value.fieldType === FieldType.dimension,
@@ -584,4 +759,21 @@ export async function getEGDefFromFile(csvFilePath: string) {
   // Find text "metric" in trow 5 get it's index and get the value from row 4
   const instrumentField = row4.split(',')[row5.split(',').indexOf('metric')];
   return { eventGrammarDef, instrumentField };
+}
+
+export async function isTimeDimensionPresent(csvFilePath: string) {
+  const {
+    eventGrammarDef,
+  }: {
+    eventGrammarDef: EventGrammarCSVFormat[];
+    instrumentField: string;
+  } = await getEGDefFromFile(csvFilePath);
+
+  for (let i = 0; i < eventGrammarDef.length; i++) {
+    if (eventGrammarDef[i].fieldType === 'timeDimension') {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
