@@ -1,4 +1,4 @@
-,,grade,subject,medium,,
+,,gradediksha,subjectdiksha,mediumdiksha,,
 ,,grade,subject,medium,,
 string,string,string,string,string,string,integer
 textbook_id,textbook_name,grade,subject,medium,day_of_created_on,qr_coverage
