@@ -1,6 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
+const { DimensionValidator, ValidationError } = require('./dimension.grammar.validator');
 
 
 async function getFiles(folderUri) {
@@ -69,6 +70,31 @@ function activate(context) {
 						vscode.DiagnosticSeverity.Error)]);
 			});
 		}
+
+		dimensionFiles.filter(file => regexDimensionGrammar.test(file)).forEach(async filePath => {
+			// get file from file path
+			const file = vscode.Uri.file(dimensionFolder + '/' + filePath);
+			// get file content as string
+			const fileContent = await vscode.workspace.fs.readFile(file);
+			const fileContentString = fileContent.toString();
+
+			// Validate using DimensionValidator
+			const dimensionValidator = new DimensionValidator(fileContentString);
+			const validationErrors = dimensionValidator.verify();
+
+			// Highlight the errors
+			if (validationErrors.length > 0) {
+				validationErrors.forEach(error => {
+					console.log({ error });
+					vscode.window.showErrorMessage(`Dimension Grammar Error: ${error.message}`);
+					// Highlight the file using a squiggly line
+					vscode.languages.createDiagnosticCollection('cqube-spec-checker').set(
+						file,
+						[new vscode.Diagnostic(new vscode.Range(error.lineNumber - 1, 0, error.lineNumber - 1, 0), error,
+							vscode.DiagnosticSeverity.Error)]);
+				});
+			}
+		});
 
 		// get all the files inside the programs folder. Get nested files as well. Ignore folders.
 		const programFiles = (await getFiles(vscode.Uri.file(programsFolder))).map(file => file.path.split('programs/')[1]);
