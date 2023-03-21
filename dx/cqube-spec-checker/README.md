@@ -4,23 +4,23 @@ This allows for verifying the cQube Grammar and Syntax.
 
 ## Installation
 Search for cQube in the extensions tab and install.
-![Installation](./docs/installation.png)
+![Installation](https://raw.githubusercontent.com/ChakshuGautam/cQube-POCs/master/dx/cqube-spec-checker/docs/installation.png)
 
 ## Usage
 Run the command `CQube: Verify Spec` from the command palette.
-![Command Palette](./docs/command.palette.png)
+![Command Palette](https://raw.githubusercontent.com/ChakshuGautam/cQube-POCs/master/dx/cqube-spec-checker/docs/command.palette.png)
 
 ### Example of Errors Highlighted
 You should see the errors highlighted in the sidebar and in the editor.
-![Sidebar Highlight](./docs/error.sidebar.png)
+![Sidebar Highlight](https://raw.githubusercontent.com/ChakshuGautam/cQube-POCs/master/dx/cqube-spec-checker/docs/error.sidebar.png)
 
 ### Example of Errors as Nofication
-![Error Notification](./docs/error.notification.png)
+![Error Notification](https://raw.githubusercontent.com/ChakshuGautam/cQube-POCs/master/dx/cqube-spec-checker/docs/error.notification.png)
 
 ### Error Details in Files
-![Example 1](./docs/error.example1.png)
-![Example 2](./docs/error.example2.png)
-![Example 3](./docs/error.example3.png)
+![Example 1](https://raw.githubusercontent.com/ChakshuGautam/cQube-POCs/master/dx/cqube-spec-checker/docs/error.example1.png)
+![Example 2](https://raw.githubusercontent.com/ChakshuGautam/cQube-POCs/master/dx/cqube-spec-checker/docs/error.example2.png)
+![Example 3](https://raw.githubusercontent.com/ChakshuGautam/cQube-POCs/master/dx/cqube-spec-checker/docs/error.example3.png)
 
 ## Release Notes
 ### 0.0.1
