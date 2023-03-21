@@ -11,13 +11,6 @@ textbook_id,textbook_name
 10,Hindi 5
 11,Hindi 6
 12,Hindi 7
-13,Math 1
-14,Math 2
-15,Math 3
-16,Math 4
-17,Math 5
-18,Math 6
-19,Math 7
 20,Social 1
 21,Social 2
 22,Social 3
@@ -28,12 +21,7 @@ textbook_id,textbook_name
 27,Biology 3
 28,Biology 4
 29,Chemistry 1
-30,Chemistry
-31,English 1
-32,English 2
-33,English 3
-34,English 4
-35,English 5
+30,Chemistry 2
 36,Math 1
 37,Math 2
 38,Math 3
@@ -43,19 +31,12 @@ textbook_id,textbook_name
 42,Math 7
 43,Math 8
 44,Math 9
-45,Hindi 6
 46,Kannada 1
 47,Kannada 2
 48,Kannada 3
 49,Kannada 4
 50,Kannada 5
 51,Kannada 6
-52,Social 1
-53,Social 2
-54,Social 3
-55,Social 4
-56,Social 5
-57,Hindi 7
 58,Hindi 8
 59,Hindi 9
 60,Chemistry 3
