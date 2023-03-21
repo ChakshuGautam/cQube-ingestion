@@ -1,4 +1,4 @@
-textbook_id,textbook_name,grade,subject,medium,qr_codes_linked_to_content
+textbook_id,textbook_name,grade_diksha,subject_diksha,medium,qr_codes_linked_to_content
 1,English 1,Class 1,Kannada,English,50
 2,English 2,Class 2,Kannada,English,50
 3,English 3,Class 3,Kannada,English,50

@@ -1,5 +1,5 @@
-textbookdiksha,gradediksha,subjectdiksha,mediumdiksha,
-textbook_id,grade,subject,medium,
+textbookdiksha,grade,subject,medium,
+textbook_id,grade_diksha,subject_diksha,medium,
 string,string,string,string,integer
-textbook_id,grade,subject,medium,resource_count
+textbook_id,grade_diksha,subject_diksha,medium,resource_count
 dimension,dimension,dimension,dimension,metric

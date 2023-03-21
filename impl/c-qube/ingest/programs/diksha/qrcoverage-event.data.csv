@@ -1,4 +1,4 @@
-textbook_id,textbook_name,grade,subject,medium,qr_coverage
+textbook_id,textbook_name,grade_diksha,subject_diksha,medium,qr_coverage
 1,English 1,Class 1,English,English,15
 2,English 2,Class 1,English,English,15
 3,English 3,Class 1,English,English,15

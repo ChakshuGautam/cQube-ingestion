@@ -124,14 +124,14 @@
       },
       "dimensions": {
         "whitelisted": [
-          "state_id,grade,subject,medium,board,content_name,mime_type,category",
-          "tb_id,grade,subject,medium",
-          "textbook_id,textbook_name,grade,subject,medium,day_of_created_on"
+          "state,grade,subject,medium,board",
+          "textbookdiksha,grade,subject,medium",
+          "textbookdiksha,grade,subject,medium"
         ],
         "blacklisted": []
       }
     },
-    {
+    { 
       "name": "PGI",
       "namespace": "pgi",
       "description": "PGI",
@@ -144,8 +144,8 @@
       },
       "dimensions": {
         "whitelisted": [
-          "state_id,district_id,category_name",
-          "state_id,category_name"
+          "state,district,categorypgi",
+          "state,categorypgi"
         ],
         "blacklisted": []
       }
@@ -163,9 +163,9 @@
       },
       "dimensions": {
         "whitelisted": [
-          "state_id,district_id,program_name",
-          "state_id,program_name,course_name",
-          "state_id,program_name"
+          "state,district,programnishtha",
+          "state,programnishtha,coursenishtha",
+          "state,programnishtha"
         ],
         "blacklisted": []
       }

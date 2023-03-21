@@ -1,4 +1,4 @@
-state_id,grade,subject,avg_play_time_in_mins_on_app_and_portal
+state_id,grade_diksha,subject_diksha,avg_play_time_in_mins_on_app_and_portal
 12,Class 1,English,1.58
 12,Class 1,English,3.77
 12,Class 2,English,2.32
