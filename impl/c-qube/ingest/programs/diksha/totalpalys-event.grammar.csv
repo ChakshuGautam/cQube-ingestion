@@ -1,0 +1,5 @@
+state,gradediksha,subjectdiksha,mediumdiksha,
+state_id,grade,subject,medium,
+string,string,string,string,integer
+state_id,grade,subject,medium,total_no_of_plays_app_and_portal
+dimension,dimension,dimension,dimension,metric
