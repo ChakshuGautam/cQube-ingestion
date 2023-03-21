@@ -2,13 +2,18 @@
   "name": "cqube-spec-checker",
   "displayName": "cqube-spec-checker",
   "description": "",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "engines": {
     "vscode": "^1.76.0"
   },
   "categories": [
     "Other"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ChakshuGautam/cQube-POCs/tree/master/dx/cqube-spec-checker"
+  },
+  "publisher": "Chakshu",
   "activationEvents": [],
   "main": "./extension.js",
   "contributes": {
