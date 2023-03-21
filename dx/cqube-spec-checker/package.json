@@ -2,7 +2,7 @@
   "name": "cqube-spec-checker",
   "displayName": "cqube-spec-checker",
   "description": "",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "engines": {
     "vscode": "^1.76.0"
   },
