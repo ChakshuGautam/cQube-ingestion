@@ -1,7 +1,8 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
-const { DimensionValidator, ValidationError } = require('./dimension.grammar.validator');
+const { DimensionValidator } = require('./dimension.grammar.validator');
+const { DimensionDataValidator } = require('./dimension.data.validator');
 
 
 async function getFiles(folderUri) {
@@ -74,18 +75,37 @@ function activate(context) {
 		dimensionFiles.filter(file => regexDimensionGrammar.test(file)).forEach(async filePath => {
 			// get file from file path
 			const file = vscode.Uri.file(dimensionFolder + '/' + filePath);
+			const dimensionDataFile = vscode.Uri.file((dimensionFolder + '/' + filePath).replace('grammar', 'data'));
 			// get file content as string
 			const fileContent = await vscode.workspace.fs.readFile(file);
 			const fileContentString = fileContent.toString();
+
+			const dimensionDataFileContent = await vscode.workspace.fs.readFile(dimensionDataFile);
+			const dimensionDataFileContentString = dimensionDataFileContent.toString();
 
 			// Validate using DimensionValidator
 			const dimensionValidator = new DimensionValidator(fileContentString);
 			const validationErrors = dimensionValidator.verify();
 
+			const dimensionDataValidator = new DimensionDataValidator(fileContentString, dimensionDataFileContentString);
+			const ddValidationErrors = dimensionDataValidator.verify();
+
+			// Highlight the errors
+			if (ddValidationErrors.length > 0) {
+				ddValidationErrors.forEach(error => {
+					vscode.window.showErrorMessage(`Dimension Data Error: ${error}`);
+					// Highlight the file using a squiggly line
+					vscode.languages.createDiagnosticCollection('cqube-spec-checker').set(
+						dimensionDataFile,
+						[new vscode.Diagnostic(new vscode.Range(error.lineNumber - 1, 0, error.lineNumber - 1, 0), error,
+							vscode.DiagnosticSeverity.Error)]);
+				});
+			}
+
+
 			// Highlight the errors
 			if (validationErrors.length > 0) {
 				validationErrors.forEach(error => {
-					console.log({ error });
 					vscode.window.showErrorMessage(`Dimension Grammar Error: ${error.message}`);
 					// Highlight the file using a squiggly line
 					vscode.languages.createDiagnosticCollection('cqube-spec-checker').set(
