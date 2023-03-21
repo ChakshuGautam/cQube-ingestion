@@ -17,3 +17,5 @@ Thumbs.db
 *.bak
 *.tmp
 *~
+
+.DS_Store
