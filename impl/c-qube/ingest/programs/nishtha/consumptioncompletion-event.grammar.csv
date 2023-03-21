@@ -1,4 +1,4 @@
-state,district,nishthaprogram,
+state,district,programnishtha,
 state_id,district_id,program_name,
 string,string,string,integer
 state_id,district_id,program_name,total_completion

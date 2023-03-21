@@ -1,4 +1,4 @@
-tb_id,grade,subject,medium,linked_qr_count
+textbook_id,grade,subject,medium,linked_qr_count
 1,Class 3,English,Hindi,7
 2,Class 3,English,Hindi,5
 3,Class 3,English,Hindi,9
