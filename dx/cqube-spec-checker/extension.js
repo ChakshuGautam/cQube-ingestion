@@ -22,7 +22,37 @@ function activate(context) {
 
 		// Display a message box to the user
 		vscode.window.showInformationMessage('Hello World from cqube-spec-checker!');
-		const folderPath = await vscode.window.showInputBox({ prompt: 'Enter the folder path to check spelling:' });
+		// Get Current Workspace Folder
+		const workspaceFolder = vscode.workspace.workspaceFolders[0];
+		const ingestFolder = workspaceFolder.uri.fsPath + '/impl/c-qube/ingest';
+
+		// Get all path for the Dimensions Folder and programs folder inside Ingest
+		const dimensionFolder = ingestFolder + '/dimensions';
+		const programs = ingestFolder + '/programs';
+
+		// Get all the files inside the dimensions folder
+		const dimensionFiles = (await vscode.workspace.fs.readDirectory(vscode.Uri.file(dimensionFolder))).map(file => file[0]);
+
+		const regexDimensionGrammar = /\-dimension\.grammar.csv$/i;
+		const regexDimensionData = /\-dimension\.data.csv$/i;
+
+		// Check if all files in the dimensions folder are either dimension grammar or dimension data
+		const dimensionFilesAreValid = dimensionFiles.every(file => regexDimensionGrammar.test(file) || regexDimensionData.test(file));
+
+		// Highlight the ones that are not valid
+		if (!dimensionFilesAreValid) {
+			const dimensionFilesNotValid = dimensionFiles.filter(file => !regexDimensionGrammar.test(file) && !regexDimensionData.test(file));
+			console.log(dimensionFilesNotValid);
+			dimensionFilesNotValid.forEach(file => {
+				vscode.window.showErrorMessage(`Invalid Dimension File: ${file}`);
+				// Highlight the file using a squiggly line
+				vscode.languages.createDiagnosticCollection('cqube-spec-checker').set(
+					vscode.Uri.file(dimensionFolder + '/' + file),
+					[new vscode.Diagnostic(new vscode.Range(0, 0, 0, 0), 'Invalid Dimension File Name: It should be "/\-dimension\.grammar.csv$/i" OR " /\-dimension\.data.csv$/i"',
+						vscode.DiagnosticSeverity.Error)]);
+			});
+		}
+		console.log("Done")
 	});
 
 	context.subscriptions.push(disposable);
