@@ -1,13 +1,13 @@
-grade_id,grade
-1,1
-2,2
-3,3
-4,4
-5,5
-6,6
-7,7
-8,8
-9,9
-10,10
-11,11
-12,12
+grade_id,grade_nas,grade_diksha,grade_state
+1,Grade 1,Class 1,1
+2,Grade 2,Class 2,2
+3,Grade 3,Class 3,3
+4,Grade 4,Class 4,4
+5,Grade 5,Class 5,5
+6,Grade 6,Class 6,6
+7,Grade 7,Class 7,7
+8,Grade 8,Class 8,8
+9,Grade 9,Class 9,9
+10,Grade 10,Class 10,10
+11,Grade 11,Class 11,11
+12,Grade 12,Class 12,12

@@ -1,5 +1,5 @@
-textbookdiksha,textbookdiksha,gradediksha,subjectdiksha,mediumdiksha,
-textbook_id,textbook_name,grade,subject,medium,
+textbookdiksha,textbookdiksha,grade,subject,medium,
+textbook_id,textbook_name,grade_diksha,subject_diksha,medium,
 string,string,string,string,string,integer
-textbook_id,textbook_name,grade,subject,medium,total_qr_codes
+textbook_id,textbook_name,grade_diksha,subject_diksha,medium,total_qr_codes
 dimension,dimension,dimension,dimension,dimension,metric
