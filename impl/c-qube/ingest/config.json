@@ -34,6 +34,121 @@
         ],
         "blacklisted": []
       }
+    },
+    {
+      "name": "PM Poshan",
+      "namespace": "pm_poshan",
+      "description": "PM Poshan",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/programs/pm-poshan"
+      },
+      "./output": {
+        "location": "./output/programs/pm-poshan"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "district,categorypm"
+        ],
+        "blacklisted": []
+      }
+    },
+    {
+      "name": "NAS",
+      "namespace": "nas",
+      "description": "NAS",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/programs/nas"
+      },
+      "./output": {
+        "location": "./output/programs/nas"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "district,lo,subject,grade",
+          "state,lo,subject,grade"
+        ],
+        "blacklisted": []
+      }
+    },
+    {
+      "name": "UDISE",
+      "namespace": "udise",
+      "description": "UDISE",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/programs/udise"
+      },
+      "./output": {
+        "location": "./output/programs/udise"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "district,categoryudise",
+          "state,categoryudise"
+        ],
+        "blacklisted": []
+      }
+    },
+    {
+      "name": "Review and Monitoring",
+      "namespace": "rev_and_monitoring",
+      "description": "Review and Monitoring",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/programs/rev-and-monitor"
+      },
+      "./output": {
+        "location": "./output/programs/rev-and-monitor"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "academicyear,district",
+          "academicyear,block",
+          "academicyear,cluster"
+        ],
+        "blacklisted": []
+      }
+    },
+    {
+      "name": "PGI",
+      "namespace": "pgi",
+      "description": "PGI",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/programs/pgi"
+      },
+      "./output": {
+        "location": "./output/programs/pgi"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "state,district,categorypgi",
+          "state,categorypgi"
+        ],
+        "blacklisted": []
+      }
+    },
+    {
+      "name": "NISHTHA",
+      "namespace": "nishtha",
+      "description": "NISHTHA",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/programs/nishtha"
+      },
+      "./output": {
+        "location": "./output/programs/nishtha"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "state,district,programnishtha",
+          "state,programnishtha,coursenishtha",
+          "state,programnishtha"
+        ],
+        "blacklisted": []
+      }
     }
   ]
 }

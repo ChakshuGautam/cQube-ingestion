@@ -211,7 +211,9 @@ export class DatasetService {
       datasetGrammar.schema,
       data,
     );
-    await this.prisma.$queryRawUnsafe(insertQuery);
+    await this.prisma.$queryRawUnsafe(insertQuery).catch((error) => {
+      console.error('ERROR', insertQuery, error);
+    });
   }
 
   async processDatasetUpdateRequest(
@@ -222,12 +224,16 @@ export class DatasetService {
       ...durs[0].dataset.schema.properties,
       ...this.counterAggregates(),
       ...this.addNonTimeDimension(durs[0].dataset.dimensions[0]),
-      ...this.addDateDimension(durs[0].dataset.timeDimension.key),
+      ...(durs[0].dataset.timeDimension
+        ? this.addDateDimension(durs[0].dataset.timeDimension.key)
+        : []),
     };
     for (const dur of durs) {
       data.push({ ...dur.updateParams, ...dur.filterParams });
     }
     await this.insertBulkDatasetData(durs[0].dataset, data).catch((error) => {
+      console.error();
+      console.error(error);
       console.error('ERROR Inserting Data in Bulk: ', durs[0].dataset.name);
       console.error(data[0]);
       console.error(durs[0].dataset.schema.properties);

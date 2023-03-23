@@ -26,6 +26,7 @@ import {
   createDimensionGrammarFromCSVDefinition,
   createEventGrammarFromCSVDefinition,
   createSingleDatasetGrammarsFromEG,
+  createSingleDatasetGrammarsFromEGWithoutTimeDimension,
   EventGrammarCSVFormat,
   getEGDefFromFile,
   isTimeDimensionPresent,
@@ -632,12 +633,22 @@ export class CsvAdapterService {
           );
           for (let k = 0; k < eventGrammar.length; k++) {
             for (let l = 0; l < defaultTimeDimensions.length; l++) {
-              const datasetGrammar = await createSingleDatasetGrammarsFromEG(
-                config?.programs[j].namespace,
-                defaultTimeDimensions[l],
-                eventGrammar[k],
-                eventGrammarFile,
-              );
+              let datasetGrammar;
+              if (await isTimeDimensionPresent(eventGrammarFile)) {
+                datasetGrammar = await createSingleDatasetGrammarsFromEG(
+                  config?.programs[j].namespace,
+                  defaultTimeDimensions[l],
+                  eventGrammar[k],
+                  eventGrammarFile,
+                );
+              } else {
+                datasetGrammar =
+                  await createSingleDatasetGrammarsFromEGWithoutTimeDimension(
+                    config?.programs[j].namespace,
+                    eventGrammar[k],
+                  );
+              }
+
               const events: Event[] = await createDatasetDataToBeInsertedFromEG(
                 config?.programs[j].input?.files,
                 defaultTimeDimensions[l],
@@ -645,6 +656,7 @@ export class CsvAdapterService {
                 eventGrammarFile,
               );
               // Create Pipes
+              console.log(events[0].data, events.length);
               const pipe: Pipe = {
                 event: eventGrammar[k],
                 transformer: defaultTransformers[0],

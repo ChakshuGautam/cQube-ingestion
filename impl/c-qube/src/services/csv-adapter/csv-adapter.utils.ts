@@ -487,16 +487,18 @@ export const createDatasetDataToBeInsertedFromEG = async (
     rowObject[propertyName] = rowData[dimenstionIndex];
     // rowObject[eventGrammars.dimension.dimension.name.name] =
     // rowData[dimenstionIndex];
-    if (timeDimension === 'Daily') {
-      rowObject['date'] = getDate(rowData[timeDimensionIndex]);
-    } else if (timeDimension === 'Weekly') {
-      rowObject['week'] = getWeek(rowData[timeDimensionIndex]);
-      rowObject['year'] = getYear(rowData[timeDimensionIndex]);
-    } else if (timeDimension === 'Monthly') {
-      rowObject['month'] = getMonth(rowData[timeDimensionIndex]);
-      rowObject['year'] = getYear(rowData[timeDimensionIndex]);
-    } else if (timeDimension === 'Yearly') {
-      rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+    if (timeDimensionIndex > -1) {
+      if (timeDimension === 'Daily') {
+        rowObject['date'] = getDate(rowData[timeDimensionIndex]);
+      } else if (timeDimension === 'Weekly') {
+        rowObject['week'] = getWeek(rowData[timeDimensionIndex]);
+        rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+      } else if (timeDimension === 'Monthly') {
+        rowObject['month'] = getMonth(rowData[timeDimensionIndex]);
+        rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+      } else if (timeDimension === 'Yearly') {
+        rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+      }
     }
     datasetEvents.push({ data: rowObject, spec: eventGrammar });
   }
