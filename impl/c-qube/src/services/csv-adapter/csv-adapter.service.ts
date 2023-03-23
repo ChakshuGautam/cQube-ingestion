@@ -607,6 +607,127 @@ export class CsvAdapterService {
     );
 
     s.stop('✅ 5. Dataset Grammars have been ingested');
+    // Insert events into the datasets
+    const callback = (
+      err: any,
+      context: TransformerContext,
+      events: Event[],
+    ) => {
+      //console.debug('callback', err, events.length);
+    };
+
+    s.start('🚧 6. Ingest Events');
+
+    for (let j = 0; j < config?.programs.length; j++) {
+      const inputFiles = readdirSync(config?.programs[j].input?.files);
+      for (let i = 0; i < inputFiles?.length; i++) {
+        if (regexEventGrammar.test(inputFiles[i])) {
+          // console.log(config?.programs[j].input?.files + `/${inputFiles[i]}`);
+          const eventGrammarFile =
+            config?.programs[j].input?.files + `/${inputFiles[i]}`;
+          const eventGrammar = await createEventGrammarFromCSVDefinition(
+            eventGrammarFile,
+            dimensionGrammarFolder,
+            config?.programs[j].namespace,
+          );
+          for (let k = 0; k < eventGrammar.length; k++) {
+            for (let l = 0; l < defaultTimeDimensions.length; l++) {
+              const datasetGrammar = await createSingleDatasetGrammarsFromEG(
+                config?.programs[j].namespace,
+                defaultTimeDimensions[l],
+                eventGrammar[k],
+                eventGrammarFile,
+              );
+              const events: Event[] = await createDatasetDataToBeInsertedFromEG(
+                config?.programs[j].input?.files,
+                defaultTimeDimensions[l],
+                eventGrammar[k],
+                eventGrammarFile,
+              );
+              // Create Pipes
+              const pipe: Pipe = {
+                event: eventGrammar[k],
+                transformer: defaultTransformers[0],
+                dataset: datasetGrammar,
+              };
+              const transformContext: TransformerContext = {
+                dataset: datasetGrammar,
+                events: events,
+                isChainable: false,
+                pipeContext: {},
+              };
+
+              try {
+                const datasetUpdateRequest: DatasetUpdateRequest[] =
+                  pipe.transformer.transformSync(
+                    callback,
+                    transformContext,
+                    events,
+                  ) as DatasetUpdateRequest[];
+                // console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
+                await this.datasetService.processDatasetUpdateRequest(
+                  datasetUpdateRequest,
+                );
+              } catch (e) {
+                console.error(e);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Ingest Compound DatasetGrammar
+    for (let m = 0; m < compoundDatasetGrammars.length; m++) {
+      const {
+        instrumentField,
+      }: {
+        eventGrammarDef: EventGrammarCSVFormat[];
+        instrumentField: string;
+      } = await getEGDefFromFile(compoundDatasetGrammars[m].egFile);
+      const compundEventGrammar: EventGrammar = {
+        name: '',
+        description: '',
+        dimension: [],
+        instrument_field: instrumentField,
+        is_active: true,
+        schema: {},
+        instrument: {
+          type: InstrumentType.COUNTER,
+          name: 'counter',
+        },
+      };
+      const events: Event[] = await createCompoundDatasetDataToBeInserted(
+        compoundDatasetGrammars[m].egFile.replace('grammar', 'data'),
+        compundEventGrammar,
+        compoundDatasetGrammars[m].dg,
+      );
+      // Create Pipes
+      const pipe: Pipe = {
+        event: compundEventGrammar,
+        transformer: defaultTransformers[0],
+        dataset: compoundDatasetGrammars[m].dg,
+      };
+      const transformContext: TransformerContext = {
+        dataset: compoundDatasetGrammars[m].dg,
+        events: events,
+        isChainable: false,
+        pipeContext: {},
+      };
+
+      const datasetUpdateRequest: DatasetUpdateRequest[] =
+        pipe.transformer.transformSync(
+          callback,
+          transformContext,
+          events,
+        ) as DatasetUpdateRequest[];
+
+      // console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
+      await this.datasetService.processDatasetUpdateRequest(
+        datasetUpdateRequest,
+      );
+    }
+    s.stop('🚧 6. Ingest Events');
   }
 
   public async ingestData() {

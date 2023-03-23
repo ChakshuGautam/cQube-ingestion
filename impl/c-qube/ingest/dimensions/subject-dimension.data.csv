@@ -1,28 +1,28 @@
 subject_id,subject_nas,subject_diksha,subject_state
-1,,Accountancy,
-2,,Biology,
-3,,Business Studies,
-4,,Chemistry,
-5,,Creative Writing and Translation,
-6,,Drawing,
-7,,Economics,
-8,Eng,English,
-9,Evs,EVS,
-10,,Fine Arts,
-11,,Geography,
-12,,Health and Physical Education,
-13,,Hindi,
-14,,History,
-15,,Home Science,
-16,Math,Mathematics,
-17,,Multi Subject,
-18,,Physics,
-19,,Political Science,
-20,,Psychology,
-21,,Sanskrit,
-22,Sci,Science,
-23,,Sociology,
-24,,Urdu,
-25,Sst,,
-26,Language,,
-27,Mil,,
+1,Accountancy,Accountancy,Accountancy
+2,Biology,Biology,Biology
+3,Business Studies,Business Studies,Business Studies
+4,Chemistry,Chemistry,Chemistry
+5,Creative Writing and Translation,Creative Writing and Translation,Creative Writing and Translation
+6,Drawing,Drawing,Drawing
+7,Economics,Economics,Economics
+8,English,English,English
+9,EVS,EVS,EVS
+10,Fine Arts,Fine Arts,Fine Arts
+11,Geography,Geography,Geography
+12,Health and Physical Education,Health and Physical Education,Health and Physical Education
+13,Hindi,Hindi,Hindi
+14,History,History,History
+15,Home Science,Home Science,Home Science
+16,Mathematics,Mathematics,Mathematics
+17,Multi Subject,Multi Subject,Multi Subject
+18,Physics,Physics,Physics
+19,Political Science,Political Science,Political Science
+20,Psychology,Psychology,Psychology
+21,Sanskrit,Sanskrit,Sanskrit
+22,Science,Science,Science
+23,Sociology,Sociology,Sociology
+24,Urdu,Urdu,Urdu
+25,Sst,Sst,Sst
+26,Language,Language,Language
+27,Mil,Mil,Mil

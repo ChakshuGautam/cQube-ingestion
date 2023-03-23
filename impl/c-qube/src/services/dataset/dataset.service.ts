@@ -171,6 +171,8 @@ export class DatasetService {
         // console.error(datasetGrammar.schema.properties);
         console.error(
           'ERROR',
+          createQuery,
+          indexQuery,
           datasetGrammar.name,
           datasetGrammar.schema.fk,
           error,
@@ -226,7 +228,7 @@ export class DatasetService {
       data.push({ ...dur.updateParams, ...dur.filterParams });
     }
     await this.insertBulkDatasetData(durs[0].dataset, data).catch((error) => {
-      console.error(error);
+      console.error('ERROR Inserting Data in Bulk: ', durs[0].dataset.name);
       console.error(data[0]);
       console.error(durs[0].dataset.schema.properties);
     });

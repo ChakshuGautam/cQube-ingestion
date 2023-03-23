@@ -1,4 +1,7 @@
 {
+  "globals": {
+    "onlyCreateWhitelisted": true
+  },
   "dimensions": {
     "namespace": "dimensions",
     "fileNameFormat": "${dimensionName}.${index}.dimensions.data.csv",
@@ -8,28 +11,8 @@
   },
   "programs": [
     {
-      "name": "Review and Monitoring",
-      "namespace": "rev_and_monitoring",
-      "description": "Review and Monitoring",
-      "shouldIngestToDB": true,
-      "input": {
-        "files": "./ingest/programs/rev-and-monitor"
-      },
-      "./output": {
-        "location": "./output/programs/rev-and-monitor"
-      },
-      "dimensions": {
-        "whitelisted": [
-          "academicyear,district",
-          "academicyear,block",
-          "academicyear,cluster"
-        ],
-        "blacklisted": []
-      }
-    },
-    {
       "name": "School Attendance",
-      "namespace": "school_attendance",
+      "namespace": "sch_att",
       "description": "School Attendance",
       "shouldIngestToDB": true,
       "input": {
@@ -53,20 +36,19 @@
       }
     },
     {
-      "name": "UDISE",
-      "namespace": "udise",
-      "description": "UDISE",
+      "name": "PM Poshan",
+      "namespace": "pm_poshan",
+      "description": "PM Poshan",
       "shouldIngestToDB": true,
       "input": {
-        "files": "./ingest/programs/udise"
+        "files": "./ingest/programs/pm-poshan"
       },
       "./output": {
-        "location": "./output/programs/udise"
+        "location": "./output/programs/pm-poshan"
       },
       "dimensions": {
         "whitelisted": [
-          "district,udisecategory",
-          "state,udisecategory"
+          "district,categorypm"
         ],
         "blacklisted": []
       }
@@ -84,8 +66,67 @@
       },
       "dimensions": {
         "whitelisted": [
-          "district,nasindicator,nassubject,grade",
-          "state,nasindicator,nassubject,grade"
+          "district,lo,subject,grade",
+          "state,lo,subject,grade"
+        ],
+        "blacklisted": []
+      }
+    },
+    {
+      "name": "UDISE",
+      "namespace": "udise",
+      "description": "UDISE",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/programs/udise"
+      },
+      "./output": {
+        "location": "./output/programs/udise"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "district,categoryudise",
+          "state,categoryudise"
+        ],
+        "blacklisted": []
+      }
+    },
+    {
+      "name": "Review and Monitoring",
+      "namespace": "rev_and_monitoring",
+      "description": "Review and Monitoring",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/programs/rev-and-monitor"
+      },
+      "./output": {
+        "location": "./output/programs/rev-and-monitor"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "academicyear,district",
+          "academicyear,block",
+          "academicyear,cluster"
+        ],
+        "blacklisted": []
+      }
+    },
+    {
+      "name": "DIKSHA",
+      "namespace": "diksha",
+      "description": "DIKSHA",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/programs/diksha"
+      },
+      "./output": {
+        "location": "./output/programs/diksha"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "state,grade,subject,medium,board",
+          "textbookdiksha,grade,subject,medium",
+          "textbookdiksha,grade,subject,medium"
         ],
         "blacklisted": []
       }
@@ -103,25 +144,29 @@
       },
       "dimensions": {
         "whitelisted": [
-          "district,category",
-          "state,category"
+          "state,district,categorypgi",
+          "state,categorypgi"
         ],
         "blacklisted": []
       }
     },
     {
-      "name": "PM-Poshan",
-      "namespace": "pm-poshan",
-      "description": "PM-Poshan",
+      "name": "NISHTHA",
+      "namespace": "nishtha",
+      "description": "NISHTHA",
       "shouldIngestToDB": true,
       "input": {
-        "files": "./ingest/programs/pm-poshan"
+        "files": "./ingest/programs/nishtha"
       },
       "./output": {
-        "location": "./output/programs/pgi"
+        "location": "./output/programs/nishtha"
       },
       "dimensions": {
-        "whitelisted": [],
+        "whitelisted": [
+          "state,district,programnishtha",
+          "state,programnishtha,coursenishtha",
+          "state,programnishtha"
+        ],
         "blacklisted": []
       }
     }
