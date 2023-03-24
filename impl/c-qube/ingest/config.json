@@ -68,7 +68,8 @@
       "dimensions": {
         "whitelisted": [
           "district,lo,subject,grade",
-          "state,lo,subject,grade"
+          "state,lo,subject,grade",
+          "district,subject,grade"
         ],
         "blacklisted": []
       }
