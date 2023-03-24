@@ -471,6 +471,7 @@ export class CsvAdapterService {
           );
           eventGrammarsGlobal.push(...eventGrammar);
           for (let i = 0; i < eventGrammar.length; i++) {
+            eventGrammar[i].program = config.programs[j].namespace;
             await this.eventService
               .createEventGrammar(eventGrammar[i])
               .catch((e) => {
@@ -561,6 +562,12 @@ export class CsvAdapterService {
                 _.uniq(egfWithoutTD),
               );
             datasetGrammarsGlobal.push(...dgsCompoundWithoutTD);
+            for (let m = 0; m < dgsCompoundWithoutTD.length; m++) {
+              compoundDatasetGrammars.push({
+                dg: dgsCompoundWithoutTD[m],
+                egFile: egfWithoutTD[m], //TODO: Hack - fix this; Don't know why this works.
+              });
+            }
             // console.log({ egfWithTD, egfWithoutTD, dgsCompoundWithoutTD });
 
             for (let l = 0; l < defaultTimeDimensions.length; l++) {
@@ -577,7 +584,7 @@ export class CsvAdapterService {
               for (let m = 0; m < dgsCompoundWithTD.length; m++) {
                 compoundDatasetGrammars.push({
                   dg: dgsCompoundWithTD[m],
-                  egFile: egfWithTD[m],
+                  egFile: egfWithTD[m], //TODO: Hack - fix this; Don't know why this works.
                 });
               }
             }
@@ -656,7 +663,7 @@ export class CsvAdapterService {
                 eventGrammarFile,
               );
               // Create Pipes
-              console.log(events[0].data, events.length);
+              // console.log(events[0].data, events.length);
               const pipe: Pipe = {
                 event: eventGrammar[k],
                 transformer: defaultTransformers[0],
