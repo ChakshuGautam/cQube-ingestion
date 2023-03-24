@@ -4,3 +4,6 @@
 [submodule "impl/ingestion-ms"]
 	path = impl/ingestion-ms
 	url = https://github.com/Sunbird-cQube/ingestion-ms.git
+[submodule "impl/grammar-ms"]
+	path = impl/grammar-ms
+	url = https://github.com/Sunbird-cQube/grammar-ms.git
