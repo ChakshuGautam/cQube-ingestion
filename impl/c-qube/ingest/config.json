@@ -26,6 +26,7 @@
           "gender,district",
           "gender,block",
           "gender,cluster",
+          "school,grade",
           "gender,school",
           "gender,school,grade",
           "schoolcategory,district",
@@ -145,7 +146,8 @@
         "whitelisted": [
           "state,district,programnishtha",
           "state,programnishtha,coursenishtha",
-          "state,programnishtha"
+          "state,programnishtha",
+          "district,programnishtha"
         ],
         "blacklisted": []
       }
