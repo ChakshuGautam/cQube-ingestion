@@ -76,6 +76,7 @@ export class EventService {
               name: 'COUNTER', //TODO: Change this to eventGrammar.instrument.name
             },
           },
+          program: eventGrammar.program,
         },
       })
       .catch((e) => {

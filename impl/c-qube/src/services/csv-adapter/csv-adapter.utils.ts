@@ -239,6 +239,7 @@ export const createDatasetGrammarsFromEG = async (
   const datasetGrammars: DatasetGrammar[] = [];
   for (let j = 0; j < defaultTimeDimensions.length; j++) {
     for (let k = 0; k < eventGrammars.length; k++) {
+      // console.log(eventGrammars[k].file);
       const datasetGrammar: DatasetGrammar =
         await createSingleDatasetGrammarsFromEG(
           folderName,
@@ -356,6 +357,7 @@ export const createSingleDatasetGrammarsFromEG = async (
   const propertyName = await getPropertyforDatasetGrammarFromEG(eventGrammar);
 
   const name = `${folderName}_${eventGrammar.instrument_field}_${defaultTimeDimension}_${eventGrammar.dimension[0]?.dimension.name.name}`;
+  // console.log(name);
   const timeDimensionKeySet = {
     Weekly: 'week',
     Monthly: 'month',
@@ -557,16 +559,18 @@ export const createCompoundDatasetDataToBeInserted = async (
       const dimensionIndex = getIndexForHeader(headers, property);
       rowObject[property] = rowData[dimensionIndex];
     }
-    if (datasetGrammar.timeDimension.type === 'Daily') {
-      rowObject['date'] = getDate(rowData[timeDimensionIndex]);
-    } else if (datasetGrammar.timeDimension.type === 'Weekly') {
-      rowObject['week'] = getWeek(rowData[timeDimensionIndex]);
-      rowObject['year'] = getYear(rowData[timeDimensionIndex]);
-    } else if (datasetGrammar.timeDimension.type === 'Monthly') {
-      rowObject['month'] = getMonth(rowData[timeDimensionIndex]);
-      rowObject['year'] = getYear(rowData[timeDimensionIndex]);
-    } else if (datasetGrammar.timeDimension.type === 'Yearly') {
-      rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+    if (datasetGrammar.timeDimension) {
+      if (datasetGrammar.timeDimension.type === 'Daily') {
+        rowObject['date'] = getDate(rowData[timeDimensionIndex]);
+      } else if (datasetGrammar.timeDimension.type === 'Weekly') {
+        rowObject['week'] = getWeek(rowData[timeDimensionIndex]);
+        rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+      } else if (datasetGrammar.timeDimension.type === 'Monthly') {
+        rowObject['month'] = getMonth(rowData[timeDimensionIndex]);
+        rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+      } else if (datasetGrammar.timeDimension.type === 'Yearly') {
+        rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+      }
     }
     datasetEvents.push({ data: rowObject, spec: eventGrammar });
   }
@@ -625,7 +629,12 @@ export const createCompoundDatasetGrammars = async (
         }
       }
     }
-    if (name === 'school_attendance_totalstudent_Daily_gender0school') {
+    // console.log(name);
+    if (
+      name === 'nas_performance_district0lo0subject0grade' ||
+      name === 'pm_poshan_category_district0categorypm' ||
+      name === 'udise_category_district0categoryudise'
+    ) {
       console.error({
         eventGrammarDef,
         compoundDimension,

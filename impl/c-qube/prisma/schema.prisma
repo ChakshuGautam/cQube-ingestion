@@ -43,6 +43,7 @@ model DatasetGrammar {
   updatedAt     DateTime  @updatedAt
   deletedAt     DateTime?
   Pipe          Pipe[]
+  program       String?
 
   @@schema("spec")
 }
@@ -61,6 +62,7 @@ model EventGrammar {
   deletedAt        DateTime?
   instrumentType   String
   Pipe             Pipe[]
+  program          String?
 
   @@schema("spec")
 }
