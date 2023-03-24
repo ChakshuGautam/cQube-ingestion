@@ -63,6 +63,14 @@ model EventGrammar {
   instrumentType   String
   Pipe             Pipe[]
   program          String?
+  eventType        EventType      @default(INTERNAL)
+
+  @@schema("spec")
+}
+
+enum EventType {
+  INTERNAL
+  EXTERNAL
 
   @@schema("spec")
 }
