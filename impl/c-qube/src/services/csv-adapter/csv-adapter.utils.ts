@@ -293,6 +293,7 @@ export const createSingleDatasetGrammarsFromEGWithoutTimeDimension = async (
     description: '',
     program: folderName,
     eventGrammarFile: eventGrammar.file,
+    eventGrammar: eventGrammar,
     isCompound: false,
     dimensions: dimensionMapping,
     schema: {
@@ -382,6 +383,7 @@ export const createSingleDatasetGrammarsFromEG = async (
     isCompound: false,
     program: folderName,
     eventGrammarFile: eventGrammar.file || eventGrammarFile,
+    eventGrammar: eventGrammar,
     dimensions: dimensionMapping,
     timeDimension: {
       key: timeDimensionKeySet[defaultTimeDimension],
@@ -448,21 +450,18 @@ export const getYear = (date): number => {
   return dateObject.getFullYear();
 };
 
-export const createDatasetDataToBeInsertedFromEG = async (
-  folderName: string,
+export const createDatasetDataToBeInserted = async (
   timeDimension: string,
-  eventGrammar: EventGrammar,
-  eventGrammarFile: string,
+  datasetGrammar: DatasetGrammar,
 ): Promise<cQubeEvent[]> => {
-  const dimensionMapping: DimensionMapping[] = [];
-  dimensionMapping.push(eventGrammar.dimension[0]);
-  const {
-    eventGrammarDef,
-  }: {
-    eventGrammarDef: EventGrammarCSVFormat[];
-    instrumentField: string;
-  } = await getEGDefFromFile(eventGrammarFile);
-  const propertyName = await getPropertyforDatasetGrammarFromEG(eventGrammar);
+  const eventGrammar = datasetGrammar.eventGrammar;
+  const dimensionMapping: DimensionMapping[] = datasetGrammar.dimensions;
+  // const propertyName = await getPropertyforDatasetGrammarFromEG(eventGrammar);
+  // Get all keys from datasetGrammar.schema.properties
+  const propertyName = Object.keys(datasetGrammar.schema.properties)
+    .filter((k) => k !== 'count')
+    .filter((k) => k !== 'sum')
+    .filter((k) => k !== 'date')[0];
 
   const filePath = eventGrammar.file.replace('grammar', 'data');
   // const df: DataFrame = pl.readCSV(filePath);
@@ -483,7 +482,7 @@ export const createDatasetDataToBeInsertedFromEG = async (
   const headers = df[0];
 
   // Get index for non time dimension
-  const dimenstionIndex = getIndexForHeader(headers, propertyName);
+  const dimensionIndex = getIndexForHeader(headers, propertyName);
 
   // Get index for timeDimension
   const timeDimensionIndex = getIndexForHeader(headers, 'date');
@@ -499,7 +498,7 @@ export const createDatasetDataToBeInsertedFromEG = async (
     const rowData = df[row];
     const rowObject = {};
     rowObject[eventGrammar.instrument_field] = parseInt(rowData[counterIndex]);
-    rowObject[propertyName] = rowData[dimenstionIndex];
+    rowObject[propertyName] = rowData[dimensionIndex];
     // rowObject[eventGrammars.dimension.dimension.name.name] =
     // rowData[dimenstionIndex];
     if (timeDimensionIndex > -1) {
@@ -760,6 +759,7 @@ function getDGDefsFromEGDefs(eventGrammarDef: EventGrammarCSVFormat[]) {
 }
 
 export async function getEGDefFromFile(csvFilePath: string) {
+  console.log(csvFilePath);
   const fileContent = await fs.readFile(csvFilePath, 'utf-8');
   const row1 = fileContent.split('\n')[0].trim();
   const row2 = fileContent.split('\n')[1].trim();

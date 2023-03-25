@@ -5,10 +5,15 @@ import {
   DimensionMapping,
   TimeDimension,
 } from '../../types/dataset';
-import { DatasetGrammar as DatasetGrammarModel } from '@prisma/client';
+import {
+  DatasetGrammar as DatasetGrammarModel,
+  EventGrammar as EventGrammarModel,
+} from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
 import { QueryBuilderService } from '../query-builder/query-builder.service';
 import { logToFile } from '../../utils/debug';
+import { EventService } from '../event/event.service';
+import { EventGrammar } from 'src/types/event';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs');
@@ -18,6 +23,7 @@ export class DatasetService {
   constructor(
     public prisma: PrismaService,
     private qbService: QueryBuilderService,
+    private eventGrammarService: EventService,
   ) {}
 
   counterAggregates(): any {
@@ -53,15 +59,30 @@ export class DatasetService {
     };
   }
 
-  dbModelToDatasetGrammar(model: DatasetGrammarModel): DatasetGrammar {
+  async dbModelToDatasetGrammar(
+    model: DatasetGrammarModel,
+  ): Promise<DatasetGrammar> {
+    let eventGrammar: EventGrammar;
+    if (model.eventGrammarId) {
+      const eventGrammarModel: EventGrammarModel =
+        await this.prisma.eventGrammar.findUnique({
+          where: {
+            id: model.eventGrammarId,
+          },
+        });
+      eventGrammar = (await this.eventGrammarService.dbModelToEventGrammar(
+        eventGrammarModel,
+      )) as EventGrammar;
+    }
     return {
       name: model.name,
       description: model.description,
-      timeDimension: model.timeDimension as unknown as TimeDimension,
-      dimensions: model.dimensions as unknown as DimensionMapping[],
+      timeDimension: JSON.parse(model.timeDimension as string) as TimeDimension,
+      dimensions: JSON.parse(model.dimensions as string) as DimensionMapping[],
       schema: model.schema as object,
       isCompound: model.isCompound,
       eventGrammarFile: model.eventGrammarFile,
+      eventGrammar: eventGrammar,
     };
   }
 
@@ -74,6 +95,15 @@ export class DatasetService {
       `datasetGrammar-${datasetGrammar.name}_${new Date().valueOf()}.json`,
     );
 
+    let eventGrammar: EventGrammarModel;
+    if (datasetGrammar.eventGrammar) {
+      eventGrammar = await this.prisma.eventGrammar.findUnique({
+        where: {
+          name: datasetGrammar.eventGrammar.name,
+        },
+      });
+    }
+
     return this.prisma.datasetGrammar
       .create({
         data: {
@@ -85,6 +115,7 @@ export class DatasetService {
           isCompound: datasetGrammar.isCompound || false,
           program: datasetGrammar.program,
           eventGrammarFile: datasetGrammar.eventGrammarFile,
+          eventGrammarId: eventGrammar?.id,
         },
       })
       .then((model: DatasetGrammarModel) => {
@@ -131,15 +162,37 @@ export class DatasetService {
       );
   }
 
-  async getCompundDatasetGrammars(): Promise<DatasetGrammar[]> {
+  async getCompoundDatasetGrammars(): Promise<DatasetGrammar[]> {
     return this.prisma.datasetGrammar
       .findMany({
         where: {
           isCompound: true,
         },
       })
-      .then((models: DatasetGrammarModel[]) =>
-        models.map((model) => this.dbModelToDatasetGrammar(model)),
+      .then(
+        async (models: DatasetGrammarModel[]): Promise<DatasetGrammar[]> => {
+          const data = Promise.all(
+            models.map((model) => this.dbModelToDatasetGrammar(model)),
+          );
+          return data;
+        },
+      );
+  }
+
+  async getNonCompoundDatasetGrammars(): Promise<DatasetGrammar[]> {
+    return this.prisma.datasetGrammar
+      .findMany({
+        where: {
+          isCompound: false,
+        },
+      })
+      .then(
+        async (models: DatasetGrammarModel[]): Promise<DatasetGrammar[]> => {
+          const data = Promise.all(
+            models.map((model) => this.dbModelToDatasetGrammar(model)),
+          );
+          return data;
+        },
       );
   }
 

@@ -20,7 +20,7 @@ import {
   createCompoundDatasetDataToBeInserted,
   createCompoundDatasetGrammars,
   createCompoundDatasetGrammarsWithoutTimeDimensions,
-  createDatasetDataToBeInsertedFromEG,
+  createDatasetDataToBeInserted,
   createDatasetGrammarsFromEG,
   createDatasetGrammarsFromEGWithoutTimeDimension,
   createDimensionGrammarFromCSVDefinition,
@@ -621,9 +621,9 @@ export class CsvAdapterService {
 
   public async ingestData() {
     const s = spinner();
-    s.start('🚧 1. Deleting Old Data');
-    await this.nukeDatasets();
-    s.stop('✅ 1. The Data has been Nuked');
+    // s.start('🚧 1. Deleting Old Data');
+    // await this.nukeDatasets();
+    // s.stop('✅ 1. The Data has been Nuked');
 
     // Parse the config
     s.start('🚧 2. Reading your config');
@@ -650,128 +650,169 @@ export class CsvAdapterService {
 
     s.start('🚧 4. Ingest Events');
 
-    for (let j = 0; j < config?.programs.length; j++) {
-      const inputFiles = readdirSync(config?.programs[j].input?.files);
-      for (let i = 0; i < inputFiles?.length; i++) {
-        if (regexEventGrammar.test(inputFiles[i])) {
-          // console.log(config?.programs[j].input?.files + `/${inputFiles[i]}`);
-          const eventGrammarFile =
-            config?.programs[j].input?.files + `/${inputFiles[i]}`;
-          const eventGrammar = await createEventGrammarFromCSVDefinition(
-            eventGrammarFile,
-            dimensionGrammarFolder,
-            config?.programs[j].namespace,
-          );
-          for (let k = 0; k < eventGrammar.length; k++) {
-            for (let l = 0; l < defaultTimeDimensions.length; l++) {
-              let datasetGrammar;
-              if (await isTimeDimensionPresent(eventGrammarFile)) {
-                datasetGrammar = await createSingleDatasetGrammarsFromEG(
-                  config?.programs[j].namespace,
-                  defaultTimeDimensions[l],
-                  eventGrammar[k],
-                  eventGrammarFile,
-                );
-              } else {
-                datasetGrammar =
-                  await createSingleDatasetGrammarsFromEGWithoutTimeDimension(
-                    config?.programs[j].namespace,
-                    eventGrammar[k],
-                  );
-              }
+    const datasetGrammars: DatasetGrammar[] =
+      await this.datasetService.getNonCompoundDatasetGrammars();
 
-              const events: Event[] = await createDatasetDataToBeInsertedFromEG(
-                config?.programs[j].input?.files,
-                defaultTimeDimensions[l],
-                eventGrammar[k],
-                eventGrammarFile,
-              );
-              // Create Pipes
-              // console.log(events[0].data, events.length);
-              const pipe: Pipe = {
-                event: eventGrammar[k],
-                transformer: defaultTransformers[0],
-                dataset: datasetGrammar,
-              };
-              const transformContext: TransformerContext = {
-                dataset: datasetGrammar,
-                events: events,
-                isChainable: false,
-                pipeContext: {},
-              };
+    for (let i = 0; i < datasetGrammars.length; i++) {
+      // EventGrammar doesn't include anything other thatn the fields
+      // that are actually required.
+      const events: Event[] = await createDatasetDataToBeInserted(
+        datasetGrammars[i]?.timeDimension?.type,
+        datasetGrammars[i],
+      );
+      // Create Pipes
+      // console.log(events[0].data, events.length);
+      const pipe: Pipe = {
+        event: datasetGrammars[i].eventGrammar,
+        transformer: defaultTransformers[0],
+        dataset: datasetGrammars[i],
+      };
+      const transformContext: TransformerContext = {
+        dataset: datasetGrammars[i],
+        events: events,
+        isChainable: false,
+        pipeContext: {},
+      };
 
-              try {
-                const datasetUpdateRequest: DatasetUpdateRequest[] =
-                  pipe.transformer.transformSync(
-                    callback,
-                    transformContext,
-                    events,
-                  ) as DatasetUpdateRequest[];
-                // console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
-                await this.datasetService.processDatasetUpdateRequest(
-                  datasetUpdateRequest,
-                );
-              } catch (e) {
-                console.error(e);
-              }
-            }
-          }
-        }
+      try {
+        const datasetUpdateRequest: DatasetUpdateRequest[] =
+          pipe.transformer.transformSync(
+            callback,
+            transformContext,
+            events,
+          ) as DatasetUpdateRequest[];
+        // console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
+        await this.datasetService.processDatasetUpdateRequest(
+          datasetUpdateRequest,
+        );
+      } catch (e) {
+        console.error(e);
       }
     }
 
-    const cdgs = await this.datasetService.getCompundDatasetGrammars();
+    // for (let j = 0; j < config?.programs.length; j++) {
+    //   const inputFiles = readdirSync(config?.programs[j].input?.files);
+    //   for (let i = 0; i < inputFiles?.length; i++) {
+    //     if (regexEventGrammar.test(inputFiles[i])) {
+    //       // console.log(config?.programs[j].input?.files + `/${inputFiles[i]}`);
+    //       const eventGrammarFile =
+    //         config?.programs[j].input?.files + `/${inputFiles[i]}`;
+    //       const eventGrammar = await createEventGrammarFromCSVDefinition(
+    //         eventGrammarFile,
+    //         dimensionGrammarFolder,
+    //         config?.programs[j].namespace,
+    //       );
+    //       for (let k = 0; k < eventGrammar.length; k++) {
+    //         for (let l = 0; l < defaultTimeDimensions.length; l++) {
+    //           let datasetGrammar;
+    //           if (await isTimeDimensionPresent(eventGrammarFile)) {
+    //             datasetGrammar = await createSingleDatasetGrammarsFromEG(
+    //               config?.programs[j].namespace,
+    //               defaultTimeDimensions[l],
+    //               eventGrammar[k],
+    //               eventGrammarFile,
+    //             );
+    //           } else {
+    //             datasetGrammar =
+    //               await createSingleDatasetGrammarsFromEGWithoutTimeDimension(
+    //                 config?.programs[j].namespace,
+    //                 eventGrammar[k],
+    //               );
+    //           }
+
+    //           // EventGrammar doesn't include anything other thatn the fields
+    //           // that are actually required.
+    //           const events: Event[] = await createDatasetDataToBeInsertedFromEG(
+    //             defaultTimeDimensions[l],
+    //             eventGrammar[k],
+    //           );
+    //           // Create Pipes
+    //           // console.log(events[0].data, events.length);
+    //           const pipe: Pipe = {
+    //             event: eventGrammar[k],
+    //             transformer: defaultTransformers[0],
+    //             dataset: datasetGrammar,
+    //           };
+    //           const transformContext: TransformerContext = {
+    //             dataset: datasetGrammar,
+    //             events: events,
+    //             isChainable: false,
+    //             pipeContext: {},
+    //           };
+
+    //           try {
+    //             const datasetUpdateRequest: DatasetUpdateRequest[] =
+    //               pipe.transformer.transformSync(
+    //                 callback,
+    //                 transformContext,
+    //                 events,
+    //               ) as DatasetUpdateRequest[];
+    //             // console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
+    //             await this.datasetService.processDatasetUpdateRequest(
+    //               datasetUpdateRequest,
+    //             );
+    //           } catch (e) {
+    //             console.error(e);
+    //           }
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
+
+    const compoundDatasetGrammars: DatasetGrammar[] =
+      await this.datasetService.getCompoundDatasetGrammars();
 
     // Ingest Compound DatasetGrammar
-    // for (let m = 0; m < compoundDatasetGrammars.length; m++) {
-    //   const {
-    //     instrumentField,
-    //   }: {
-    //     eventGrammarDef: EventGrammarCSVFormat[];
-    //     instrumentField: string;
-    //   } = await getEGDefFromFile(compoundDatasetGrammars[m].egFile);
-    //   const compundEventGrammar: EventGrammar = {
-    //     name: '',
-    //     description: '',
-    //     dimension: [],
-    //     instrument_field: instrumentField,
-    //     is_active: true,
-    //     schema: {},
-    //     instrument: {
-    //       type: InstrumentType.COUNTER,
-    //       name: 'counter',
-    //     },
-    //   };
-    //   const events: Event[] = await createCompoundDatasetDataToBeInserted(
-    //     compoundDatasetGrammars[m].egFile.replace('grammar', 'data'),
-    //     compundEventGrammar,
-    //     compoundDatasetGrammars[m].dg,
-    //   );
-    //   // Create Pipes
-    //   const pipe: Pipe = {
-    //     event: compundEventGrammar,
-    //     transformer: defaultTransformers[0],
-    //     dataset: compoundDatasetGrammars[m].dg,
-    //   };
-    //   const transformContext: TransformerContext = {
-    //     dataset: compoundDatasetGrammars[m].dg,
-    //     events: events,
-    //     isChainable: false,
-    //     pipeContext: {},
-    //   };
+    for (let m = 0; m < compoundDatasetGrammars.length; m++) {
+      const {
+        instrumentField,
+      }: {
+        eventGrammarDef: EventGrammarCSVFormat[];
+        instrumentField: string;
+      } = await getEGDefFromFile(compoundDatasetGrammars[m].eventGrammarFile);
+      const compoundEventGrammar: EventGrammar = {
+        name: '',
+        description: '',
+        dimension: [],
+        instrument_field: instrumentField,
+        is_active: true,
+        schema: {},
+        instrument: {
+          type: InstrumentType.COUNTER,
+          name: 'counter',
+        },
+      };
+      const events: Event[] = await createCompoundDatasetDataToBeInserted(
+        compoundDatasetGrammars[m].eventGrammarFile.replace('grammar', 'data'),
+        compoundEventGrammar,
+        compoundDatasetGrammars[m],
+      );
+      // Create Pipes
+      const pipe: Pipe = {
+        event: compoundEventGrammar,
+        transformer: defaultTransformers[0],
+        dataset: compoundDatasetGrammars[m],
+      };
+      const transformContext: TransformerContext = {
+        dataset: compoundDatasetGrammars[m],
+        events: events,
+        isChainable: false,
+        pipeContext: {},
+      };
 
-    //   const datasetUpdateRequest: DatasetUpdateRequest[] =
-    //     pipe.transformer.transformSync(
-    //       callback,
-    //       transformContext,
-    //       events,
-    //     ) as DatasetUpdateRequest[];
+      const datasetUpdateRequest: DatasetUpdateRequest[] =
+        pipe.transformer.transformSync(
+          callback,
+          transformContext,
+          events,
+        ) as DatasetUpdateRequest[];
 
-    //   // console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
-    //   await this.datasetService.processDatasetUpdateRequest(
-    //     datasetUpdateRequest,
-    //   );
-    // }
+      // console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
+      await this.datasetService.processDatasetUpdateRequest(
+        datasetUpdateRequest,
+      );
+    }
     s.stop('🚧 4. Ingest Events');
   }
 
