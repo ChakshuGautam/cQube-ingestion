@@ -220,13 +220,14 @@ export class DatasetService {
     durs: DatasetUpdateRequest[],
   ): Promise<void> {
     const data = [];
+    const timeDimensionProperties = durs[0].dataset.timeDimension
+      ? this.addDateDimension(durs[0].dataset.timeDimension.key)
+      : [];
     durs[0].dataset.schema.properties = {
       ...durs[0].dataset.schema.properties,
       ...this.counterAggregates(),
       ...this.addNonTimeDimension(durs[0].dataset.dimensions[0]),
-      ...(durs[0].dataset.timeDimension
-        ? this.addDateDimension(durs[0].dataset.timeDimension.key)
-        : []),
+      ...timeDimensionProperties,
     };
     for (const dur of durs) {
       data.push({ ...dur.updateParams, ...dur.filterParams });
