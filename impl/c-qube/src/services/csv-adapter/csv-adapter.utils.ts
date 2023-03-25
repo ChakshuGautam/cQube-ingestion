@@ -291,6 +291,8 @@ export const createSingleDatasetGrammarsFromEGWithoutTimeDimension = async (
     // content_subject_daily_total_interactions
     name,
     description: '',
+    program: folderName,
+    isCompound: false,
     dimensions: dimensionMapping,
     schema: {
       title: name,
@@ -376,6 +378,8 @@ export const createSingleDatasetGrammarsFromEG = async (
     // content_subject_daily_total_interactions
     name,
     description: '',
+    isCompound: false,
+    program: folderName,
     dimensions: dimensionMapping,
     timeDimension: {
       key: timeDimensionKeySet[defaultTimeDimension],
@@ -659,6 +663,8 @@ export const createCompoundDatasetGrammars = async (
     const dataserGrammar: DatasetGrammar = {
       // content_subject_daily_total_interactions
       name,
+      isCompound: true,
+      program: namespace,
       description: '',
       dimensions: dimensionMapping,
       timeDimension: {
@@ -726,6 +732,8 @@ export const createCompoundDatasetGrammarsWithoutTimeDimensions = async (
     const datasetGrammar: DatasetGrammar = {
       // content_subject_daily_total_interactions
       name,
+      isCompound: true,
+      program: namespace,
       description: '',
       dimensions: dimensionMapping,
       schema: {

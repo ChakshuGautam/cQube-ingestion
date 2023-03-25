@@ -20,6 +20,8 @@ export interface DatasetGrammar {
   dimensions: DimensionMapping[];
   timeDimension?: TimeDimension;
   schema: JSONSchema4;
+  isCompound?: boolean;
+  program?: string;
 }
 
 export interface Dataset {

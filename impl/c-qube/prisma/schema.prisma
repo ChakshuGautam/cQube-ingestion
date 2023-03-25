@@ -44,6 +44,7 @@ model DatasetGrammar {
   deletedAt     DateTime?
   Pipe          Pipe[]
   program       String?
+  isCompound    Boolean   @default(false)
 
   @@schema("spec")
 }

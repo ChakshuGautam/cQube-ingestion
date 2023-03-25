@@ -60,6 +60,7 @@ export class DatasetService {
       timeDimension: model.timeDimension as unknown as TimeDimension,
       dimensions: model.dimensions as unknown as DimensionMapping[],
       schema: model.schema as object,
+      isCompound: model.isCompound,
     };
   }
 
@@ -80,21 +81,26 @@ export class DatasetService {
           schema: datasetGrammar.schema,
           dimensions: JSON.stringify(datasetGrammar.dimensions),
           timeDimension: JSON.stringify(datasetGrammar.timeDimension),
+          isCompound: datasetGrammar.isCompound || false,
+          program: datasetGrammar.program,
         },
       })
-      .then((model: DatasetGrammarModel) => this.dbModelToDatasetGrammar(model))
+      .then((model: DatasetGrammarModel) => {
+        // console.log('Dataset Grammar created successfully', model.name);
+        return this.dbModelToDatasetGrammar(model);
+      })
       .catch((error) => {
-        // console.error(datasetGrammar.name);
-        // console.error(JSON.stringify(datasetGrammar, null, 2));
-        // console.error(error);
-        // fs.writeFile(
-        //   `./debug/datasetGrammar-${datasetGrammar.name}.error`,
-        //   error.stack,
-        //   function (err) {
-        //     if (err) return console.log(err);
-        //   },
-        // );
-        // throw error;
+        console.error(datasetGrammar.name);
+        console.error(JSON.stringify(datasetGrammar, null, 2));
+        console.error(error);
+        fs.writeFile(
+          `./debug/datasetGrammar-${datasetGrammar.name}.error`,
+          error.stack,
+          function (err) {
+            if (err) return console.log(err);
+          },
+        );
+        throw error;
         return datasetGrammar;
       });
   }
