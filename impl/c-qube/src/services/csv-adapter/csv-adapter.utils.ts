@@ -116,10 +116,17 @@ export const createEventGrammar = (
 ): EventGrammar => {
   const properties = {};
   for (let i = 0; i < columns.length; i++) {
-    properties[columns[i].name] = {
-      type: columns[i].type,
-      unique: true,
-    };
+    if (columns[i].type === 'date') {
+      properties[columns[i].name] = {
+        type: 'string',
+        format: 'date',
+      };
+    } else {
+      properties[columns[i].name] = {
+        type: columns[i].type,
+        unique: true,
+      };
+    }
   }
   const eventGrammar: EventGrammar = {
     file: csvFilePath,

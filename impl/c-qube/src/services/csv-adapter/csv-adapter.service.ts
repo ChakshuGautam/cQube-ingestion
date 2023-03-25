@@ -59,6 +59,7 @@ export enum ColumnType {
   string = 'string',
   integer = 'integer',
   float = 'float',
+  date = 'date',
 }
 
 export type Column = {
