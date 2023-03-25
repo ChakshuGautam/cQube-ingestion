@@ -22,6 +22,7 @@ export interface DatasetGrammar {
   schema: JSONSchema4;
   isCompound?: boolean;
   program?: string;
+  eventGrammarFile?: string;
 }
 
 export interface Dataset {

@@ -292,6 +292,7 @@ export const createSingleDatasetGrammarsFromEGWithoutTimeDimension = async (
     name,
     description: '',
     program: folderName,
+    eventGrammarFile: eventGrammar.file,
     isCompound: false,
     dimensions: dimensionMapping,
     schema: {
@@ -380,6 +381,7 @@ export const createSingleDatasetGrammarsFromEG = async (
     description: '',
     isCompound: false,
     program: folderName,
+    eventGrammarFile: eventGrammar.file || eventGrammarFile,
     dimensions: dimensionMapping,
     timeDimension: {
       key: timeDimensionKeySet[defaultTimeDimension],
@@ -665,6 +667,7 @@ export const createCompoundDatasetGrammars = async (
       name,
       isCompound: true,
       program: namespace,
+      eventGrammarFile,
       description: '',
       dimensions: dimensionMapping,
       timeDimension: {
@@ -734,6 +737,7 @@ export const createCompoundDatasetGrammarsWithoutTimeDimensions = async (
       name,
       isCompound: true,
       program: namespace,
+      eventGrammarFile: eventGrammarFile,
       description: '',
       dimensions: dimensionMapping,
       schema: {

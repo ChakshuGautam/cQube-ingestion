@@ -61,6 +61,7 @@ export class DatasetService {
       dimensions: model.dimensions as unknown as DimensionMapping[],
       schema: model.schema as object,
       isCompound: model.isCompound,
+      eventGrammarFile: model.eventGrammarFile,
     };
   }
 
@@ -83,6 +84,7 @@ export class DatasetService {
           timeDimension: JSON.stringify(datasetGrammar.timeDimension),
           isCompound: datasetGrammar.isCompound || false,
           program: datasetGrammar.program,
+          eventGrammarFile: datasetGrammar.eventGrammarFile,
         },
       })
       .then((model: DatasetGrammarModel) => {
@@ -126,6 +128,18 @@ export class DatasetService {
       })
       .then((model: DatasetGrammarModel) =>
         this.dbModelToDatasetGrammar(model),
+      );
+  }
+
+  async getCompundDatasetGrammars(): Promise<DatasetGrammar[]> {
+    return this.prisma.datasetGrammar
+      .findMany({
+        where: {
+          isCompound: true,
+        },
+      })
+      .then((models: DatasetGrammarModel[]) =>
+        models.map((model) => this.dbModelToDatasetGrammar(model)),
       );
   }
 

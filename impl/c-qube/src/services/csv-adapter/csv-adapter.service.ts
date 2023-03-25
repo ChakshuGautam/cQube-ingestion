@@ -617,13 +617,6 @@ export class CsvAdapterService {
 
     s.stop('✅ 5. Dataset Grammars have been ingested');
     // Insert events into the datasets
-    const callback = (
-      err: any,
-      context: TransformerContext,
-      events: Event[],
-    ) => {
-      //console.debug('callback', err, events.length);
-    };
   }
 
   public async ingestData() {
@@ -727,56 +720,58 @@ export class CsvAdapterService {
       }
     }
 
+    const cdgs = await this.datasetService.getCompundDatasetGrammars();
+
     // Ingest Compound DatasetGrammar
-    for (let m = 0; m < compoundDatasetGrammars.length; m++) {
-      const {
-        instrumentField,
-      }: {
-        eventGrammarDef: EventGrammarCSVFormat[];
-        instrumentField: string;
-      } = await getEGDefFromFile(compoundDatasetGrammars[m].egFile);
-      const compundEventGrammar: EventGrammar = {
-        name: '',
-        description: '',
-        dimension: [],
-        instrument_field: instrumentField,
-        is_active: true,
-        schema: {},
-        instrument: {
-          type: InstrumentType.COUNTER,
-          name: 'counter',
-        },
-      };
-      const events: Event[] = await createCompoundDatasetDataToBeInserted(
-        compoundDatasetGrammars[m].egFile.replace('grammar', 'data'),
-        compundEventGrammar,
-        compoundDatasetGrammars[m].dg,
-      );
-      // Create Pipes
-      const pipe: Pipe = {
-        event: compundEventGrammar,
-        transformer: defaultTransformers[0],
-        dataset: compoundDatasetGrammars[m].dg,
-      };
-      const transformContext: TransformerContext = {
-        dataset: compoundDatasetGrammars[m].dg,
-        events: events,
-        isChainable: false,
-        pipeContext: {},
-      };
+    // for (let m = 0; m < compoundDatasetGrammars.length; m++) {
+    //   const {
+    //     instrumentField,
+    //   }: {
+    //     eventGrammarDef: EventGrammarCSVFormat[];
+    //     instrumentField: string;
+    //   } = await getEGDefFromFile(compoundDatasetGrammars[m].egFile);
+    //   const compundEventGrammar: EventGrammar = {
+    //     name: '',
+    //     description: '',
+    //     dimension: [],
+    //     instrument_field: instrumentField,
+    //     is_active: true,
+    //     schema: {},
+    //     instrument: {
+    //       type: InstrumentType.COUNTER,
+    //       name: 'counter',
+    //     },
+    //   };
+    //   const events: Event[] = await createCompoundDatasetDataToBeInserted(
+    //     compoundDatasetGrammars[m].egFile.replace('grammar', 'data'),
+    //     compundEventGrammar,
+    //     compoundDatasetGrammars[m].dg,
+    //   );
+    //   // Create Pipes
+    //   const pipe: Pipe = {
+    //     event: compundEventGrammar,
+    //     transformer: defaultTransformers[0],
+    //     dataset: compoundDatasetGrammars[m].dg,
+    //   };
+    //   const transformContext: TransformerContext = {
+    //     dataset: compoundDatasetGrammars[m].dg,
+    //     events: events,
+    //     isChainable: false,
+    //     pipeContext: {},
+    //   };
 
-      const datasetUpdateRequest: DatasetUpdateRequest[] =
-        pipe.transformer.transformSync(
-          callback,
-          transformContext,
-          events,
-        ) as DatasetUpdateRequest[];
+    //   const datasetUpdateRequest: DatasetUpdateRequest[] =
+    //     pipe.transformer.transformSync(
+    //       callback,
+    //       transformContext,
+    //       events,
+    //     ) as DatasetUpdateRequest[];
 
-      // console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
-      await this.datasetService.processDatasetUpdateRequest(
-        datasetUpdateRequest,
-      );
-    }
+    //   // console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
+    //   await this.datasetService.processDatasetUpdateRequest(
+    //     datasetUpdateRequest,
+    //   );
+    // }
     s.stop('🚧 4. Ingest Events');
   }
 
