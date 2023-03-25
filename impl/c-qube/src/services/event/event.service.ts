@@ -13,6 +13,8 @@ import {
 import { PrismaService } from '../../prisma.service';
 import { QueryBuilderService } from '../query-builder/query-builder.service';
 import { DimensionService } from '../dimension/dimension.service';
+import { DimensionMapping } from 'src/types/dataset';
+import { DimensionGrammar } from 'src/types/dimension';
 
 @Injectable()
 export class EventService {
@@ -22,8 +24,16 @@ export class EventService {
     private dimensionService: DimensionService,
   ) {}
 
-  dbModelToEventGrammar(model: EventGrammarModel): EventGrammar {
+  async dbModelToEventGrammar(model: EventGrammarModel): Promise<EventGrammar> {
     // Get DimensionGrammar from DimensionGrammarSpec Table
+    const dm: any[] = JSON.parse(model.dimensionMapping as string);
+    for (let i = 0; i < dm.length; i++) {
+      const dimensionGrammarModel: DimensionGrammarModel =
+        await this.dimensionService.getDimensionGrammaModelByName(dm[i].name);
+      const dimensionGrammar: DimensionGrammar =
+        this.dimensionService.dbModelToDimensionGrammar(dimensionGrammarModel);
+      dm[i].dimension.name = dimensionGrammar;
+    }
     // Change the dimension field Name to dimensionGrammar
     return {
       name: model.name,
@@ -32,7 +42,8 @@ export class EventService {
       schema: model.schema as object,
       instrument_field: model.instrumentField,
       is_active: model.isActive,
-      dimension: null,
+      dimension: dm as DimensionMapping[],
+      file: model.file,
     };
   }
 
@@ -77,6 +88,7 @@ export class EventService {
             },
           },
           program: eventGrammar.program,
+          file: eventGrammar.file,
         },
       })
       .catch((e) => {
