@@ -58,4 +58,6 @@ jobs:
       - name: e2e Tests
         working-directory: impl/c-qube
         run: |
+          yarn test:docker:up
+          while [ "`docker inspect -f {{.State.Health.Status}} $container_id`" != "healthy" ]; do     sleep 2; done
           yarn test:e2e
