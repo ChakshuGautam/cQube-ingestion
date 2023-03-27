@@ -74,27 +74,27 @@ describe('CsvAdapterService', () => {
           },
           block_id: {
             type: 'string',
-            unique: true,
+            unique: false,
           },
           block_name: {
             type: 'string',
-            unique: true,
+            unique: false,
           },
           district_id: {
             type: 'string',
-            unique: true,
+            unique: false,
           },
           district_name: {
             type: 'string',
-            unique: true,
+            unique: false,
           },
           latitude: {
             type: 'string',
-            unique: true,
+            unique: false,
           },
           longitude: {
             type: 'string',
-            unique: true,
+            unique: false,
           },
         },
         indexes: [
