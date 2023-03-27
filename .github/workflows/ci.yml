@@ -49,3 +49,13 @@ jobs:
         run: |
           yarn test
           yarn test:cov
+      
+      - name: Stop DBs
+        working-directory: .
+        run: |
+          docker-compose down
+      
+      - name: e2e Tests
+        working-directory: impl/c-qube
+        run: |
+          yarn test:e2e

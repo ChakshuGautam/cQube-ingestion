@@ -1,5 +1,6 @@
 data
 pgdata
+pgdata-test
 venv
 .7z
 scratchpad.md
