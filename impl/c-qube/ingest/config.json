@@ -168,7 +168,8 @@
           "state,district,programnishtha",
           "state,programnishtha,coursenishtha",
           "state,programnishtha",
-          "district,programnishtha"
+          "district,programnishtha",
+          "coursenishtha,programnishtha"
         ],
         "blacklisted": []
       }
