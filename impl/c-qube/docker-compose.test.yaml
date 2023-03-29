@@ -1,0 +1,20 @@
+# create a docker-compose file to setup PSQL
+
+version: '3.6'
+services:
+  test-timescaledb:
+    container_name: test-timescaledb
+    image: timescale/timescaledb:2.0.0-pg12
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./pgdata-test:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: timescaledb
+      POSTGRES_PASSWORD: postgrespassword
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5

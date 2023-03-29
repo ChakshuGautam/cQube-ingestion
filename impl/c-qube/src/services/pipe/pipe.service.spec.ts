@@ -45,6 +45,6 @@ describe('PipeService', () => {
         pl.col('b').sum().alias('sum-b'),
         pl.count('b').alias('count-b'),
       );
-    console.log('grouped', grouped);
+    // console.log('grouped', grouped);
   });
 });

@@ -12,6 +12,8 @@ import {
   cancel,
   text,
 } from '@clack/prompts';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs');
@@ -20,34 +22,78 @@ const path = require('path');
 
 async function bootstrap() {
   const application = await NestFactory.createApplicationContext(AppModule);
+  const csvAdapterService = application.get(CsvAdapterService);
   resetLogs();
 
-  const command = process.argv[2];
-  const debugFlag = process.argv[3].split('=')[1] === 'true';
-  process.env['DEBUG'] = debugFlag.toString();
-  const csvAdapterService = application.get(CsvAdapterService);
+  // const command = process.argv[2];
+  // // only if third argument is passed
+  // let debugFlag = false;
+  // if (process.argv[3]) {
+  //   debugFlag = process.argv[3].split('=')[1] === 'true';
+  // }
+  // process.env['DEBUG'] = debugFlag.toString();
 
-  switch (command) {
-    case 'ingest':
+  // switch (command) {
+  //   case 'ingest':
+  //     intro(`Starting Ingestion Process`);
+  //     await csvAdapterService.ingest();
+  //     outro(`You're all set!`);
+  //     break;
+  //   case 'ingest-data':
+  //     intro(`Starting Data Ingestion Process`);
+  //     await csvAdapterService.ingestData();
+  //     outro(`You're all set!`);
+  //     break;
+  //   case 'nuke-db':
+  //     await csvAdapterService.nuke();
+  //     break;
+  //   default:
+  //     console.log('Command not found');
+  //     process.exit(1);
+  // }
+
+  // await application.close();
+  // process.exit(0);
+
+  yargs(hideBin(process.argv))
+    .option('debug', {
+      alias: 'd',
+      type: 'boolean',
+      default: false,
+      describe: 'Enable debug mode',
+    })
+    .command('ingest', 'Starting Ingestion Process', {}, async (argv) => {
+      process.env['DEBUG'] = argv.debug.toString();
       intro(`Starting Ingestion Process`);
       await csvAdapterService.ingest();
       outro(`You're all set!`);
-      break;
-    case 'ingest-data':
-      intro(`Starting Data Ingestion Process`);
-      await csvAdapterService.ingestData();
-      outro(`You're all set!`);
-      break;
-    case 'nuke-db':
+      await application.close();
+      process.exit(0);
+    })
+    .command(
+      'ingest-data',
+      'Starting Data Ingestion Process',
+      {},
+      async (argv) => {
+        process.env['DEBUG'] = argv.debug.toString();
+        intro(`Starting Data Ingestion Process`);
+        await csvAdapterService.ingestData();
+        outro(`You're all set!`);
+        await application.close();
+        process.exit(0);
+      },
+    )
+    .command('nuke-db', 'Nuke the database', {}, async (argv) => {
+      process.env['DEBUG'] = argv.debug.toString();
       await csvAdapterService.nuke();
-      break;
-    default:
-      console.log('Command not found');
-      process.exit(1);
-  }
-
-  await application.close();
-  process.exit(0);
+      await application.close();
+      process.exit(0);
+    })
+    .demandCommand(1, 'Please provide a valid command')
+    .help()
+    .version()
+    .strict()
+    .parse();
 }
 
 bootstrap();
