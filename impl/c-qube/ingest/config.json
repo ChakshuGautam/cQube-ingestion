@@ -88,7 +88,8 @@
       "dimensions": {
         "whitelisted": [
           "district,lo,subject,grade",
-          "state,lo,subject,grade"
+          "state,lo,subject,grade",
+          "district,subject,grade"
         ],
         "blacklisted": []
       }
@@ -167,7 +168,8 @@
           "state,district,programnishtha",
           "state,programnishtha,coursenishtha",
           "state,programnishtha",
-          "district,programnishtha"
+          "district,programnishtha",
+          "coursenishtha,programnishtha"
         ],
         "blacklisted": []
       }

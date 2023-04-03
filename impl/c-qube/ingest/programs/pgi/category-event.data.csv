@@ -1,4 +1,4 @@
-state_id,district_id,category_id,category_value
+state_id,district_id,category_name,category_value
 12,101,1,145.2
 12,102,1,139.7
 22,201,1,146.4
