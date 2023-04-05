@@ -1,0 +1,5 @@
+state,district,categorypgi,
+state_id,district_id,category_id,
+string,string,string,integer
+state_id,district_id,category_id,category_value
+dimension,dimension,dimension,metric

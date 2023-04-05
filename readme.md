@@ -1,3 +1,5 @@
+[![Node.js CI](https://github.com/ChakshuGautam/cQube-POCs/actions/workflows/ci.yml/badge.svg)](https://github.com/ChakshuGautam/cQube-POCs/actions/workflows/ci.yml)
+
 ### Documentation
 
 [Find Docs in docs folder](docs/)

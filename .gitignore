@@ -1,6 +1,8 @@
 data
 pgdata
+pgdata-test
 venv
 .7z
-*.csv
 scratchpad.md
+.env
+random_data.csv

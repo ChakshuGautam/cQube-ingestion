@@ -1,6 +1,6 @@
-### Dataset
+# Dataset
 
-- This is not an automated process right now - needs to be moved to an automated things
+**This is not an automated process right now - needs to be moved to an automated things**
 
 ```json
 {
@@ -11,10 +11,27 @@
 }
 ```
 
-Note: `id`, `created_at`, `updated_at`, `count`, `sum`, `percentage` are all automatically added to the dataset
-How do I map a dataset to a dimension?
+Note: `id`, `created_at`, `updated_at`, `count`, `sum`, `percentage` are all automatically added to the dataset.
 
-#### Dataset Grammar
+<!--How do I map a dataset to a dimension?-->
+
+## Dataset Grammar
+
+The Dataset Grammar requires
+
+- `name` : .
+- `description` : .
+- `dimensions` : .
+- `schema` : .
+
+```ts
+DatasetGrammar {
+  name: string;
+  description: string;
+  dimensions: DimensionMapping[];
+  schema: JSONSchema4;
+}
+```
 
 ```json
 {

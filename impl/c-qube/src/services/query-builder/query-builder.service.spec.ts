@@ -25,9 +25,12 @@ describe('QueryBuilderService', () => {
 
     const createStatement = service.generateCreateStatement(
       jsonSchema as JSONSchema4,
+      false,
     );
     expect(createStatement).toBe(
-      'CREATE TABLE my_schema.my_table (\n  id integer\n);',
+      service.cleanStatement(
+        'CREATE TABLE my_schema.my_table (\n  id integer\n);',
+      ),
     );
   });
 
@@ -59,7 +62,9 @@ describe('QueryBuilderService', () => {
       jsonSchema as JSONSchema4,
     );
     expect(createStatement).toBe(
-      'CREATE TABLE my_schema.my_table (\n  name VARCHAR\n);',
+      service.cleanStatement(
+        'CREATE TABLE my_schema.my_table (\n  name VARCHAR\n);',
+      ),
     );
   });
 
@@ -76,7 +81,9 @@ describe('QueryBuilderService', () => {
       jsonSchema as JSONSchema4,
     );
     expect(createStatement).toBe(
-      'CREATE TABLE my_schema.my_table (\n  name VARCHAR(255)\n);',
+      service.cleanStatement(
+        'CREATE TABLE my_schema.my_table (\n  name VARCHAR(255)\n);',
+      ),
     );
   });
 
@@ -95,7 +102,9 @@ describe('QueryBuilderService', () => {
       jsonSchema as JSONSchema4,
     );
     expect(createStatement).toBe(
-      'CREATE TABLE my_schema.my_table (\n  id integer,\n  name VARCHAR(255),\n  date_created TIMESTAMP\n);',
+      service.cleanStatement(
+        'CREATE TABLE my_schema.my_table (\n  id integer,\n  name VARCHAR(255),\n  date_created TIMESTAMP\n);',
+      ),
     );
   });
 
@@ -118,7 +127,9 @@ describe('QueryBuilderService', () => {
       jsonSchema as JSONSchema4,
     );
     expect(createStatement).toBe(
-      'CREATE TABLE my_schema.my_table (\n  id FLOAT8\n);',
+      service.cleanStatement(
+        'CREATE TABLE my_schema.my_table (\n  id FLOAT8\n);',
+      ),
     );
   });
 
@@ -135,7 +146,9 @@ describe('QueryBuilderService', () => {
       jsonSchema as JSONSchema4,
     );
     expect(createStatement).toBe(
-      'CREATE TABLE my_schema.my_table (\n  id FLOAT8\n);',
+      service.cleanStatement(
+        'CREATE TABLE my_schema.my_table (\n  id FLOAT8\n);',
+      ),
     );
   });
 
@@ -156,7 +169,7 @@ describe('QueryBuilderService', () => {
     const expectedStatements: string[] = [
       `CREATE INDEX my_table_name_idx ON my_schema.my_table (name);`,
       `CREATE INDEX my_table_date_created_idx ON my_schema.my_table (date_created);`,
-    ];
+    ].map(service.cleanStatement);
     expect(indexStatements.sort()).toEqual(expectedStatements.sort());
   });
 
@@ -211,7 +224,37 @@ describe('QueryBuilderService', () => {
     );
 
     expect(insertStatement).toBe(
-      `INSERT INTO my_schema.my_table (name, date_created) VALUES ('test', '2020-01-01T00:00:00.000Z');`,
+      service.cleanStatement(
+        `INSERT INTO my_schema.my_table (name, date_created) VALUES ('test', '2020-01-01T00:00:00.000Z');`,
+      ),
+    );
+  });
+
+  it('generates a "Create" statement with ID as primary key', () => {
+    const jsonSchema = {
+      title: 'my_table',
+      psql_schema: 'my_schema',
+      properties: {
+        name: { type: 'string', maxLength: 255 },
+        date_created: { type: 'string', format: 'date-time' },
+      },
+      indexes: [
+        { columns: [['name', 'date_created']] },
+        { columns: [['name'], ['date_created']] },
+      ],
+    };
+
+    const insertStatement = service.generateCreateStatement(
+      jsonSchema as JSONSchema4,
+      true,
+    );
+
+    expect(insertStatement).toBe(
+      service.cleanStatement(`CREATE TABLE my_schema.my_table (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255),
+        date_created TIMESTAMP
+      );`),
     );
   });
 });

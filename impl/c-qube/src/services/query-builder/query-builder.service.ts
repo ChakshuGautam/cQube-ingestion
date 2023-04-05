@@ -1,12 +1,54 @@
 import { Injectable } from '@nestjs/common';
 import { JSONSchema4 } from 'json-schema';
+
+type fk = {
+  column: string;
+  reference: {
+    table: string;
+    column: string;
+  };
+};
+
 @Injectable()
 export class QueryBuilderService {
   constructor() {}
 
-  generateCreateStatement(jsonSchema: JSONSchema4) {
-    const tableName = jsonSchema.title;
-    let createStatement = `CREATE TABLE ${tableName} (\n`;
+  cleanStatement(statement: string): string {
+    return (
+      statement
+        .replace(/^[ ]+|[ ]+$/g, '')
+        // Due to BAD data in CSV files, this might fail so commented out
+        // .replace(/\s\s+/g, ' ')
+        .replace(/\n/g, '')
+        .replace(/\(\s+/g, '(')
+        .replace(/\,\s+/g, ', ')
+        .replace(/\s+\)/g, ')')
+    );
+  }
+
+  addFKConstraintDuringCreation(
+    schema: JSONSchema4,
+    createStatement: string,
+  ): string {
+    createStatement = this.cleanStatement(createStatement);
+    const fkStatements = schema.fk.map((fk: fk) => {
+      let referenceField = `${fk.reference.table}(name)`;
+      if (fk.reference.column) {
+        referenceField = `${fk.reference.table}(${fk.reference.column})`;
+      }
+      return `constraint fk_${fk.column} FOREIGN KEY (${fk.column}) REFERENCES ${referenceField}`; //TODO: Should be the FK
+    });
+    createStatement = createStatement.replace(');', ',');
+    createStatement += fkStatements.join(',\n');
+    createStatement += ');';
+    return this.cleanStatement(createStatement);
+  }
+
+  generateCreateStatement(schema: JSONSchema4, autoPrimaryKey = false): string {
+    const tableName = schema.title;
+    const psqlSchema = schema.psql_schema;
+    const primaryKeySegment = autoPrimaryKey ? '\n id SERIAL PRIMARY KEY,' : '';
+    let createStatement = `CREATE TABLE ${psqlSchema}.${tableName} (${primaryKeySegment}\n`;
 
     const properties = jsonSchema.properties;
     for (const property in properties) {
@@ -14,6 +56,8 @@ export class QueryBuilderService {
       createStatement += `  ${property} `;
       if (column.type === 'string' && column.format === 'date-time') {
         createStatement += 'TIMESTAMP';
+      } else if (column.type === 'string' && column.format === 'date') {
+        createStatement += `DATE`;
       } else if (
         column.type === 'number' &&
         (column.format === 'float' || column.format === 'double')
@@ -26,8 +70,8 @@ export class QueryBuilderService {
       if (column.type === 'string' && column.maxLength) {
         createStatement += `(${column.maxLength})`;
       }
-      if(column.notNull === true){
-        createStatement += ' NOT NULL';
+      if (column.type === 'string' && column.unique) {
+        createStatement += ` UNIQUE`;
       }
       createStatement += ',\n';
     }
@@ -35,7 +79,13 @@ export class QueryBuilderService {
     createStatement = createStatement.slice(0, -2); // remove last comma and newline
     createStatement += '\n);';
 
-    return createStatement;
+    if (schema.fk !== undefined) {
+      createStatement = this.addFKConstraintDuringCreation(
+        schema,
+        createStatement,
+      );
+    }
+    return this.cleanStatement(createStatement);
   }
 
   generateIndexStatement(schema: JSONSchema4): string | null {
@@ -52,6 +102,67 @@ export class QueryBuilderService {
         }
       }
     }
-    return indexStatements;
+    return indexStatements.map((statement) => this.cleanStatement(statement));
+  }
+
+  generateInsertStatement(schema: JSONSchema4, data: any): string {
+    const tableName = schema.title;
+    const psqlSchema = schema.psql_schema;
+    const fields = [];
+    const values = [];
+
+    const propertiesToSkip = ['id'];
+
+    const properties = schema.properties;
+    for (const property in properties) {
+      if (propertiesToSkip.includes(property)) continue;
+      fields.push(property);
+      values.push(`'${data[property]}'`);
+    }
+
+    const query = `INSERT INTO ${psqlSchema}.${tableName} (${fields.join(
+      ', ',
+    )}) VALUES (${values.join(', ')});`;
+    return this.cleanStatement(query);
+  }
+
+  generateBulkInsertStatement(schema: JSONSchema4, data: any[]): string {
+    const tableName = schema.title;
+    const psqlSchema = schema.psql_schema;
+    const fields = [];
+    const values = [];
+
+    const propertiesToSkip = ['id'];
+
+    const properties = schema.properties;
+    for (const property in properties) {
+      if (propertiesToSkip.includes(property)) continue;
+      fields.push(property);
+    }
+
+    for (const row of data) {
+      const rowValues = [];
+      for (const property in properties) {
+        if (propertiesToSkip.includes(property)) continue;
+        if (
+          schema.properties[property].type === 'string' &&
+          schema.properties[property].format === 'date'
+        ) {
+          rowValues.push(`'${row[property].toISOString()}'`);
+        } else {
+          rowValues.push(`'${row[property]}'`);
+        }
+      }
+      values.push(`(${rowValues.join(', ')})`);
+    }
+
+    const query = `INSERT INTO ${psqlSchema}.${tableName} (${fields.join(
+      ', ',
+    )}) VALUES ${values.join(', ')};`;
+    return this.cleanStatement(query);
+  }
+
+  generateUpdateStatement(schema: JSONSchema4, data: any): string[] {
+    throw new Error('Method not implemented.');
   }
 }

@@ -1,30 +1,30 @@
-## Workflow for defining a spec
+# Workflow for defining a spec
 
 When defining a design doc, it should be done in the following order:
 
-1. Define a KPI
+1. [Define a KPI](#kpi)
 2. Define a chart (optional)
-3. Define a dimension
-4. Define a dataset
+3. [Define a dimension](#dimension)
+4. [Define a dataset](#dataset)
 5. Define an event
 6. Define a transformer
 7. Map the transformer to the event
 
-#### KPI
+## KPI
 
 ```json
 {
   "name": "Attendance Bar Graph by School",
   "description": "This is a bar graph of attendance by school",
-  "filter_dimensions": ["Schools", "Last 7 Days"]
+  "dimensions": ["Schools", "Last 7 Days"]
 }
 ```
 
-#### Dimension
+## Dimension
 
 ```json
 {
-  "id": "Dimension1",
+  "id": "Dimension-1",
   "name": "Schools",
   "type": "dynamic",
   "storage": {
@@ -46,7 +46,7 @@ When defining a design doc, it should be done in the following order:
 }
 ```
 
-#### Dataset
+## Dataset
 
 - This is not an automated process right now - needs to be moved to an automated things
 
@@ -62,7 +62,7 @@ When defining a design doc, it should be done in the following order:
 Note: `id`, `created_at`, `updated_at`, `count`, `sum`, `percentage` are all automatically added to the dataset
 How do I map a dataset to a dimension?
 
-#### Dataset Grammar
+## Dataset Grammar
 
 ```json
 {

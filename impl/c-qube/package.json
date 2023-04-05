@@ -13,20 +13,33 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "test:docker:up": "docker-compose -f docker-compose.test.yaml up -d",
+    "test:docker:down": "docker-compose -f docker-compose.test.yaml down",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "yarn prisma migrate deploy && jest --config ./test/jest-e2e.json",
+    "cli": "ts-node src/console.ts"
   },
   "dependencies": {
+    "@clack/prompts": "^0.6.1",
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
     "@prisma/client": "4.8.1",
     "@types/json-schema": "^7.0.11",
+    "chalk": "4.1.2",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "lodash": "^4.17.21",
+    "nodejs-polars": "^0.7.2",
+    "nodejs-polars-linux-x64-gnu": "^0.7.2",
+    "picocolors": "^1.0.0",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.2.0",
+    "to-json-schema": "^0.2.5",
+    "yargs": "^17.7.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
@@ -67,6 +80,7 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "testTimeout": 300000
   }
 }

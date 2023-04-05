@@ -33,3 +33,10 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# Fixtures
+!fixtures/**
+!rev-and-monitor/**
+
+.env
+debug

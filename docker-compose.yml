@@ -34,3 +34,21 @@ services:
       ## uncomment next line to set an admin secret
       # HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
       HASURA_GRAPHQL_MIGRATIONS_DISABLE_TRANSACTION: "true"
+      HASURA_GRAPHQL_CONSOLE_ASSETS_DIR: /srv/console-assets
+
+  pgpool-serv:
+    image: bitnami/pgpool
+    ports:
+      - 5433:5432
+    volumes:
+      - ./configs/pgpool-extra.conf:/config/myconf.conf
+    environment:
+      # https://github.com/bitnami/bitnami-docker-pgpool#configuration
+      - PGPOOL_BACKEND_NODES=0:timescaledb:5432
+      - PGPOOL_SR_CHECK_USER=timescaledb
+      - PGPOOL_SR_CHECK_PASSWORD=postgrespassword
+      - PGPOOL_POSTGRES_USERNAME=timescaledb
+      - PGPOOL_POSTGRES_PASSWORD=postgrespassword
+      - PGPOOL_ADMIN_USERNAME=timescaledb
+      - PGPOOL_ADMIN_PASSWORD=postgrespassword
+      - PGPOOL_USER_CONF_FILE=/config/myconf.conf

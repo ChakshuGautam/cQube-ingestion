@@ -11,7 +11,7 @@ datasource db {
 
 model InstrumentType {
   type         String         @id @default(cuid())
-  name         String
+  name         String         @unique
   description  String?
   EventGrammar EventGrammar[]
 
@@ -33,50 +33,65 @@ model DimensionGrammar {
 }
 
 model DatasetGrammar {
-  id          Int       @id @default(autoincrement())
-  name        String    @unique
-  description String?
-  dimensions  Json
-  schema      Json
-  type        String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
-  Pipe        Pipe[]
+  id               Int           @id @default(autoincrement())
+  name             String        @unique
+  description      String?
+  dimensions       Json
+  timeDimension    Json?
+  schema           Json
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  deletedAt        DateTime?
+  Pipe             Pipe[]
+  program          String?
+  isCompound       Boolean       @default(false)
+  eventGrammarFile String?
+  eventGrammar     EventGrammar? @relation(fields: [eventGrammarId], references: [id])
+  eventGrammarId   Int?
 
   @@schema("spec")
 }
 
 model EventGrammar {
-  id                 Int            @id @default(autoincrement())
-  name               String         @unique
-  instrument         InstrumentType @relation(fields: [instrumentTypeType], references: [type])
-  schema             Json
-  instrumentField    String
-  isActive           Boolean        @default(true)
-  description        String?
-  type               String
-  createdAt          DateTime       @default(now())
-  updatedAt          DateTime       @updatedAt
-  deletedAt          DateTime?
-  instrumentTypeType String
-  Pipe               Pipe[]
+  id               Int              @id @default(autoincrement())
+  name             String           @unique
+  instrument       InstrumentType   @relation(fields: [instrumentType], references: [type])
+  schema           Json
+  dimensionMapping Json
+  instrumentField  String
+  isActive         Boolean          @default(true)
+  description      String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  deletedAt        DateTime?
+  instrumentType   String
+  Pipe             Pipe[]
+  program          String?
+  file             String?
+  eventType        EventType        @default(INTERNAL)
+  DatasetGrammar   DatasetGrammar[]
+
+  @@schema("spec")
+}
+
+enum EventType {
+  INTERNAL
+  EXTERNAL
 
   @@schema("spec")
 }
 
 model Transformer {
-  id             Int       @id @default(autoincrement())
-  name           String    @unique
-  event          String
-  dataset        String
-  transformSync  String
-  transformAsync String
-  type           String
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  deletedAt      DateTime?
-  Pipe           Pipe[]
+  id                 Int       @id @default(autoincrement())
+  name               String    @unique
+  suggestiveEvents   String[]
+  suggestiveDatasets String[]
+  transformSync      String
+  transformAsync     String
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  deletedAt          DateTime?
+  Pipe               Pipe[]
 
   @@schema("transformers")
 }

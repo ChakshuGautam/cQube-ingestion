@@ -1,0 +1,5 @@
+state,district,
+state_id,district_id,
+string,string,integer
+state_id,district_id,no_of_students
+dimension,dimension,metric

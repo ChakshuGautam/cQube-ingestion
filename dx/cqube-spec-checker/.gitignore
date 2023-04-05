@@ -1,0 +1,21 @@
+# Node.js dependencies
+node_modules
+
+# Build artifacts
+*.vsix
+out
+
+# Debugging files
+/.vscode
+*.code-workspace
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+*.log
+*.swp
+*.bak
+*.tmp
+*~
+
+.DS_Store
