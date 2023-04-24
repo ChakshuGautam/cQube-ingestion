@@ -82,7 +82,9 @@ export class CsvAdapterService {
     eventCounterColumns: string[],
   ): Promise<any> {
     // Setup DataFrame
-    const df: DataFrame = pl.readCSV(csvPath);
+    const df: DataFrame = pl.readCSV(csvPath, {
+      quoteChar: "'",
+    });
     const allHeaders = df.columns;
 
     // Can be inferred from the dataFieldColumn
@@ -378,7 +380,9 @@ export class CsvAdapterService {
           'grammar',
           'data',
         );
-        const df: DataFrame = pl.readCSV(dimensionDataFileName);
+        const df: DataFrame = pl.readCSV(dimensionDataFileName, {
+          quoteChar: "'",
+        });
         dimensions.push(dimensionGrammar);
         await this.dimensionService
           .createDimensionGrammar(dimensionGrammar)

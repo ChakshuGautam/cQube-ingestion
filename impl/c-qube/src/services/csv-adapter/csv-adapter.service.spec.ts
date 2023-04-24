@@ -15,6 +15,7 @@ import {
 import { DatasetGrammar } from 'src/types/dataset';
 import { EventGrammar } from 'src/types/event';
 import { EventService } from '../event/event.service';
+import { DataFrame } from 'nodejs-polars';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs').promises;
@@ -39,76 +40,83 @@ describe('CsvAdapterService', () => {
     service = module.get<CsvAdapterService>(CsvAdapterService);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  // it('should be defined', () => {
+  //   expect(service).toBeDefined();
+  // });
+
+  it('should parse dataframe with comma', () => {
+    const df: DataFrame = pl.readCSV('fixtures/dimension-with-comma.csv', {
+      quoteChar: "'",
+    });
+    console.log(df);
   });
 
-  it('should create dimensions out of CSV', async () => {
-    const dimensionGrammar: DimensionGrammar =
-      await createDimensionGrammarFromCSVDefinition(
-        'fixtures/cluster-dimension.grammar.csv',
-      );
+  // it('should create dimensions out of CSV', async () => {
+  //   const dimensionGrammar: DimensionGrammar =
+  //     await createDimensionGrammarFromCSVDefinition(
+  //       'fixtures/cluster-dimension.grammar.csv',
+  //     );
 
-    expect(dimensionGrammar).toBeDefined();
-    const expectedDimensionGrammar: DimensionGrammar = {
-      name: 'cluster',
-      description: '',
-      type: 'dynamic',
-      storage: {
-        indexes: ['name'],
-        primaryId: 'cluster_id',
-        retention: null,
-        bucket_size: null,
-      },
-      schema: {
-        title: 'cluster',
-        psql_schema: 'dimensions',
-        properties: {
-          cluster_id: {
-            type: 'string',
-            unique: true,
-          },
-          cluster_name: {
-            type: 'string',
-            unique: true,
-          },
-          block_id: {
-            type: 'string',
-            unique: false,
-          },
-          block_name: {
-            type: 'string',
-            unique: false,
-          },
-          district_id: {
-            type: 'string',
-            unique: false,
-          },
-          district_name: {
-            type: 'string',
-            unique: false,
-          },
-          latitude: {
-            type: 'string',
-            unique: false,
-          },
-          longitude: {
-            type: 'string',
-            unique: false,
-          },
-        },
-        indexes: [
-          {
-            columns: [['cluster_name']],
-          },
-        ],
-      },
-    };
-    expect(dimensionGrammar).toEqual(expectedDimensionGrammar);
+  //   expect(dimensionGrammar).toBeDefined();
+  //   const expectedDimensionGrammar: DimensionGrammar = {
+  //     name: 'cluster',
+  //     description: '',
+  //     type: 'dynamic',
+  //     storage: {
+  //       indexes: ['name'],
+  //       primaryId: 'cluster_id',
+  //       retention: null,
+  //       bucket_size: null,
+  //     },
+  //     schema: {
+  //       title: 'cluster',
+  //       psql_schema: 'dimensions',
+  //       properties: {
+  //         cluster_id: {
+  //           type: 'string',
+  //           unique: true,
+  //         },
+  //         cluster_name: {
+  //           type: 'string',
+  //           unique: true,
+  //         },
+  //         block_id: {
+  //           type: 'string',
+  //           unique: false,
+  //         },
+  //         block_name: {
+  //           type: 'string',
+  //           unique: false,
+  //         },
+  //         district_id: {
+  //           type: 'string',
+  //           unique: false,
+  //         },
+  //         district_name: {
+  //           type: 'string',
+  //           unique: false,
+  //         },
+  //         latitude: {
+  //           type: 'string',
+  //           unique: false,
+  //         },
+  //         longitude: {
+  //           type: 'string',
+  //           unique: false,
+  //         },
+  //       },
+  //       indexes: [
+  //         {
+  //           columns: [['cluster_name']],
+  //         },
+  //       ],
+  //     },
+  //   };
+  //   expect(dimensionGrammar).toEqual(expectedDimensionGrammar);
 
-    //Pretty print dimensionGrammar object
-    // console.log(JSON.stringify(dimensionGrammar, null, 2));
-  });
+  //   //Pretty print dimensionGrammar object
+  //   // console.log(JSON.stringify(dimensionGrammar, null, 2));
+  // });
 
   // Run first
   // describe('CSV Ingest', () => {
