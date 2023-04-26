@@ -24,6 +24,7 @@ import { createObjectCsvWriter as createCsvWriter } from 'csv-writer';
 import { promisify } from 'util';
 import stream from 'stream';
 import { createReadStream } from 'fs';
+import * as csv from 'csv-parser';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs').promises;
@@ -115,6 +116,31 @@ describe('CsvAdapterService', () => {
       quoteChar: "'",
     });
     console.log(df);
+  });
+
+  it('should parse dataframe with comma', async () => {
+    async function readCSV(filePath: string): Promise<string[][]> {
+      return new Promise((resolve, reject) => {
+        const rows: string[][] = [];
+
+        fs1
+          .createReadStream(filePath)
+          .pipe(csv({ separator: ',', headers: false }))
+          .on('data', (data) => {
+            rows.push(Object.values(data));
+          })
+          .on('end', () => {
+            resolve(rows);
+          })
+          .on('error', (error) => {
+            reject(error);
+          });
+      });
+    }
+
+    const filePath = 'fixtures/dimension-with-comma.csv';
+    const df = await readCSV(filePath);
+    df.shift(); // Remove the header row
   });
 
   // it('should create dimensions out of CSV', async () => {
