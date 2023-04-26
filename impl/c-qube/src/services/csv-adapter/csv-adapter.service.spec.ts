@@ -16,11 +16,24 @@ import { DatasetGrammar } from 'src/types/dataset';
 import { EventGrammar } from 'src/types/event';
 import { EventService } from '../event/event.service';
 import { DataFrame } from 'nodejs-polars';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const csvParser = require('csv-parser');
+
+import csvtojson from 'csvtojson';
+import { createObjectCsvWriter as createCsvWriter } from 'csv-writer';
+import { promisify } from 'util';
+import stream from 'stream';
+import { createReadStream } from 'fs';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs').promises;
 // eslint-disable-next-line @typescript-eslint/no-var-requires
+const fs1 = require('fs');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const pl = require('nodejs-polars');
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const readline = require('readline');
 
 describe('CsvAdapterService', () => {
   let service: CsvAdapterService;
@@ -43,6 +56,59 @@ describe('CsvAdapterService', () => {
   // it('should be defined', () => {
   //   expect(service).toBeDefined();
   // });
+
+  it('should create a temp csv file', async () => {
+    const inputFile = 'fixtures/dimension-with-comma.csv';
+    const outputFile = 'fixtures/dimension-with-comma.temp.csv';
+
+    async function processCSV(input, output) {
+      return new Promise((resolve, reject) => {
+        if (fs1.existsSync(output)) {
+          fs1.unlinkSync(output);
+        }
+        const readStream = fs1.createReadStream(input);
+        const writeStream = fs1.createWriteStream(output);
+        const file = readline.createInterface({
+          input: readStream,
+          output: process.stdout,
+          terminal: false,
+        });
+        file.on('line', (line) => {
+          let newline = '';
+          for (const letter in line) {
+            if (line[letter] == '"') {
+              continue;
+            } else {
+              newline = newline + line[letter];
+            }
+          }
+          writeStream.write(newline + '\r\n');
+        });
+        file.on('close', async () => {
+          console.log('onclose');
+          // await fs1.unlinkSync(input);
+          // await this.processSleep(200);
+          readStream.close();
+          writeStream.end();
+          writeStream.on('finish', async () => {
+            console.log('onfinish');
+            // await fs1.renameSync(output, input);
+            resolve(output);
+          });
+        });
+        file.on('error', (err) => {
+          reject(err);
+        });
+      });
+    }
+
+    try {
+      await processCSV(inputFile, outputFile);
+      console.log(`CSV file successfully processed and saved as ${outputFile}`);
+    } catch (error) {
+      console.error('Error processing CSV file:', error);
+    }
+  });
 
   it('should parse dataframe with comma', () => {
     const df: DataFrame = pl.readCSV('fixtures/dimension-with-comma.csv', {
