@@ -84,6 +84,7 @@ export class CsvAdapterService {
     // Setup DataFrame
     const df: DataFrame = pl.readCSV(csvPath, {
       quoteChar: "'",
+      ignoreErrors: true,
     });
     const allHeaders = df.columns;
 
@@ -382,6 +383,7 @@ export class CsvAdapterService {
         );
         const df: DataFrame = pl.readCSV(dimensionDataFileName, {
           quoteChar: "'",
+          ignoreErrors: true,
         });
         dimensions.push(dimensionGrammar);
         await this.dimensionService
@@ -623,7 +625,7 @@ export class CsvAdapterService {
     // Insert events into the datasets
   }
 
-  public async ingestData() {
+  public async ingestData(ingestionFolder, ingestConfigFileName) {
     const s = spinner();
     // s.start('🚧 1. Deleting Old Data');
     // await this.nukeDatasets();
@@ -631,9 +633,9 @@ export class CsvAdapterService {
 
     // Parse the config
     s.start('🚧 2. Reading your config');
-    const ingestionFolder = './ingest';
+
     const config = JSON.parse(
-      await readFile(ingestionFolder + '/config.json', 'utf8'),
+      await readFile(ingestionFolder + '/' + ingestConfigFileName, 'utf8'),
     );
     const regexEventGrammar = /\-event\.grammar.csv$/i;
     const defaultTimeDimensions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
