@@ -1,0 +1,5 @@
+state,grade,subject,
+state_id,grade_diksha,subject_diksha,
+string,string,string,string,integer
+state_id,grade_diksha,subject_diksha,avg_play_time_in_mins_on_app_and_portal
+dimension,dimension,dimension,metric

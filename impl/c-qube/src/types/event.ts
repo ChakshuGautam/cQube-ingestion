@@ -11,6 +11,7 @@ export interface Instrument {
 }
 
 export interface EventGrammar {
+  file?: string;
   name: string;
   instrument: Instrument;
   description: string;
@@ -19,6 +20,7 @@ export interface EventGrammar {
   is_active: boolean;
   type?: 'single-dimension' | 'multi-dimension';
   dimension: DimensionMapping[] | DimensionMapping;
+  program?: string;
 }
 
 export interface Event {

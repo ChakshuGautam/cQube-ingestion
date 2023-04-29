@@ -5,10 +5,15 @@ import {
   DimensionMapping,
   TimeDimension,
 } from '../../types/dataset';
-import { DatasetGrammar as DatasetGrammarModel } from '@prisma/client';
+import {
+  DatasetGrammar as DatasetGrammarModel,
+  EventGrammar as EventGrammarModel,
+} from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
 import { QueryBuilderService } from '../query-builder/query-builder.service';
 import { logToFile } from '../../utils/debug';
+import { EventService } from '../event/event.service';
+import { EventGrammar } from 'src/types/event';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs');
@@ -18,6 +23,7 @@ export class DatasetService {
   constructor(
     public prisma: PrismaService,
     private qbService: QueryBuilderService,
+    private eventGrammarService: EventService,
   ) {}
 
   counterAggregates(): any {
@@ -53,13 +59,30 @@ export class DatasetService {
     };
   }
 
-  dbModelToDatasetGrammar(model: DatasetGrammarModel): DatasetGrammar {
+  async dbModelToDatasetGrammar(
+    model: DatasetGrammarModel,
+  ): Promise<DatasetGrammar> {
+    let eventGrammar: EventGrammar;
+    if (model.eventGrammarId) {
+      const eventGrammarModel: EventGrammarModel =
+        await this.prisma.eventGrammar.findUnique({
+          where: {
+            id: model.eventGrammarId,
+          },
+        });
+      eventGrammar = (await this.eventGrammarService.dbModelToEventGrammar(
+        eventGrammarModel,
+      )) as EventGrammar;
+    }
     return {
       name: model.name,
       description: model.description,
-      timeDimension: model.timeDimension as unknown as TimeDimension,
-      dimensions: model.dimensions as unknown as DimensionMapping[],
+      timeDimension: JSON.parse(model.timeDimension as string) as TimeDimension,
+      dimensions: JSON.parse(model.dimensions as string) as DimensionMapping[],
       schema: model.schema as object,
+      isCompound: model.isCompound,
+      eventGrammarFile: model.eventGrammarFile,
+      eventGrammar: eventGrammar,
     };
   }
 
@@ -72,6 +95,15 @@ export class DatasetService {
       `datasetGrammar-${datasetGrammar.name}_${new Date().valueOf()}.json`,
     );
 
+    let eventGrammar: EventGrammarModel;
+    if (datasetGrammar.eventGrammar) {
+      eventGrammar = await this.prisma.eventGrammar.findUnique({
+        where: {
+          name: datasetGrammar.eventGrammar.name,
+        },
+      });
+    }
+
     return this.prisma.datasetGrammar
       .create({
         data: {
@@ -80,21 +112,28 @@ export class DatasetService {
           schema: datasetGrammar.schema,
           dimensions: JSON.stringify(datasetGrammar.dimensions),
           timeDimension: JSON.stringify(datasetGrammar.timeDimension),
+          isCompound: datasetGrammar.isCompound || false,
+          program: datasetGrammar.program,
+          eventGrammarFile: datasetGrammar.eventGrammarFile,
+          eventGrammarId: eventGrammar?.id,
         },
       })
-      .then((model: DatasetGrammarModel) => this.dbModelToDatasetGrammar(model))
+      .then((model: DatasetGrammarModel) => {
+        // console.log('Dataset Grammar created successfully', model.name);
+        return this.dbModelToDatasetGrammar(model);
+      })
       .catch((error) => {
         console.error(datasetGrammar.name);
         console.error(JSON.stringify(datasetGrammar, null, 2));
         console.error(error);
-        // fs.writeFile(
-        //   `./debug/datasetGrammar-${datasetGrammar.name}.error`,
-        //   error.stack,
-        //   function (err) {
-        //     if (err) return console.log(err);
-        //   },
-        // );
-        // throw error;
+        fs.writeFile(
+          `./debug/datasetGrammar-${datasetGrammar.name}.error`,
+          error.stack,
+          function (err) {
+            if (err) return console.log(err);
+          },
+        );
+        throw error;
         return datasetGrammar;
       });
   }
@@ -123,6 +162,40 @@ export class DatasetService {
       );
   }
 
+  async getCompoundDatasetGrammars(): Promise<DatasetGrammar[]> {
+    return this.prisma.datasetGrammar
+      .findMany({
+        where: {
+          isCompound: true,
+        },
+      })
+      .then(
+        async (models: DatasetGrammarModel[]): Promise<DatasetGrammar[]> => {
+          const data = Promise.all(
+            models.map((model) => this.dbModelToDatasetGrammar(model)),
+          );
+          return data;
+        },
+      );
+  }
+
+  async getNonCompoundDatasetGrammars(): Promise<DatasetGrammar[]> {
+    return this.prisma.datasetGrammar
+      .findMany({
+        where: {
+          isCompound: false,
+        },
+      })
+      .then(
+        async (models: DatasetGrammarModel[]): Promise<DatasetGrammar[]> => {
+          const data = Promise.all(
+            models.map((model) => this.dbModelToDatasetGrammar(model)),
+          );
+          return data;
+        },
+      );
+  }
+
   async createDataset(
     datasetGrammar: DatasetGrammar,
     autoPrimaryKey = true,
@@ -141,13 +214,21 @@ export class DatasetService {
         });
       }
     }
-    timeDimensionKey = datasetGrammar.timeDimension.key;
     // Add aggregates to schema
-    datasetGrammar.schema.properties = {
-      ...datasetGrammar.schema.properties,
-      ...this.counterAggregates(),
-      ...this.addDateDimension(timeDimensionKey),
-    };
+    if (datasetGrammar.timeDimension) {
+      timeDimensionKey = datasetGrammar.timeDimension.key;
+
+      datasetGrammar.schema.properties = {
+        ...datasetGrammar.schema.properties,
+        ...this.counterAggregates(),
+        ...this.addDateDimension(timeDimensionKey),
+      };
+    } else {
+      datasetGrammar.schema.properties = {
+        ...datasetGrammar.schema.properties,
+        ...this.counterAggregates(),
+      };
+    }
 
     const createQuery = this.qbService.generateCreateStatement(
       datasetGrammar.schema,
@@ -156,20 +237,28 @@ export class DatasetService {
     const indexQuery: string[] = this.qbService.generateIndexStatement(
       datasetGrammar.schema,
     );
+    // console.error(datasetGrammar.name, { createQuery, indexQuery });
     await this.prisma
       .$queryRawUnsafe(createQuery)
       .catch(async (error) => {
         // console.error(datasetGrammar.schema.properties);
-        // console.error(error);
-        delete datasetGrammar.schema.fk;
-        const createQuery = this.qbService.generateCreateStatement(
-          datasetGrammar.schema,
-          autoPrimaryKey,
+        console.error(
+          'ERROR',
+          createQuery,
+          indexQuery,
+          datasetGrammar.name,
+          datasetGrammar.schema.fk,
+          error,
         );
-        console.log(createQuery);
-        await this.prisma.$queryRawUnsafe(createQuery).catch((e) => {
-          console.error('Failed again');
-        });
+        // delete datasetGrammar.schema.fk;
+        // const createQuery = this.qbService.generateCreateStatement(
+        //   datasetGrammar.schema,
+        //   autoPrimaryKey,
+        // );
+        // console.log('Query2', createQuery);
+        // await this.prisma.$queryRawUnsafe(createQuery).catch((e) => {
+        //   console.error('Failed again');
+        // });
       })
       .then(async (model: DatasetGrammarModel) => {
         // iterate over indexQuery and execute each query
@@ -195,24 +284,31 @@ export class DatasetService {
       datasetGrammar.schema,
       data,
     );
-    await this.prisma.$queryRawUnsafe(insertQuery);
+    await this.prisma.$queryRawUnsafe(insertQuery).catch((error) => {
+      console.error('ERROR', insertQuery, error);
+    });
   }
 
   async processDatasetUpdateRequest(
     durs: DatasetUpdateRequest[],
   ): Promise<void> {
     const data = [];
+    const timeDimensionProperties = durs[0].dataset.timeDimension
+      ? this.addDateDimension(durs[0].dataset.timeDimension.key)
+      : [];
     durs[0].dataset.schema.properties = {
       ...durs[0].dataset.schema.properties,
       ...this.counterAggregates(),
       ...this.addNonTimeDimension(durs[0].dataset.dimensions[0]),
-      ...this.addDateDimension(durs[0].dataset.timeDimension.key),
+      ...timeDimensionProperties,
     };
     for (const dur of durs) {
       data.push({ ...dur.updateParams, ...dur.filterParams });
     }
     await this.insertBulkDatasetData(durs[0].dataset, data).catch((error) => {
+      console.error();
       console.error(error);
+      console.error('ERROR Inserting Data in Bulk: ', durs[0].dataset.name);
       console.error(data[0]);
       console.error(durs[0].dataset.schema.properties);
     });

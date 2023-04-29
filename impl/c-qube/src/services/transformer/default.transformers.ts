@@ -35,18 +35,25 @@ export const defaultTransformers: Transformer[] = [
         const datasetGrammar = context.dataset;
 
         const instrumentField = eventGrammar.instrument_field;
-
         const timeDimensionKeys: string[] = [];
-        if (datasetGrammar.timeDimension.key === 'date') {
-          timeDimensionKeys.push('date');
-        } else if (datasetGrammar.timeDimension.key === 'month') {
-          timeDimensionKeys.push('month');
-          timeDimensionKeys.push('year');
-        } else if (datasetGrammar.timeDimension.key === 'week') {
-          timeDimensionKeys.push('week');
-          timeDimensionKeys.push('year');
-        } else {
-          timeDimensionKeys.push('year');
+
+        try {
+          if (datasetGrammar.timeDimension) {
+            if (datasetGrammar.timeDimension.key === 'date') {
+              timeDimensionKeys.push('date');
+            } else if (datasetGrammar.timeDimension.key === 'month') {
+              timeDimensionKeys.push('month');
+              timeDimensionKeys.push('year');
+            } else if (datasetGrammar.timeDimension.key === 'week') {
+              timeDimensionKeys.push('week');
+              timeDimensionKeys.push('year');
+            } else {
+              timeDimensionKeys.push('year');
+            }
+          }
+        } catch (e) {
+          console.log(e);
+          console.log(datasetGrammar.timeDimension.key);
         }
 
         // TODO: Change the above date string to regex
@@ -59,51 +66,59 @@ export const defaultTransformers: Transformer[] = [
         const newDF: DataFrame = pl.readRecords(eventData, {
           inferSchemaLength: 10,
         });
-        const changedDF = newDF
-          .groupBy(
-            ...timeDimensionKeys,
-            ...datasetGrammar.dimensions.map((x) => x.key),
-          )
-          .agg(
-            pl.avg(instrumentField).alias('avg'),
-            pl.count(instrumentField).alias('count'),
-            pl.col(instrumentField).sum().alias('sum'),
-          );
+        try {
+          const changedDF = newDF
+            .groupBy(
+              ...timeDimensionKeys,
+              ...datasetGrammar.dimensions.map((x) => x.key),
+            )
+            .agg(
+              pl.avg(instrumentField).alias('avg'),
+              pl.count(instrumentField).alias('count'),
+              pl.col(instrumentField).sum().alias('sum'),
+            );
+          const datasetUpdateRequests: DatasetUpdateRequest[] = changedDF
+            .select(
+              'count',
+              'sum',
+              'avg',
+              ...timeDimensionKeys,
+              ...datasetGrammar.dimensions.map((x) => x.key),
+            )
+            .map((x) => {
+              let indexOfTimeDimensions = 3; //0, 1, 2 are count, sum, avg
+              const filterParams: Record<string, string> = {};
+              for (let i = 0; i < timeDimensionKeys.length; i++) {
+                filterParams[`${timeDimensionKeys[i]}`] =
+                  x[indexOfTimeDimensions];
+                indexOfTimeDimensions += 1;
+              }
+              for (let i = 0; i < datasetGrammar.dimensions.length; i++) {
+                filterParams[`${datasetGrammar.dimensions[i].key}`] =
+                  x[indexOfTimeDimensions];
+                indexOfTimeDimensions += 1;
+              }
 
-        const datasetUpdateRequests: DatasetUpdateRequest[] = changedDF
-          .select(
-            'count',
-            'sum',
-            'avg',
-            ...timeDimensionKeys,
-            ...datasetGrammar.dimensions.map((x) => x.key),
-          )
-          .map((x) => {
-            let indexOfTimeDimensions = 3; //0, 1, 2 are count, sum, avg
-            const filterParams: Record<string, string> = {};
-            for (let i = 0; i < timeDimensionKeys.length; i++) {
-              filterParams[`${timeDimensionKeys[i]}`] =
-                x[indexOfTimeDimensions];
-              indexOfTimeDimensions += 1;
-            }
-            for (let i = 0; i < datasetGrammar.dimensions.length; i++) {
-              filterParams[`${datasetGrammar.dimensions[i].key}`] =
-                x[indexOfTimeDimensions];
-              indexOfTimeDimensions += 1;
-            }
-
-            return {
-              dataset: datasetGrammar,
-              dimensionFilter: eventGrammar.name,
-              updateParams: {
-                count: x[0],
-                sum: x[1],
-                avg: x[2],
-              },
-              filterParams,
-            };
-          });
-        return datasetUpdateRequests;
+              return {
+                dataset: datasetGrammar,
+                dimensionFilter: eventGrammar.name,
+                updateParams: {
+                  count: x[0],
+                  sum: x[1],
+                  avg: x[2],
+                },
+                filterParams,
+              };
+            });
+          return datasetUpdateRequests;
+        } catch (e) {
+          console.log(e);
+          console.log(eventData[0]);
+          console.log(timeDimensionKeys);
+          console.log(datasetGrammar.timeDimension);
+          console.log(datasetGrammar.dimensions.map((x) => x.key));
+          console.log(datasetGrammar.name);
+        }
       }
     },
   },

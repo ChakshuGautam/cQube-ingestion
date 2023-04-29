@@ -1,0 +1,23 @@
+[
+  {
+    "id": 4,
+    "program_name": "NISHTHA 2.0",
+    "sum": 183,
+    "count": 2,
+    "avg": 91.5
+  },
+  {
+    "id": 5,
+    "program_name": "NISHTHA 3.0",
+    "sum": 101,
+    "count": 2,
+    "avg": 50.5
+  },
+  {
+    "id": 6,
+    "program_name": "NISHTHA 1.0",
+    "sum": 83,
+    "count": 2,
+    "avg": 41.5
+  }
+]

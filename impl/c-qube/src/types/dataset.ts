@@ -1,3 +1,4 @@
+import { EventGrammar } from './event';
 import { JSONSchema4 } from 'json-schema';
 import { DimensionGrammar } from './dimension';
 
@@ -18,8 +19,12 @@ export interface DatasetGrammar {
   name: string;
   description: string;
   dimensions: DimensionMapping[];
-  timeDimension: TimeDimension;
+  timeDimension?: TimeDimension;
   schema: JSONSchema4;
+  isCompound?: boolean;
+  program?: string;
+  eventGrammarFile?: string;
+  eventGrammar?: EventGrammar;
 }
 
 export interface Dataset {

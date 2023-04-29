@@ -1,0 +1,5 @@
+state,programnishtha,coursenishtha,
+state_id,program_name,course_name,
+string,string,string,integer
+state_id,program_name,course_name,total_completion
+dimension,dimension,dimension,metric

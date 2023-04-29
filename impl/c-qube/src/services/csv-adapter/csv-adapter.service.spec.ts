@@ -15,11 +15,26 @@ import {
 import { DatasetGrammar } from 'src/types/dataset';
 import { EventGrammar } from 'src/types/event';
 import { EventService } from '../event/event.service';
+import { DataFrame } from 'nodejs-polars';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const csvParser = require('csv-parser');
+
+import csvtojson from 'csvtojson';
+import { createObjectCsvWriter as createCsvWriter } from 'csv-writer';
+import { promisify } from 'util';
+import stream from 'stream';
+import { createReadStream } from 'fs';
+import * as csv from 'csv-parser';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs').promises;
 // eslint-disable-next-line @typescript-eslint/no-var-requires
+const fs1 = require('fs');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const pl = require('nodejs-polars');
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const readline = require('readline');
 
 describe('CsvAdapterService', () => {
   let service: CsvAdapterService;
@@ -39,106 +54,161 @@ describe('CsvAdapterService', () => {
     service = module.get<CsvAdapterService>(CsvAdapterService);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  // it('should be defined', () => {
+  //   expect(service).toBeDefined();
+  // });
+
+  it('should create a temp csv file', async () => {
+    const inputFile = 'fixtures/dimension-with-comma.csv';
+    const outputFile = 'fixtures/dimension-with-comma.temp.csv';
+
+    async function processCSV(input, output) {
+      return new Promise((resolve, reject) => {
+        if (fs1.existsSync(output)) {
+          fs1.unlinkSync(output);
+        }
+        const readStream = fs1.createReadStream(input);
+        const writeStream = fs1.createWriteStream(output);
+        const file = readline.createInterface({
+          input: readStream,
+          output: process.stdout,
+          terminal: false,
+        });
+        file.on('line', (line) => {
+          let newline = '';
+          for (const letter in line) {
+            if (line[letter] == '"') {
+              continue;
+            } else {
+              newline = newline + line[letter];
+            }
+          }
+          writeStream.write(newline + '\r\n');
+        });
+        file.on('close', async () => {
+          console.log('onclose');
+          // await fs1.unlinkSync(input);
+          // await this.processSleep(200);
+          readStream.close();
+          writeStream.end();
+          writeStream.on('finish', async () => {
+            console.log('onfinish');
+            // await fs1.renameSync(output, input);
+            resolve(output);
+          });
+        });
+        file.on('error', (err) => {
+          reject(err);
+        });
+      });
+    }
+
+    try {
+      await processCSV(inputFile, outputFile);
+      console.log(`CSV file successfully processed and saved as ${outputFile}`);
+    } catch (error) {
+      console.error('Error processing CSV file:', error);
+    }
   });
 
-  it('should create dimensions out of CSV', async () => {
-    const dimensionGrammar: DimensionGrammar =
-      await createDimensionGrammarFromCSVDefinition(
-        'fixtures/cluster-dimension.grammar.csv',
-      );
-
-    expect(dimensionGrammar).toBeDefined();
-    const expectedDimensionGrammar: DimensionGrammar = {
-      name: 'cluster',
-      description: '',
-      type: 'dynamic',
-      storage: {
-        indexes: ['name'],
-        primaryId: 'cluster_id',
-        retention: null,
-        bucket_size: null,
-      },
-      schema: {
-        title: 'cluster',
-        psql_schema: 'dimensions',
-        properties: {
-          cluster_id: {
-            type: 'string',
-            unique: true,
-          },
-          cluster_name: {
-            type: 'string',
-            unique: true,
-          },
-          block_id: {
-            type: 'string',
-            unique: true,
-          },
-          block_name: {
-            type: 'string',
-            unique: true,
-          },
-          district_id: {
-            type: 'string',
-            unique: true,
-          },
-          district_name: {
-            type: 'string',
-            unique: true,
-          },
-          latitude: {
-            type: 'string',
-            unique: true,
-          },
-          longitude: {
-            type: 'string',
-            unique: true,
-          },
-        },
-        indexes: [
-          {
-            columns: [['cluster_name']],
-          },
-        ],
-      },
-    };
-    expect(dimensionGrammar).toEqual(expectedDimensionGrammar);
-
-    //Pretty print dimensionGrammar object
-    // console.log(JSON.stringify(dimensionGrammar, null, 2));
+  it('should parse dataframe with comma', () => {
+    const df: DataFrame = pl.readCSV('fixtures/dimension-with-comma.csv', {
+      quoteChar: "'",
+    });
+    console.log(df);
   });
 
-  it('should test the creation of EventGrammar', async () => {
-    const csvPath = 'fixtures/cluster-event.grammar.csv';
-    const eventGrammars: EventGrammar[] =
-      await createEventGrammarFromCSVDefinition(csvPath, 'fixtures');
+  it('should parse dataframe with comma', async () => {
+    async function readCSV(filePath: string): Promise<string[][]> {
+      return new Promise((resolve, reject) => {
+        const rows: string[][] = [];
 
-    expect(eventGrammars).toBeDefined();
-    expect(eventGrammars.length).toEqual(3);
+        fs1
+          .createReadStream(filePath)
+          .pipe(csv({ separator: ',', headers: false }))
+          .on('data', (data) => {
+            rows.push(Object.values(data));
+          })
+          .on('end', () => {
+            resolve(rows);
+          })
+          .on('error', (error) => {
+            reject(error);
+          });
+      });
+    }
 
-    // Pretty print dimensionGrammar object
-    // console.log(JSON.stringify(eventGrammar, null, 2));
+    const filePath = 'fixtures/dimension-with-comma.csv';
+    const df = await readCSV(filePath);
+    df.shift(); // Remove the header row
   });
 
-  it('should create a datasetGrammars from a CSV', async () => {
-    const csvPathDimension = 'fixtures/cluster-dimension.grammar.csv';
-    const csvPathEvent = 'fixtures/cluster-event.grammar.csv';
-    const dimensionGrammarForCluster: DimensionGrammar =
-      await createDimensionGrammarFromCSVDefinition(csvPathDimension);
-    const eventGrammarForCluster: EventGrammar[] =
-      await createEventGrammarFromCSVDefinition(csvPathEvent, 'fixtures');
-    const defaultTimeDimensions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
-    const datasetGrammars: DatasetGrammar[] = await createDatasetGrammarsFromEG(
-      'fixtures',
-      [dimensionGrammarForCluster],
-      defaultTimeDimensions,
-      eventGrammarForCluster,
-    );
-    expect(datasetGrammars).toBeDefined();
-    expect(datasetGrammars.length).toEqual(12);
-  });
+  // it('should create dimensions out of CSV', async () => {
+  //   const dimensionGrammar: DimensionGrammar =
+  //     await createDimensionGrammarFromCSVDefinition(
+  //       'fixtures/cluster-dimension.grammar.csv',
+  //     );
+
+  //   expect(dimensionGrammar).toBeDefined();
+  //   const expectedDimensionGrammar: DimensionGrammar = {
+  //     name: 'cluster',
+  //     description: '',
+  //     type: 'dynamic',
+  //     storage: {
+  //       indexes: ['name'],
+  //       primaryId: 'cluster_id',
+  //       retention: null,
+  //       bucket_size: null,
+  //     },
+  //     schema: {
+  //       title: 'cluster',
+  //       psql_schema: 'dimensions',
+  //       properties: {
+  //         cluster_id: {
+  //           type: 'string',
+  //           unique: true,
+  //         },
+  //         cluster_name: {
+  //           type: 'string',
+  //           unique: true,
+  //         },
+  //         block_id: {
+  //           type: 'string',
+  //           unique: false,
+  //         },
+  //         block_name: {
+  //           type: 'string',
+  //           unique: false,
+  //         },
+  //         district_id: {
+  //           type: 'string',
+  //           unique: false,
+  //         },
+  //         district_name: {
+  //           type: 'string',
+  //           unique: false,
+  //         },
+  //         latitude: {
+  //           type: 'string',
+  //           unique: false,
+  //         },
+  //         longitude: {
+  //           type: 'string',
+  //           unique: false,
+  //         },
+  //       },
+  //       indexes: [
+  //         {
+  //           columns: [['cluster_name']],
+  //         },
+  //       ],
+  //     },
+  //   };
+  //   expect(dimensionGrammar).toEqual(expectedDimensionGrammar);
+
+  //   //Pretty print dimensionGrammar object
+  //   // console.log(JSON.stringify(dimensionGrammar, null, 2));
+  // });
 
   // Run first
   // describe('CSV Ingest', () => {

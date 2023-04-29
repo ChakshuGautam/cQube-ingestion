@@ -1,0 +1,18 @@
+## Adapter
+[Convert State Data] => Dimension/Dataset events [Ramya]
+Gradeee 1 => 2
+
+## Data from the state/NAS/VSK
+grade, attendance, day
+Grade 1, 20, 2023-2-2
+Classsses 1, 20, 2023-2-2
+Grade 2, 20, 2023-2-2
+
+## Grade Dimension
+grade_id, grade_number, grade_nas, grade_vsk, grade_name_hp
+1, 1, Grade 1, Class 1, Grade 1
+2, 1, Gradeee 1, Classes 1, Gradeee 1
+
+## Adapter
+Step 1: Pick the ID from the dimension table called Grade.
+Step 2: Map it back to data and get the ID.
