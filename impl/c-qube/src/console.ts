@@ -77,7 +77,12 @@ async function bootstrap() {
       async (argv) => {
         process.env['DEBUG'] = argv.debug.toString();
         intro(`Starting Data Ingestion Process`);
-        await csvAdapterService.ingestData();
+        const ingestionFolder = './ingest';
+        const ingestConfigFileName = 'config.json';
+        await csvAdapterService.ingestData(
+          ingestionFolder,
+          ingestConfigFileName,
+        );
         outro(`You're all set!`);
         await application.close();
         process.exit(0);

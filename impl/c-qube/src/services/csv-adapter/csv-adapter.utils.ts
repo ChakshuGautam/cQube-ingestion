@@ -18,6 +18,26 @@ const fs = require('fs').promises;
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pl = require('nodejs-polars');
 
+import * as csv from 'csv-parser';
+
+async function readCSV(filePath: string): Promise<string[][]> {
+  return new Promise((resolve, reject) => {
+    const rows: string[][] = [];
+
+    fs.createReadStream(filePath)
+      .pipe(csv({ separator: ',', headers: false }))
+      .on('data', (data) => {
+        rows.push(Object.values(data));
+      })
+      .on('end', () => {
+        resolve(rows);
+      })
+      .on('error', (error) => {
+        reject(error);
+      });
+  });
+}
+
 export const createDimensionGrammarFromCSVDefinition = async (
   csvFilePath: string,
 ): Promise<DimensionGrammar> => {

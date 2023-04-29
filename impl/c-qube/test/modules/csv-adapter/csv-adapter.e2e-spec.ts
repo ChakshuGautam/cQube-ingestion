@@ -11,6 +11,7 @@ import { QueryBuilderService } from './../../../src/services/query-builder/query
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
+  let csvAdapterService: CsvAdapterService;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -27,12 +28,14 @@ describe('AppController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
+    csvAdapterService = app.get<CsvAdapterService>(CsvAdapterService);
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  it('ingest-small-data', async () => {
+    await csvAdapterService.ingest();
+    // SQL Query to this table => nishtha_perc_certification_programnishtha
+    // Convert it to JSON
+    // outputDatasets/nishtha_perc_certification_programnishtha
+    // expect(outputDatasets/nishtha_perc_certification_programnishtha.json).toBe(SQL Query Output);
   });
 });
