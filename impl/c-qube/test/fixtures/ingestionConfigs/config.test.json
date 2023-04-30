@@ -16,7 +16,7 @@
       "description": "Test Program",
       "shouldIngestToDB": true,
       "input": {
-        "files": "./ingestionConfigs/programs/test-program"
+        "files": "./test/fixtures/ingestionConfigs/programs/test-program"
       },
       "./output": {
         "location": "./output/programs/test-program"

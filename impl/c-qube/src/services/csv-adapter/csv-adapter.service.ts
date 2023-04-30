@@ -334,7 +334,10 @@ export class CsvAdapterService {
     });
   }
 
-  public async ingest() {
+  public async ingest(
+    ingestionFolder = './ingest',
+    ingestConfigFileName = 'config.json',
+  ) {
     const s = spinner();
     s.start('🚧 1. Deleting Old Data');
     await this.nuke();
@@ -344,9 +347,9 @@ export class CsvAdapterService {
 
     // Parse the config
     s.start('🚧 2. Reading your config');
-    const ingestionFolder = './ingest';
+    // const ingestionFolder = './ingest';
     const config = JSON.parse(
-      await readFile(ingestionFolder + '/config.json', 'utf8'),
+      await readFile(ingestionFolder + '/' + ingestConfigFileName, 'utf8'),
     );
     const regexEventGrammar = /\-event\.grammar.csv$/i;
     const defaultTimeDimensions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];

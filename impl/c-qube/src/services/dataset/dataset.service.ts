@@ -312,6 +312,7 @@ export class DatasetService {
         console.error('Trying them 1 by 1');
         // start ingesting one by one and print row if cannot be ingested
         let rowsIngested = 0;
+        const failedRows = [];
         const promises = data.map((row) => {
           return limit(() => this.insertDatasetData(durs[0].dataset, row))
             .then((s) => {
@@ -323,6 +324,7 @@ export class DatasetService {
                 `Could not insert data due to FK constraint ${durs[0].dataset.name}`,
                 row,
               );
+              failedRows.push(row);
             });
         });
         const result = await Promise.all(promises);
