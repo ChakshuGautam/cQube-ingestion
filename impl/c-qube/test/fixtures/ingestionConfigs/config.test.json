@@ -1,0 +1,34 @@
+{
+  "globals": {
+    "onlyCreateWhitelisted": true
+  },
+  "dimensions": {
+    "namespace": "dimensions",
+    "fileNameFormat": "${dimensionName}.${index}.dimensions.data.csv",
+    "input": {
+      "files": "./ingest/dimensions"
+    }
+  },
+  "programs": [
+    {
+      "name": "Test Program",
+      "namespace": "test_program",
+      "description": "Test Program",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingestionConfigs/programs/test-program"
+      },
+      "./output": {
+        "location": "./output/programs/test-program"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "academicyear,district",
+          "academicyear,block",
+          "academicyear,cluster"
+        ],
+        "blacklisted": []
+      }
+    }
+  ]
+}

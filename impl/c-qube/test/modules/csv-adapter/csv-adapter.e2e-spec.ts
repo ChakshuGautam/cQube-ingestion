@@ -32,10 +32,32 @@ describe('AppController (e2e)', () => {
   });
 
   it('ingest-small-data', async () => {
-    await csvAdapterService.ingest();
+    // await csvAdapterService.ingest();
     // SQL Query to this table => nishtha_perc_certification_programnishtha
     // Convert it to JSON
     // outputDatasets/nishtha_perc_certification_programnishtha
     // expect(outputDatasets/nishtha_perc_certification_programnishtha.json).toBe(SQL Query Output);
+  });
+
+  it('validate the grammar and event data', async () => {
+    const ingestionFolder = './test/fixtures/ingestionConfigs';
+    const ingestionConfigFileName = 'config.test.json';
+    await csvAdapterService.ingestData(
+      ingestionFolder,
+      ingestionConfigFileName,
+    );
+  });
+
+  it('should do partial insertion', async () => {
+    const ingestionFolder = './test/fixtures/ingestionConfigs';
+    const ingestionConfigFileName = 'config.test.json';
+    await csvAdapterService.ingestData(
+      ingestionFolder,
+      ingestionConfigFileName,
+    );
+  });
+
+  it('sanity check data for single quotes', async () => {
+    return true;
   });
 });

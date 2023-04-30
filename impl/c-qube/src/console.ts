@@ -94,6 +94,24 @@ async function bootstrap() {
       await application.close();
       process.exit(0);
     })
+    .command(
+      'ingest-test',
+      'Starting Data Ingestion Process',
+      {},
+      async (argv) => {
+        process.env['DEBUG'] = argv.debug.toString();
+        intro(`Starting Data Ingestion Process`);
+        const ingestionFolder = './test/fixtures/ingestionConfigs';
+        const ingestConfigFileName = 'config.test.json';
+        await csvAdapterService.ingestData(
+          ingestionFolder,
+          ingestConfigFileName,
+        );
+        outro(`You're all set!`);
+        await application.close();
+        process.exit(0);
+      },
+    )
     .demandCommand(1, 'Please provide a valid command')
     .help()
     .version()
