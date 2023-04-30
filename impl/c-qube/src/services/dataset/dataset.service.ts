@@ -14,6 +14,8 @@ import { QueryBuilderService } from '../query-builder/query-builder.service';
 import { logToFile } from '../../utils/debug';
 import { EventService } from '../event/event.service';
 import { EventGrammar } from 'src/types/event';
+const pLimit = require('p-limit');
+const limit = pLimit(20);
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs');
@@ -284,9 +286,7 @@ export class DatasetService {
       datasetGrammar.schema,
       data,
     );
-    await this.prisma.$queryRawUnsafe(insertQuery).catch((error) => {
-      console.error('ERROR', insertQuery, error);
-    });
+    await this.prisma.$queryRawUnsafe(insertQuery);
   }
 
   async processDatasetUpdateRequest(
@@ -305,13 +305,30 @@ export class DatasetService {
     for (const dur of durs) {
       data.push({ ...dur.updateParams, ...dur.filterParams });
     }
-    await this.insertBulkDatasetData(durs[0].dataset, data).catch((error) => {
-      console.error();
-      console.error(error);
-      console.error('ERROR Inserting Data in Bulk: ', durs[0].dataset.name);
-      console.error(data[0]);
-      console.error(durs[0].dataset.schema.properties);
-    });
+    // TODO check for FK constraints before insert
+    await this.insertBulkDatasetData(durs[0].dataset, data).catch(
+      async (error) => {
+        console.error('ERROR Inserting Data in Bulk: ', durs[0].dataset.name);
+        console.error('Trying them 1 by 1');
+        // start ingesting one by one and print row if cannot be ingested
+        let rowsIngested = 0;
+        const promises = data.map((row) => {
+          return limit(() => this.insertDatasetData(durs[0].dataset, row))
+            .then((s) => {
+              rowsIngested += 1;
+              console.log('Done', rowsIngested);
+            })
+            .catch((e) => {
+              console.error(
+                `Could not insert data due to FK constraint ${durs[0].dataset.name}`,
+                row,
+              );
+            });
+        });
+        const result = await Promise.all(promises);
+        console.error(result.length, 'rows inserted');
+      },
+    );
   }
   addNonTimeDimension(dimension: DimensionMapping): {
     [k: string]: any;

@@ -642,9 +642,6 @@ export class CsvAdapterService {
     const dimensionGrammarFolder = config?.dimensions.input?.files;
 
     s.stop('✅ 2. Config parsing completed');
-    // Ingest Compound DatasetGrammar
-    s.start('🚧 3. Ingest Events');
-
     // Insert events into the datasets
     const callback = (
       err: any,
@@ -654,7 +651,7 @@ export class CsvAdapterService {
       //console.debug('callback', err, events.length);
     };
 
-    s.start('🚧 4. Ingest Events');
+    s.start('🚧 3. Ingest Events');
 
     const datasetGrammars: DatasetGrammar[] =
       await this.datasetService.getNonCompoundDatasetGrammars();

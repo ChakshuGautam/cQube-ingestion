@@ -10,33 +10,15 @@ import {
   InstrumentType,
   Event as cQubeEvent,
 } from '../../types/event';
-// import { InstrumentType, EventGrammar } from 'src/types/event';
 import { Column, ColumnType } from './csv-adapter.service';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs').promises;
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const pl = require('nodejs-polars');
+const readline = require('readline');
 
 import * as csv from 'csv-parser';
 
-async function readCSV(filePath: string): Promise<string[][]> {
-  return new Promise((resolve, reject) => {
-    const rows: string[][] = [];
-
-    fs.createReadStream(filePath)
-      .pipe(csv({ separator: ',', headers: false }))
-      .on('data', (data) => {
-        rows.push(Object.values(data));
-      })
-      .on('end', () => {
-        resolve(rows);
-      })
-      .on('error', (error) => {
-        reject(error);
-      });
-  });
-}
+const fs1 = require('fs');
 
 export const createDimensionGrammarFromCSVDefinition = async (
   csvFilePath: string,
@@ -487,13 +469,15 @@ export const createDatasetDataToBeInserted = async (
   // const df: DataFrame = pl.readCSV(filePath);
   // let dfModified: DataFrame;
 
-  const fileContent = await fs.readFile(filePath, 'utf-8');
-  const lines = fileContent.split('\n');
-  const df = [];
-  for (let i = 0; i < lines.length; i++) {
-    df.push(lines[i].split(',').map((value) => value.trim()));
-  }
+  // const fileContent = await fs.readFile(filePath, 'utf-8');
+  // const lines = fileContent.split('\n');
+  // const df = [];
+  // for (let i = 0; i < lines.length; i++) {
+  //   df.push(lines[i].split(',').map((value) => value.trim()));
+  // }
 
+  await processCsv(filePath, filePath.split('.csv')[0] + '_temp.csv');
+  const df = await readCSV(filePath);
   const getIndexForHeader = (headers: string[], header: string): number => {
     return headers.indexOf(header);
   };
@@ -557,12 +541,15 @@ export const createCompoundDatasetDataToBeInserted = async (
   delete properties.count;
   delete properties.year;
 
-  const fileContent = await fs.readFile(eventFilePath, 'utf-8');
-  const lines = fileContent.split('\n');
-  const df = [];
-  for (let i = 0; i < lines.length; i++) {
-    df.push(lines[i].split(',').map((value) => value.trim()));
-  }
+  // const fileContent = await fs.readFile(eventFilePath, 'utf-8');
+  // const lines = fileContent.split('\n');
+  // const df = [];
+  // for (let i = 0; i < lines.length; i++) {
+  //   df.push(lines[i].split(',').map((value) => value.trim()));
+  // }
+
+  await processCsv(eventFilePath, eventFilePath.split('.csv')[0] + '_temp.csv');
+  const df = await readCSV(eventFilePath);
 
   const getIndexForHeader = (headers: string[], header: string): number => {
     return headers.indexOf(header);
@@ -826,4 +813,66 @@ export async function isTimeDimensionPresent(csvFilePath: string) {
       return false;
     }
   }
+}
+
+async function readCSV(filePath: string): Promise<string[][]> {
+  return new Promise((resolve, reject) => {
+    const rows: string[][] = [];
+
+    fs1
+      .createReadStream(filePath)
+      .pipe(csv({ separator: ',', headers: false, quote: "'" }))
+      .on('data', (data) => {
+        rows.push(Object.values(data));
+      })
+      .on('end', () => {
+        resolve(rows);
+      })
+      .on('error', (error) => {
+        reject(error);
+      });
+  });
+}
+
+async function processCsv(input, output) {
+  return new Promise((resolve, reject) => {
+    if (fs1.existsSync(output)) {
+      fs1.unlinkSync(output);
+    }
+    const readStream = fs1.createReadStream(input);
+    const writeStream = fs1.createWriteStream(output);
+    const file = readline.createInterface({
+      input: readStream,
+      output: process.stdout,
+      terminal: false,
+    });
+    file.on('line', (line) => {
+      let newline = '';
+      for (const letter in line) {
+        if (line[letter] == '"') {
+          continue;
+        } else {
+          newline = newline + line[letter];
+        }
+      }
+      writeStream.write(newline + '\r\n');
+    });
+    file.on('close', async () => {
+      await fs1.unlinkSync(input);
+      await processSleep(200);
+      readStream.close();
+      writeStream.end();
+      writeStream.on('finish', async () => {
+        await fs1.renameSync(output, input);
+        resolve(output);
+      });
+    });
+    file.on('error', (err) => {
+      reject(err);
+    });
+  });
+}
+
+async function processSleep(time) {
+  return new Promise((resolve) => setTimeout(resolve, time));
 }
