@@ -94,6 +94,7 @@ async function bootstrap() {
       await application.close();
       process.exit(0);
     })
+<<<<<<< HEAD
     .command(
       'ingest-test',
       'Starting Data Ingestion Process',
@@ -112,6 +113,14 @@ async function bootstrap() {
         process.exit(0);
       },
     )
+=======
+    .command('nuke-datasets', 'Nuke the datasets', {}, async (argv) => {
+      process.env['DEBUG'] = argv.debug.toString();
+      await csvAdapterService.nukeDatasets();
+      await application.close();
+      process.exit(0);
+    })
+>>>>>>> eac12f4ee35cfb3923065b8a92365bf0df1ef094
     .demandCommand(1, 'Please provide a valid command')
     .help()
     .version()
