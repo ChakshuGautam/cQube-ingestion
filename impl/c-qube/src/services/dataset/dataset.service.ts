@@ -14,6 +14,8 @@ import { QueryBuilderService } from '../query-builder/query-builder.service';
 import { logToFile } from '../../utils/debug';
 import { EventService } from '../event/event.service';
 import { EventGrammar } from 'src/types/event';
+import { retryPromiseWithDelay } from '../../utils/retry';
+
 const pLimit = require('p-limit');
 const limit = pLimit(20);
 
@@ -306,31 +308,50 @@ export class DatasetService {
       data.push({ ...dur.updateParams, ...dur.filterParams });
     }
     // TODO check for FK constraints before insert
-    await this.insertBulkDatasetData(durs[0].dataset, data).catch(
-      async (error) => {
-        console.error('ERROR Inserting Data in Bulk: ', durs[0].dataset.name);
-        console.error('Trying them 1 by 1');
-        // start ingesting one by one and print row if cannot be ingested
-        let rowsIngested = 0;
-        const failedRows = [];
-        const promises = data.map((row) => {
-          return limit(() => this.insertDatasetData(durs[0].dataset, row))
-            .then((s) => {
-              rowsIngested += 1;
-              console.log('Done', rowsIngested);
-            })
-            .catch((e) => {
-              console.error(
-                `Could not insert data due to FK constraint ${durs[0].dataset.name}`,
-                row,
-              );
-              failedRows.push(row);
-            });
-        });
-        const result = await Promise.all(promises);
-        console.error(result.length, 'rows inserted');
-      },
-    );
+    await retryPromiseWithDelay(
+      this.insertBulkDatasetData(durs[0].dataset, data),
+      3,
+      1000,
+    ).catch(async (error) => {
+      console.error('ERROR Inserting Data in Bulk: ', durs[0].dataset.name);
+      console.error('Trying them 1 by 1');
+      // start ingesting one by one and print row if cannot be ingested
+      let rowsIngested = 0;
+      const failedRows = [];
+      const promises = data.map((row) => {
+        return limit(() =>
+          retryPromiseWithDelay(
+            this.insertDatasetData(durs[0].dataset, row),
+            3,
+            1000,
+          ),
+        )
+          .then((s) => {
+            rowsIngested += 1;
+            console.log('Done', rowsIngested);
+          })
+          .catch((e) => {
+            console.error(
+              `Could not insert data due to FK constraint ${durs[0].dataset.name}`,
+              row,
+            );
+            failedRows.push(row);
+          });
+      });
+      const result = await Promise.all(promises);
+      console.error(result.length, 'rows inserted');
+      console.log('failedRows', failedRows);
+      if (failedRows.length > 0) {
+        const header = Object.keys(failedRows[0]).join(',') + '\n';
+        const rows = failedRows
+          .map((obj) => Object.values(obj).join(',') + '\n')
+          .join('');
+        const csv = header + rows;
+        console.log('csv: ', csv);
+        // TODO: write to file in output folder
+        // fs.writeFileSync()
+      }
+    });
   }
   addNonTimeDimension(dimension: DimensionMapping): {
     [k: string]: any;
