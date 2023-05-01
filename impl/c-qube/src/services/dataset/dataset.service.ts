@@ -78,6 +78,8 @@ export class DatasetService {
     }
     return {
       name: model.name,
+      tableName: model.tableName,
+      tableNameExpanded: model.tableNameExpanded,
       description: model.description,
       timeDimension: JSON.parse(model.timeDimension as string) as TimeDimension,
       dimensions: JSON.parse(model.dimensions as string) as DimensionMapping[],
@@ -109,6 +111,8 @@ export class DatasetService {
     return this.prisma.datasetGrammar
       .create({
         data: {
+          tableName: datasetGrammar.tableName,
+          tableNameExpanded: datasetGrammar.tableNameExpanded,
           name: datasetGrammar.name,
           description: datasetGrammar.description,
           schema: datasetGrammar.schema,
@@ -232,6 +236,8 @@ export class DatasetService {
       };
     }
 
+    datasetGrammar.schema.title = datasetGrammar.tableName;
+
     const createQuery = this.qbService.generateCreateStatement(
       datasetGrammar.schema,
       autoPrimaryKey,
@@ -306,6 +312,7 @@ export class DatasetService {
       data.push({ ...dur.updateParams, ...dur.filterParams });
     }
     // TODO check for FK constraints before insert
+    durs[0].dataset.schema.title = durs[0].dataset.tableName;
     await this.insertBulkDatasetData(durs[0].dataset, data).catch(
       async (error) => {
         console.error('ERROR Inserting Data in Bulk: ', durs[0].dataset.name);
@@ -316,7 +323,6 @@ export class DatasetService {
           return limit(() => this.insertDatasetData(durs[0].dataset, row))
             .then((s) => {
               rowsIngested += 1;
-              console.log('Done', rowsIngested);
             })
             .catch((e) => {
               console.error(

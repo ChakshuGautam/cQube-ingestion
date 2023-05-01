@@ -43,6 +43,8 @@ import {
   cancel,
   text,
 } from '@clack/prompts';
+import { expand } from 'rxjs';
+import { retryPromiseWithDelay } from '../../utils/retry';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const chalk = require('chalk');
 
@@ -561,12 +563,26 @@ export class CsvAdapterService {
                 egfWithoutTD.push(eventGrammarFiles[egfIndex]);
               }
             }
+            const allExistingDGs =
+              await this.datasetService.getCompoundDatasetGrammars();
+            const hashTable = {};
+            for (let i = 0; i < allExistingDGs.length; i++) {
+              // Table Name = program_name_<hash>
+              // Expanded Table Name = program_name_0X0Y0Z0T
+              // Hashtable = {<hash>: 0X0Y0Z0T}
+              const allParts = allExistingDGs[i].tableName.split(_);
+              const allPartsExpanded =
+                allExistingDGs[i].tableNameExpanded.split(_);
+              hashTable[allParts[allParts.length - 1]] =
+                allPartsExpanded[allPartsExpanded.length - 1];
+            }
             const dgsCompoundWithoutTD: DatasetGrammar[] =
               await createCompoundDatasetGrammarsWithoutTimeDimensions(
                 config.programs[j].namespace,
                 compoundDimensionsToBeInEG,
                 dimensions,
                 _.uniq(egfWithoutTD),
+                hashTable,
               );
             datasetGrammarsGlobal.push(...dgsCompoundWithoutTD);
             for (let m = 0; m < dgsCompoundWithoutTD.length; m++) {
@@ -578,6 +594,19 @@ export class CsvAdapterService {
             // console.log({ egfWithTD, egfWithoutTD, dgsCompoundWithoutTD });
 
             for (let l = 0; l < defaultTimeDimensions.length; l++) {
+              const allExistingDGs =
+                await this.datasetService.getCompoundDatasetGrammars();
+              const hashTable = {};
+              for (let i = 0; i < allExistingDGs.length; i++) {
+                // Table Name = program_name_<hash>
+                // Expanded Table Name = program_name_0X0Y0Z0T
+                // Hashtable = {<hash>: 0X0Y0Z0T}
+                const allParts = allExistingDGs[i].tableName.split(_);
+                const allPartsExpanded =
+                  allExistingDGs[i].tableNameExpanded.split(_);
+                hashTable[allParts[allParts.length - 1]] =
+                  allPartsExpanded[allPartsExpanded.length - 1];
+              }
               const dgsCompoundWithTD: DatasetGrammar[] =
                 await createCompoundDatasetGrammars(
                   config.programs[j].namespace,
@@ -585,6 +614,7 @@ export class CsvAdapterService {
                   compoundDimensionsToBeInEG,
                   dimensions,
                   _.uniq(egfWithTD),
+                  hashTable,
                 );
 
               datasetGrammarsGlobal.push(...dgsCompoundWithTD);
@@ -607,6 +637,12 @@ export class CsvAdapterService {
       'datasetGrammars.file',
     );
 
+    // console.log(
+    //   datasetGrammarsGlobal.map((i) => {
+    //     return { name: i.tableName, expanded: i.tableNameExpanded };
+    //   }),
+    // );
+
     //   Ingest DatasetGrammar
     //   -- Generate Datasets using the DimensionGrammar and EventGrammar
     //   -- Insert them into DB
@@ -618,7 +654,9 @@ export class CsvAdapterService {
 
     // Create Empty Dataset Tables
     await Promise.all(
-      datasetGrammarsGlobal.map((x) => this.datasetService.createDataset(x)),
+      datasetGrammarsGlobal.map((x) =>
+        retryPromiseWithDelay(this.datasetService.createDataset(x), 3, 1000),
+      ),
     );
 
     s.stop('✅ 5. Dataset Grammars have been ingested');
