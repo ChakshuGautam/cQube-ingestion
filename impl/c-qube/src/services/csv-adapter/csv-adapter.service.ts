@@ -648,14 +648,18 @@ export class CsvAdapterService {
     //   -- Insert them into DB
     await Promise.all(
       datasetGrammarsGlobal.map((x) =>
-        this.datasetService.createDatasetGrammar(x),
+        retryPromiseWithDelay(
+          this.datasetService.createDatasetGrammar(x),
+          20,
+          5000,
+        ),
       ),
     );
 
     // Create Empty Dataset Tables
     await Promise.all(
       datasetGrammarsGlobal.map((x) =>
-        retryPromiseWithDelay(this.datasetService.createDataset(x), 3, 1000),
+        retryPromiseWithDelay(this.datasetService.createDataset(x), 20, 5000),
       ),
     );
 

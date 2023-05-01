@@ -505,25 +505,31 @@ export const createDatasetDataToBeInserted = async (
   const datasetEvents: cQubeEvent[] = [];
   for (let row = 1; row < df.length - 1; row++) {
     const rowData = df[row];
-    const rowObject = {};
-    rowObject[eventGrammar.instrument_field] = parseInt(rowData[counterIndex]);
-    rowObject[propertyName] = rowData[dimensionIndex];
-    // rowObject[eventGrammars.dimension.dimension.name.name] =
-    // rowData[dimenstionIndex];
-    if (timeDimensionIndex > -1) {
-      if (timeDimension === 'Daily') {
-        rowObject['date'] = getDate(rowData[timeDimensionIndex]);
-      } else if (timeDimension === 'Weekly') {
-        rowObject['week'] = getWeek(rowData[timeDimensionIndex]);
-        rowObject['year'] = getYear(rowData[timeDimensionIndex]);
-      } else if (timeDimension === 'Monthly') {
-        rowObject['month'] = getMonth(rowData[timeDimensionIndex]);
-        rowObject['year'] = getYear(rowData[timeDimensionIndex]);
-      } else if (timeDimension === 'Yearly') {
-        rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+    try {
+      const rowObject = {};
+      rowObject[eventGrammar.instrument_field] = parseInt(
+        rowData[counterIndex],
+      );
+      rowObject[propertyName] = rowData[dimensionIndex];
+      // rowObject[eventGrammars.dimension.dimension.name.name] =
+      // rowData[dimenstionIndex];
+      if (timeDimensionIndex > -1) {
+        if (timeDimension === 'Daily') {
+          rowObject['date'] = getDate(rowData[timeDimensionIndex]);
+        } else if (timeDimension === 'Weekly') {
+          rowObject['week'] = getWeek(rowData[timeDimensionIndex]);
+          rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+        } else if (timeDimension === 'Monthly') {
+          rowObject['month'] = getMonth(rowData[timeDimensionIndex]);
+          rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+        } else if (timeDimension === 'Yearly') {
+          rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+        }
       }
+      datasetEvents.push({ data: rowObject, spec: eventGrammar });
+    } catch (e) {
+      console.error('Wrong datapoint', rowData, filePath);
     }
-    datasetEvents.push({ data: rowObject, spec: eventGrammar });
   }
   return datasetEvents;
 
@@ -576,27 +582,33 @@ export const createCompoundDatasetDataToBeInserted = async (
 
   for (let row = 1; row < df.length - 1; row++) {
     const rowData = df[row];
-    const rowObject = {};
-    rowObject[eventGrammar.instrument_field] = parseInt(rowData[counterIndex]);
-    for (const property in properties) {
-      // TODO: Fix this hack
-      const dimensionIndex = getIndexForHeader(headers, property);
-      rowObject[property] = rowData[dimensionIndex];
-    }
-    if (datasetGrammar.timeDimension) {
-      if (datasetGrammar.timeDimension.type === 'Daily') {
-        rowObject['date'] = getDate(rowData[timeDimensionIndex]);
-      } else if (datasetGrammar.timeDimension.type === 'Weekly') {
-        rowObject['week'] = getWeek(rowData[timeDimensionIndex]);
-        rowObject['year'] = getYear(rowData[timeDimensionIndex]);
-      } else if (datasetGrammar.timeDimension.type === 'Monthly') {
-        rowObject['month'] = getMonth(rowData[timeDimensionIndex]);
-        rowObject['year'] = getYear(rowData[timeDimensionIndex]);
-      } else if (datasetGrammar.timeDimension.type === 'Yearly') {
-        rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+    try {
+      const rowObject = {};
+      rowObject[eventGrammar.instrument_field] = parseInt(
+        rowData[counterIndex],
+      );
+      for (const property in properties) {
+        // TODO: Fix this hack
+        const dimensionIndex = getIndexForHeader(headers, property);
+        rowObject[property] = rowData[dimensionIndex];
       }
+      if (datasetGrammar.timeDimension) {
+        if (datasetGrammar.timeDimension.type === 'Daily') {
+          rowObject['date'] = getDate(rowData[timeDimensionIndex]);
+        } else if (datasetGrammar.timeDimension.type === 'Weekly') {
+          rowObject['week'] = getWeek(rowData[timeDimensionIndex]);
+          rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+        } else if (datasetGrammar.timeDimension.type === 'Monthly') {
+          rowObject['month'] = getMonth(rowData[timeDimensionIndex]);
+          rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+        } else if (datasetGrammar.timeDimension.type === 'Yearly') {
+          rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+        }
+      }
+      datasetEvents.push({ data: rowObject, spec: eventGrammar });
+    } catch (e) {
+      console.error('Wrong datapoint', rowData, eventFilePath);
     }
-    datasetEvents.push({ data: rowObject, spec: eventGrammar });
   }
   return datasetEvents;
 
@@ -703,7 +715,6 @@ export const createCompoundDatasetGrammars = async (
     };
     datasetGrammars.push(dataserGrammar);
   }
-  console.log({ datasetGrammars });
   return datasetGrammars;
 };
 
