@@ -318,6 +318,67 @@ export class CsvAdapterService {
     });
   }
 
+  async validateEventDataWithGrammar(
+    grammarFilePath: string,
+    eventFilePath: string,
+  ) {
+    // read csvPath and get first row using file-reader
+    const eventGrammarContent = await fs.readFile(grammarFilePath, 'utf-8');
+    const rowHeaders: string = eventGrammarContent.split('\n')[3].trim();
+    const colDataTypes: ReadonlyArray<string> = eventGrammarContent
+      .split('\n')[2]
+      .trim()
+      .split(',');
+
+    const eventDataContent = await fs.readFile(eventFilePath, 'utf-8');
+    const allRows = eventDataContent.split('\n');
+    const headers = allRows[0].trim();
+
+    // check if we have a empty last line
+    if (allRows[allRows.length - 1].trim() === '') allRows.pop();
+
+    if (rowHeaders !== headers) {
+      throw new Error('Row Headers do not match');
+    }
+
+    const nonStringDataTypeIdxs = [];
+    for (let i = 0; i < colDataTypes.length; i++) {
+      if (colDataTypes[i] !== 'string') nonStringDataTypeIdxs.push(i);
+    }
+
+    const rows = allRows.slice(1).map((row: string) => row.trim().split(','));
+
+    const toValidate = [];
+    toValidate.fill([], 0, nonStringDataTypeIdxs.length);
+    rows.forEach((row: ReadonlyArray<string>) => {
+      for (let i = 0; i < nonStringDataTypeIdxs.length; i++) {
+        if (!toValidate[i]) toValidate[i] = [row[nonStringDataTypeIdxs[i]]];
+        else toValidate[i].push(row[nonStringDataTypeIdxs[i]]);
+      }
+    });
+
+    // validate data
+
+    for (let i = 0; i < toValidate.length; i++) {
+      const col = toValidate[i];
+      const colDataType = colDataTypes[nonStringDataTypeIdxs[i]];
+      switch (colDataType) {
+        case 'date':
+          col.forEach((dateString: string) => {
+            const date = new Date(dateString);
+            if (date.toString() === 'Invalid Date')
+              throw new Error('Invalid Data');
+          });
+          break;
+        case 'integer':
+          col.forEach((numString: string) => {
+            if (isNaN(parseFloat(numString))) throw new Error('Invalid Data');
+          });
+          break;
+      }
+    }
+  }
+
   public async ingest(
     ingestionFolder = './ingest',
     ingestConfigFileName = 'config.json',

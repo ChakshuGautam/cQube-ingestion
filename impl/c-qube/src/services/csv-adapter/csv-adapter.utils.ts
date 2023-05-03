@@ -335,7 +335,7 @@ export const getPropertyforDatasetGrammarFromEG = async (
     if (
       eventGrammarDef[i].fieldType === FieldType.dimension &&
       eventGrammarDef[i].dimensionName ===
-        eventGrammar.dimension[0].dimension.name.name
+      eventGrammar.dimension[0].dimension.name.name
     ) {
       propertyName = eventGrammarDef[i].fieldName;
     }
@@ -435,7 +435,7 @@ export const getWeek = (date): number => {
   return Math.ceil(
     (dateObject.getTime() -
       new Date(dateObject.getFullYear(), 0, 1).getTime()) /
-      (1000 * 60 * 60 * 24 * 7),
+    (1000 * 60 * 60 * 24 * 7),
   );
 };
 
@@ -635,9 +635,8 @@ export const createCompoundDatasetGrammars = async (
     } = await getEGDefFromFile(eventGrammarFile);
     const dimensionMapping: DimensionMapping[] = [];
     const properties: Record<string, Record<string, string>> = {};
-    const prefix = `${namespace}_${
-      eventGrammarFile.split('/').pop().split('.')[0].split('-')[0]
-    }`;
+    const prefix = `${namespace}_${eventGrammarFile.split('/').pop().split('.')[0].split('-')[0]
+      }`;
     const name = `${prefix}_${defaultTimeDimension}_${compoundDimension.join(
       '0',
     )}`;
@@ -735,9 +734,8 @@ export const createCompoundDatasetGrammarsWithoutTimeDimensions = async (
     } = await getEGDefFromFile(eventGrammarFile);
     const dimensionMapping: DimensionMapping[] = [];
     const properties: Record<string, Record<string, string>> = {};
-    const prefix = `${namespace}_${
-      eventGrammarFile.split('/').pop().split('.')[0].split('-')[0]
-    }`;
+    const prefix = `${namespace}_${eventGrammarFile.split('/').pop().split('.')[0].split('-')[0]
+      }`;
     const name = `${prefix}_${compoundDimension.join('0')}`;
     for (const dimension of compoundDimension) {
       for (const egd of eventGrammarDef) {
