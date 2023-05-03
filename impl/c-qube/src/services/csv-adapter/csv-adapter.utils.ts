@@ -17,6 +17,7 @@ const pl = require('nodejs-polars');
 const readline = require('readline');
 
 import * as csv from 'csv-parser';
+import { hash, unhash } from '../../utils/hash';
 
 const fs1 = require('fs');
 
@@ -292,6 +293,8 @@ export const createSingleDatasetGrammarsFromEGWithoutTimeDimension = async (
   const datasetGrammar: DatasetGrammar = {
     // content_subject_daily_total_interactions
     name,
+    tableName: name,
+    tableNameExpanded: name,
     description: '',
     program: folderName,
     eventGrammarFile: eventGrammar.file,
@@ -382,6 +385,8 @@ export const createSingleDatasetGrammarsFromEG = async (
     // content_subject_daily_total_interactions
     name,
     description: '',
+    tableName: name,
+    tableNameExpanded: name,
     isCompound: false,
     program: folderName,
     eventGrammarFile: eventGrammar.file || eventGrammarFile,
@@ -500,25 +505,31 @@ export const createDatasetDataToBeInserted = async (
   const datasetEvents: cQubeEvent[] = [];
   for (let row = 1; row < df.length - 1; row++) {
     const rowData = df[row];
-    const rowObject = {};
-    rowObject[eventGrammar.instrument_field] = parseInt(rowData[counterIndex]);
-    rowObject[propertyName] = rowData[dimensionIndex];
-    // rowObject[eventGrammars.dimension.dimension.name.name] =
-    // rowData[dimenstionIndex];
-    if (timeDimensionIndex > -1) {
-      if (timeDimension === 'Daily') {
-        rowObject['date'] = getDate(rowData[timeDimensionIndex]);
-      } else if (timeDimension === 'Weekly') {
-        rowObject['week'] = getWeek(rowData[timeDimensionIndex]);
-        rowObject['year'] = getYear(rowData[timeDimensionIndex]);
-      } else if (timeDimension === 'Monthly') {
-        rowObject['month'] = getMonth(rowData[timeDimensionIndex]);
-        rowObject['year'] = getYear(rowData[timeDimensionIndex]);
-      } else if (timeDimension === 'Yearly') {
-        rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+    try {
+      const rowObject = {};
+      rowObject[eventGrammar.instrument_field] = parseInt(
+        rowData[counterIndex],
+      );
+      rowObject[propertyName] = rowData[dimensionIndex];
+      // rowObject[eventGrammars.dimension.dimension.name.name] =
+      // rowData[dimenstionIndex];
+      if (timeDimensionIndex > -1) {
+        if (timeDimension === 'Daily') {
+          rowObject['date'] = getDate(rowData[timeDimensionIndex]);
+        } else if (timeDimension === 'Weekly') {
+          rowObject['week'] = getWeek(rowData[timeDimensionIndex]);
+          rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+        } else if (timeDimension === 'Monthly') {
+          rowObject['month'] = getMonth(rowData[timeDimensionIndex]);
+          rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+        } else if (timeDimension === 'Yearly') {
+          rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+        }
       }
+      datasetEvents.push({ data: rowObject, spec: eventGrammar });
+    } catch (e) {
+      console.error('Wrong datapoint', rowData, filePath);
     }
-    datasetEvents.push({ data: rowObject, spec: eventGrammar });
   }
   return datasetEvents;
 
@@ -571,27 +582,33 @@ export const createCompoundDatasetDataToBeInserted = async (
 
   for (let row = 1; row < df.length - 1; row++) {
     const rowData = df[row];
-    const rowObject = {};
-    rowObject[eventGrammar.instrument_field] = parseInt(rowData[counterIndex]);
-    for (const property in properties) {
-      // TODO: Fix this hack
-      const dimensionIndex = getIndexForHeader(headers, property);
-      rowObject[property] = rowData[dimensionIndex];
-    }
-    if (datasetGrammar.timeDimension) {
-      if (datasetGrammar.timeDimension.type === 'Daily') {
-        rowObject['date'] = getDate(rowData[timeDimensionIndex]);
-      } else if (datasetGrammar.timeDimension.type === 'Weekly') {
-        rowObject['week'] = getWeek(rowData[timeDimensionIndex]);
-        rowObject['year'] = getYear(rowData[timeDimensionIndex]);
-      } else if (datasetGrammar.timeDimension.type === 'Monthly') {
-        rowObject['month'] = getMonth(rowData[timeDimensionIndex]);
-        rowObject['year'] = getYear(rowData[timeDimensionIndex]);
-      } else if (datasetGrammar.timeDimension.type === 'Yearly') {
-        rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+    try {
+      const rowObject = {};
+      rowObject[eventGrammar.instrument_field] = parseInt(
+        rowData[counterIndex],
+      );
+      for (const property in properties) {
+        // TODO: Fix this hack
+        const dimensionIndex = getIndexForHeader(headers, property);
+        rowObject[property] = rowData[dimensionIndex];
       }
+      if (datasetGrammar.timeDimension) {
+        if (datasetGrammar.timeDimension.type === 'Daily') {
+          rowObject['date'] = getDate(rowData[timeDimensionIndex]);
+        } else if (datasetGrammar.timeDimension.type === 'Weekly') {
+          rowObject['week'] = getWeek(rowData[timeDimensionIndex]);
+          rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+        } else if (datasetGrammar.timeDimension.type === 'Monthly') {
+          rowObject['month'] = getMonth(rowData[timeDimensionIndex]);
+          rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+        } else if (datasetGrammar.timeDimension.type === 'Yearly') {
+          rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+        }
+      }
+      datasetEvents.push({ data: rowObject, spec: eventGrammar });
+    } catch (e) {
+      console.error('Wrong datapoint', rowData, eventFilePath);
     }
-    datasetEvents.push({ data: rowObject, spec: eventGrammar });
   }
   return datasetEvents;
 
@@ -606,6 +623,7 @@ export const createCompoundDatasetGrammars = async (
   compoundDimension: string[],
   allDimensionGrammars: DimensionGrammar[],
   eventGrammarFiles: string[],
+  hashTable,
 ): Promise<DatasetGrammar[]> => {
   const datasetGrammars: DatasetGrammar[] = [];
   for (const eventGrammarFile of eventGrammarFiles) {
@@ -617,9 +635,14 @@ export const createCompoundDatasetGrammars = async (
     } = await getEGDefFromFile(eventGrammarFile);
     const dimensionMapping: DimensionMapping[] = [];
     const properties: Record<string, Record<string, string>> = {};
-    const name = `${namespace}_${
+    const prefix = `${namespace}_${
       eventGrammarFile.split('/').pop().split('.')[0].split('-')[0]
-    }_${defaultTimeDimension}_${compoundDimension.join('0')}`;
+    }`;
+    const name = `${prefix}_${defaultTimeDimension}_${compoundDimension.join(
+      '0',
+    )}`;
+    // TODO - Create a table called datasetTableName
+    // Columns - table_name_expanded, table_name_hash, meta
     for (const dimension of compoundDimension) {
       for (const egd of eventGrammarDef) {
         if (egd.dimensionName === dimension) {
@@ -671,6 +694,8 @@ export const createCompoundDatasetGrammars = async (
     const dataserGrammar: DatasetGrammar = {
       // content_subject_daily_total_interactions
       name,
+      tableName: `${prefix}_${hash(name, 'key', hashTable)}`,
+      tableNameExpanded: name,
       isCompound: true,
       program: namespace,
       eventGrammarFile,
@@ -698,6 +723,7 @@ export const createCompoundDatasetGrammarsWithoutTimeDimensions = async (
   compoundDimension: string[],
   allDimensionGrammars: DimensionGrammar[],
   eventGrammarFiles: string[],
+  hashTable,
 ): Promise<DatasetGrammar[]> => {
   const datasetGrammars: DatasetGrammar[] = [];
   for (const eventGrammarFile of eventGrammarFiles) {
@@ -709,9 +735,10 @@ export const createCompoundDatasetGrammarsWithoutTimeDimensions = async (
     } = await getEGDefFromFile(eventGrammarFile);
     const dimensionMapping: DimensionMapping[] = [];
     const properties: Record<string, Record<string, string>> = {};
-    const name = `${namespace}_${
+    const prefix = `${namespace}_${
       eventGrammarFile.split('/').pop().split('.')[0].split('-')[0]
-    }_${compoundDimension.join('0')}`;
+    }`;
+    const name = `${prefix}_${compoundDimension.join('0')}`;
     for (const dimension of compoundDimension) {
       for (const egd of eventGrammarDef) {
         if (egd.dimensionName === dimension) {
@@ -741,6 +768,8 @@ export const createCompoundDatasetGrammarsWithoutTimeDimensions = async (
     const datasetGrammar: DatasetGrammar = {
       // content_subject_daily_total_interactions
       name,
+      tableName: `${prefix}_${hash(name, 'key', hashTable)}`,
+      tableNameExpanded: name,
       isCompound: true,
       program: namespace,
       eventGrammarFile: eventGrammarFile,
@@ -756,6 +785,7 @@ export const createCompoundDatasetGrammarsWithoutTimeDimensions = async (
     };
     datasetGrammars.push(datasetGrammar);
   }
+  console.log({ datasetGrammars });
   return datasetGrammars;
 };
 
@@ -767,6 +797,7 @@ function getDGDefsFromEGDefs(eventGrammarDef: EventGrammarCSVFormat[]) {
 
 export async function getEGDefFromFile(csvFilePath: string) {
   console.log(csvFilePath);
+  // TODO: removeEmptyLines; Caused an issue when ingesting data with first line as blank.
   const fileContent = await fs.readFile(csvFilePath, 'utf-8');
   const row1 = fileContent.split('\n')[0].trim();
   const row2 = fileContent.split('\n')[1].trim();
@@ -806,6 +837,7 @@ export async function isTimeDimensionPresent(csvFilePath: string) {
     instrumentField: string;
   } = await getEGDefFromFile(csvFilePath);
 
+  //TODO Fix this - assumes the first column to be date.
   for (let i = 0; i < eventGrammarDef.length; i++) {
     if (eventGrammarDef[i].fieldType === 'timeDimension') {
       return true;
@@ -875,4 +907,30 @@ async function processCsv(input, output) {
 
 async function processSleep(time) {
   return new Promise((resolve) => setTimeout(resolve, time));
+}
+
+function removeEmptyLines(filePath) {
+  // Read the file contents
+  fs.readFile(filePath, 'utf-8', (err, data) => {
+    if (err) {
+      console.error('Error reading file:', err);
+      return;
+    }
+
+    // Split the file contents into lines and filter out empty lines
+    const lines = data.split('\n');
+    const nonEmptyLines = lines.filter((line) => line.trim() !== '');
+
+    // Join the non-empty lines back together
+    const filteredContents = nonEmptyLines.join('\n');
+
+    // Write the filtered contents back to the file
+    fs.writeFile(filePath, filteredContents, (err) => {
+      if (err) {
+        console.error('Error writing file:', err);
+      } else {
+        console.log('Empty lines removed successfully');
+      }
+    });
+  });
 }

@@ -8,6 +8,7 @@ import {
 import {
   DatasetGrammar as DatasetGrammarModel,
   EventGrammar as EventGrammarModel,
+  PrismaClient,
 } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
 import { QueryBuilderService } from '../query-builder/query-builder.service';
@@ -17,10 +18,19 @@ import { EventGrammar } from 'src/types/event';
 import { retryPromiseWithDelay } from '../../utils/retry';
 
 const pLimit = require('p-limit');
-const limit = pLimit(20);
+const limit = pLimit(40);
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs');
+
+type InsertionError = {
+  error: string;
+  data: any;
+};
+
+export type DatasetGrammarFilter = {
+  wildcard?: string;
+};
 
 @Injectable()
 export class DatasetService {
@@ -80,6 +90,8 @@ export class DatasetService {
     }
     return {
       name: model.name,
+      tableName: model.tableName,
+      tableNameExpanded: model.tableNameExpanded,
       description: model.description,
       timeDimension: JSON.parse(model.timeDimension as string) as TimeDimension,
       dimensions: JSON.parse(model.dimensions as string) as DimensionMapping[],
@@ -111,6 +123,8 @@ export class DatasetService {
     return this.prisma.datasetGrammar
       .create({
         data: {
+          tableName: datasetGrammar.tableName,
+          tableNameExpanded: datasetGrammar.tableNameExpanded,
           name: datasetGrammar.name,
           description: datasetGrammar.description,
           schema: datasetGrammar.schema,
@@ -166,12 +180,18 @@ export class DatasetService {
       );
   }
 
-  async getCompoundDatasetGrammars(): Promise<DatasetGrammar[]> {
+  async getCompoundDatasetGrammars(filter: any): Promise<DatasetGrammar[]> {
+    const prismaFilters = {
+      isCompound: true,
+    };
+    if (filter?.name !== undefined) {
+      prismaFilters['name'] = {
+        contains: filter.name,
+      };
+    }
     return this.prisma.datasetGrammar
       .findMany({
-        where: {
-          isCompound: true,
-        },
+        where: prismaFilters,
       })
       .then(
         async (models: DatasetGrammarModel[]): Promise<DatasetGrammar[]> => {
@@ -183,12 +203,18 @@ export class DatasetService {
       );
   }
 
-  async getNonCompoundDatasetGrammars(): Promise<DatasetGrammar[]> {
+  async getNonCompoundDatasetGrammars(filter: any): Promise<DatasetGrammar[]> {
+    const prismaFilters = {
+      isCompound: false,
+    };
+    if (filter?.name !== undefined) {
+      prismaFilters['name'] = {
+        contains: filter.name,
+      };
+    }
     return this.prisma.datasetGrammar
       .findMany({
-        where: {
-          isCompound: false,
-        },
+        where: prismaFilters,
       })
       .then(
         async (models: DatasetGrammarModel[]): Promise<DatasetGrammar[]> => {
@@ -233,6 +259,8 @@ export class DatasetService {
         ...this.counterAggregates(),
       };
     }
+
+    datasetGrammar.schema.title = datasetGrammar.tableName;
 
     const createQuery = this.qbService.generateCreateStatement(
       datasetGrammar.schema,
@@ -308,50 +336,34 @@ export class DatasetService {
       data.push({ ...dur.updateParams, ...dur.filterParams });
     }
     // TODO check for FK constraints before insert
-    await retryPromiseWithDelay(
-      this.insertBulkDatasetData(durs[0].dataset, data),
-      3,
-      1000,
-    ).catch(async (error) => {
-      console.error('ERROR Inserting Data in Bulk: ', durs[0].dataset.name);
-      console.error('Trying them 1 by 1');
-      // start ingesting one by one and print row if cannot be ingested
-      let rowsIngested = 0;
-      const failedRows = [];
-      const promises = data.map((row) => {
-        return limit(() =>
-          retryPromiseWithDelay(
-            this.insertDatasetData(durs[0].dataset, row),
-            3,
-            1000,
-          ),
-        )
-          .then((s) => {
-            rowsIngested += 1;
-            console.log('Done', rowsIngested);
-          })
-          .catch((e) => {
-            console.error(
-              `Could not insert data due to FK constraint ${durs[0].dataset.name}`,
-              row,
-            );
-            failedRows.push(row);
-          });
-      });
-      const result = await Promise.all(promises);
-      console.error(result.length, 'rows inserted');
-      console.log('failedRows', failedRows);
-      if (failedRows.length > 0) {
-        const header = Object.keys(failedRows[0]).join(',') + '\n';
-        const rows = failedRows
-          .map((obj) => Object.values(obj).join(',') + '\n')
-          .join('');
-        const csv = header + rows;
-        console.log('csv: ', csv);
-        // TODO: write to file in output folder
-        // fs.writeFileSync()
-      }
-    });
+    durs[0].dataset.schema.title = durs[0].dataset.tableName;
+    await this.insertBulkDatasetData(durs[0].dataset, data).catch(
+      async (error) => {
+        console.error('ERROR Inserting Data in Bulk: ', durs[0].dataset.name);
+        console.error('Trying them 1 by 1');
+        // start ingesting one by one and print row if cannot be ingested
+        let rowsIngested = 0;
+        const errors: InsertionError[] = [];
+        const promises = data.map((row) => {
+          return limit(() => this.insertDatasetData(durs[0].dataset, row))
+            .then((s) => {
+              rowsIngested += 1;
+            })
+            .catch((e) => {
+              errors.push({
+                error: e.message,
+                data: row,
+              });
+            });
+        });
+        await Promise.all(promises);
+        fs.writeFileSync(
+          `./logs/log-${Date.now()}.json`,
+          JSON.stringify({ errors }),
+        );
+        console.error(rowsIngested, 'rows inserted');
+      },
+    );
   }
   addNonTimeDimension(dimension: DimensionMapping): {
     [k: string]: any;
