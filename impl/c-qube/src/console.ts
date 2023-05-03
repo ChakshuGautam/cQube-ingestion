@@ -79,10 +79,10 @@ async function bootstrap() {
         intro(`Starting Data Ingestion Process`);
         const ingestionFolder = './ingest';
         const ingestConfigFileName = 'config.json';
-        // await csvAdapterService.ingestData({}); //Ingest all datasets
-        await csvAdapterService.ingestData({
-          name: 'infra', //ingest ones with the word "infra" in the name
-        });
+        await csvAdapterService.ingestData({}); //Ingest all datasets
+        // await csvAdapterService.ingestData({
+        //   name: 'infra', //ingest ones with the word "infra" in the name
+        // });
         outro(`You're all set!`);
         await application.close();
         process.exit(0);
@@ -104,10 +104,7 @@ async function bootstrap() {
         const ingestionFolder = './test/fixtures/ingestionConfigs';
         const ingestConfigFileName = 'config.test.json';
         await csvAdapterService.ingest(ingestionFolder, ingestConfigFileName);
-        await csvAdapterService.ingestData(
-          ingestionFolder,
-          ingestConfigFileName,
-        );
+        await csvAdapterService.ingestData({});
         outro(`You're all set!`);
         await application.close();
         process.exit(0);
