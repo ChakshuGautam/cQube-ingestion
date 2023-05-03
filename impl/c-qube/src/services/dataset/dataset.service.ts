@@ -15,10 +15,15 @@ import { logToFile } from '../../utils/debug';
 import { EventService } from '../event/event.service';
 import { EventGrammar } from 'src/types/event';
 const pLimit = require('p-limit');
-const limit = pLimit(20);
+const limit = pLimit(40);
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs');
+
+type InsertionError = {
+  error: string;
+  data: any;
+};
 
 @Injectable()
 export class DatasetService {
@@ -319,20 +324,21 @@ export class DatasetService {
         console.error('Trying them 1 by 1');
         // start ingesting one by one and print row if cannot be ingested
         let rowsIngested = 0;
+        const errors: InsertionError[] = [];
         const promises = data.map((row) => {
           return limit(() => this.insertDatasetData(durs[0].dataset, row))
             .then((s) => {
               rowsIngested += 1;
             })
             .catch((e) => {
-              console.error(
-                `Could not insert data due to FK constraint ${durs[0].dataset.name}`,
-                row,
-              );
+              errors.push({
+                error: e.message,
+                data: row,
+              });
             });
         });
         const result = await Promise.all(promises);
-        console.error(result.length, 'rows inserted');
+        console.error(rowsIngested, 'rows inserted');
       },
     );
   }

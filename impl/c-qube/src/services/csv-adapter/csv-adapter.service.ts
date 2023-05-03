@@ -720,16 +720,22 @@ export class CsvAdapterService {
       };
 
       try {
-        const datasetUpdateRequest: DatasetUpdateRequest[] =
-          pipe.transformer.transformSync(
-            callback,
-            transformContext,
-            events,
-          ) as DatasetUpdateRequest[];
-        // console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
-        await this.datasetService.processDatasetUpdateRequest(
-          datasetUpdateRequest,
-        );
+        if (events.length > 0) {
+          const datasetUpdateRequest: DatasetUpdateRequest[] =
+            pipe.transformer.transformSync(
+              callback,
+              transformContext,
+              events,
+            ) as DatasetUpdateRequest[];
+          // console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
+          if (datasetUpdateRequest.length > 0) {
+            await this.datasetService.processDatasetUpdateRequest(
+              datasetUpdateRequest,
+            );
+          } else {
+            // No events
+          }
+        }
       } catch (e) {
         console.error(e);
       }
@@ -846,17 +852,24 @@ export class CsvAdapterService {
         pipeContext: {},
       };
 
-      const datasetUpdateRequest: DatasetUpdateRequest[] =
-        pipe.transformer.transformSync(
-          callback,
-          transformContext,
-          events,
-        ) as DatasetUpdateRequest[];
+      if (events.length > 0) {
+        const datasetUpdateRequest: DatasetUpdateRequest[] =
+          pipe.transformer.transformSync(
+            callback,
+            transformContext,
+            events,
+          ) as DatasetUpdateRequest[];
 
-      // console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
-      await this.datasetService.processDatasetUpdateRequest(
-        datasetUpdateRequest,
-      );
+        // console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
+        await this.datasetService.processDatasetUpdateRequest(
+          datasetUpdateRequest,
+        );
+      } else {
+        console.error(
+          'No relevant events for this dataset',
+          compoundDatasetGrammars[m].name,
+        );
+      }
     }
     s.stop('🚧 4. Ingest Events');
   }
