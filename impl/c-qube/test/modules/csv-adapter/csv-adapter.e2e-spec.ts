@@ -34,13 +34,6 @@ describe('AppController (e2e)', () => {
     csvAdapterService = app.get<CsvAdapterService>(CsvAdapterService);
   });
 
-
-  // it('validate the grammar and event data', async () => {
-  //   const ingestionFolder = './test/fixtures/ingestionConfigs';
-  //   const ingestionConfigFileName = 'config.test.json';
-  //   await csvAdapterService.ingestData({});
-  // });
-
   it('ingest test data', async () => {
     const ingestionFolder = './test/fixtures/ingestionConfigs';
     const ingestionConfigFileName = 'config.test.json';
@@ -56,6 +49,18 @@ describe('AppController (e2e)', () => {
     console.log('res: ', res);
     expect(res).toMatchObject(smallResponse);
   });
+
+  // it('validate the grammar and event data', async () => {
+  //   const ingestionFolder = './test/fixtures/ingestionConfigs';
+  //   const ingestionConfigFileName = 'config.test.json';
+  //   await csvAdapterService.ingestData({});
+  // });
+
+  // it('validate the grammar and event data', async () => {
+  //   const ingestionFolder = './test/fixtures/ingestionConfigs';
+  //   const ingestionConfigFileName = 'config.test.json';
+  //   await csvAdapterService.ingestData({});
+  // });
 
   // it('sanity check data for single quotes', async () => {
   //   return true;
