@@ -13,14 +13,9 @@ import {
 import { Column, ColumnType } from './csv-adapter.service';
 const fs = require('fs').promises;
 
-const pl = require('nodejs-polars');
-const readline = require('readline');
-
-import * as csv from 'csv-parser';
 import { hash, unhash } from '../../utils/hash';
 import { DateParser } from './csv-parser/dateparser';
-import { promisify } from 'util';
-const fs1 = require('fs');
+import { readCSV } from './csv-parser/csvreader';
 
 export const createDimensionGrammarFromCSVDefinition = async (
   csvFilePath: string,
@@ -416,48 +411,6 @@ export const createSingleDatasetGrammarsFromEG = async (
   return datasetGrammar;
 };
 
-// Parse date in the following format: 02/01/23
-export const getDate = (date): Date => {
-  const splitDate = date.split('/');
-  const day = parseInt(splitDate[0], 10);
-  const month = parseInt(splitDate[1], 10);
-  const year = 2000 + parseInt(splitDate[2], 10);
-  const dateObject = new Date(year, month - 1, day);
-  return dateObject;
-};
-
-// Parse date in the following format: 02/01/23
-export const getWeek = (date): number => {
-  const splitDate = date.split('/');
-  const day = parseInt(splitDate[0], 10);
-  const month = parseInt(splitDate[1], 10);
-  const year = 2000 + parseInt(splitDate[2], 10);
-  const dateObject = new Date(year, month - 1, day);
-  return Math.ceil(
-    (dateObject.getTime() -
-      new Date(dateObject.getFullYear(), 0, 1).getTime()) /
-      (1000 * 60 * 60 * 24 * 7),
-  );
-};
-
-// Parse date in the following format: 02/01/23
-export const getMonth = (date): number => {
-  const splitDate = date.split('/');
-  const day = parseInt(splitDate[0], 10);
-  const month = parseInt(splitDate[1], 10);
-  return month;
-};
-
-// Parse date in the following format: 02/01/23
-export const getYear = (date): number => {
-  const splitDate = date.split('/');
-  const day = parseInt(splitDate[0], 10);
-  const month = parseInt(splitDate[1], 10);
-  const year = 2000 + parseInt(splitDate[2], 10);
-  const dateObject = new Date(year, month - 1, day);
-  return dateObject.getFullYear();
-};
-
 export const createDatasetDataToBeInserted = async (
   timeDimension: string,
   datasetGrammar: DatasetGrammar,
@@ -472,17 +425,7 @@ export const createDatasetDataToBeInserted = async (
     .filter((k) => k !== 'date')[0];
 
   const filePath = eventGrammar.file.replace('grammar', 'data');
-  // const df: DataFrame = pl.readCSV(filePath);
-  // let dfModified: DataFrame;
 
-  // const fileContent = await fs.readFile(filePath, 'utf-8');
-  // const lines = fileContent.split('\n');
-  // const df = [];
-  // for (let i = 0; i < lines.length; i++) {
-  //   df.push(lines[i].split(',').map((value) => value.trim()));
-  // }
-
-  // await processCsv(filePath, filePath.split('.csv')[0] + '_temp.csv');
   const df = await readCSV(filePath);
   const getIndexForHeader = (headers: string[], header: string): number => {
     return headers.indexOf(header);
@@ -520,20 +463,14 @@ export const createDatasetDataToBeInserted = async (
         const date = dateParser.parseDate(rowData[timeDimensionIndex]);
         if (timeDimension === 'Daily') {
           rowObject['date'] = date;
-          // rowObject['date'] = getDate(rowData[timeDimensionIndex]);
         } else if (timeDimension === 'Weekly') {
           rowObject['week'] = DateParser.getWeek(date);
           rowObject['year'] = DateParser.getYear(date);
-          // rowObject['week'] = getWeek(rowData[timeDimensionIndex]);
-          // rowObject['year'] = getYear(rowData[timeDimensionIndex]);
         } else if (timeDimension === 'Monthly') {
           rowObject['month'] = DateParser.getMonth(date);
           rowObject['year'] = DateParser.getYear(date);
-          // rowObject['month'] = getMonth(rowData[timeDimensionIndex]);
-          // rowObject['year'] = getYear(rowData[timeDimensionIndex]);
         } else if (timeDimension === 'Yearly') {
           rowObject['year'] = DateParser.getYear(date);
-          // rowObject['year'] = getYear(rowData[timeDimensionIndex]);
         }
       }
       datasetEvents.push({ data: rowObject, spec: eventGrammar });
@@ -562,14 +499,6 @@ export const createCompoundDatasetDataToBeInserted = async (
   delete properties.count;
   delete properties.year;
 
-  // const fileContent = await fs.readFile(eventFilePath, 'utf-8');
-  // const lines = fileContent.split('\n');
-  // const df = [];
-  // for (let i = 0; i < lines.length; i++) {
-  //   df.push(lines[i].split(',').map((value) => value.trim()));
-  // }
-
-  // await processCsv(eventFilePath, eventFilePath.split('.csv')[0] + '_temp.csv');
   const df = await readCSV(eventFilePath);
 
   const getIndexForHeader = (headers: string[], header: string): number => {
@@ -607,20 +536,14 @@ export const createCompoundDatasetDataToBeInserted = async (
         const date = dateParser.parseDate(rowData[timeDimensionIndex]);
         if (datasetGrammar.timeDimension.type === 'Daily') {
           rowObject['date'] = date;
-          // rowObject['date'] = getDate(rowData[timeDimensionIndex]);
         } else if (datasetGrammar.timeDimension.type === 'Weekly') {
           rowObject['week'] = DateParser.getWeek(date);
           rowObject['year'] = DateParser.getYear(date);
-          // rowObject['week'] = getWeek(rowData[timeDimensionIndex]);
-          // rowObject['year'] = getYear(rowData[timeDimensionIndex]);
         } else if (datasetGrammar.timeDimension.type === 'Monthly') {
           rowObject['month'] = DateParser.getMonth(date);
           rowObject['year'] = DateParser.getYear(date);
-          // rowObject['month'] = getMonth(rowData[timeDimensionIndex]);
-          // rowObject['year'] = getYear(rowData[timeDimensionIndex]);
         } else if (datasetGrammar.timeDimension.type === 'Yearly') {
           rowObject['year'] = DateParser.getYear(date);
-          rowObject['year'] = getYear(rowData[timeDimensionIndex]);
         }
       }
       datasetEvents.push({ data: rowObject, spec: eventGrammar });
@@ -803,7 +726,6 @@ export const createCompoundDatasetGrammarsWithoutTimeDimensions = async (
     };
     datasetGrammars.push(datasetGrammar);
   }
-  console.log({ datasetGrammars });
   return datasetGrammars;
 };
 
@@ -814,7 +736,6 @@ function getDGDefsFromEGDefs(eventGrammarDef: EventGrammarCSVFormat[]) {
 }
 
 export async function getEGDefFromFile(csvFilePath: string) {
-  console.log(csvFilePath);
   // TODO: removeEmptyLines; Caused an issue when ingesting data with first line as blank.
   const fileContent = await fs.readFile(csvFilePath, 'utf-8');
   const row1 = fileContent.split('\n')[0].trim();
@@ -862,88 +783,5 @@ export async function isTimeDimensionPresent(csvFilePath: string) {
     } else {
       return false;
     }
-  }
-}
-
-async function readCSV(filePath: string): Promise<string[][]> {
-  return new Promise((resolve, reject) => {
-    const rows: string[][] = [];
-
-    fs1
-      .createReadStream(filePath)
-      .pipe(csv({ separator: ',', headers: false, quote: "'" }))
-      .on('data', (data) => {
-        rows.push(Object.values(data));
-      })
-      .on('end', () => {
-        resolve(rows);
-      })
-      .on('error', (error) => {
-        reject(error);
-      });
-  });
-}
-
-export async function processCsv(input, output) {
-  return new Promise((resolve, reject) => {
-    if (fs1.existsSync(output)) {
-      fs1.unlinkSync(output);
-    }
-    const readStream = fs1.createReadStream(input);
-    const writeStream = fs1.createWriteStream(output);
-    const file = readline.createInterface({
-      input: readStream,
-      output: process.stdout,
-      terminal: false,
-    });
-    file.on('line', (line) => {
-      let newline = '';
-      for (const letter in line) {
-        if (line[letter] == '"') {
-          continue;
-        } else {
-          newline = newline + line[letter];
-        }
-      }
-      writeStream.write(newline + '\r\n');
-    });
-    file.on('close', async () => {
-      await fs1.unlinkSync(input);
-      await processSleep(200);
-      readStream.close();
-      writeStream.end();
-      writeStream.on('finish', async () => {
-        await fs1.renameSync(output, input);
-        resolve(output);
-      });
-    });
-    file.on('error', (err) => {
-      reject(err);
-    });
-  });
-}
-
-async function processSleep(time) {
-  return new Promise((resolve) => setTimeout(resolve, time));
-}
-
-export async function removeEmptyLines(filePath: string): Promise<void> {
-  const readFileAsync = promisify(fs1.readFile);
-  const writeFileAsync = promisify(fs1.writeFile);
-  try {
-    // Read the file contents
-    const data = await readFileAsync(filePath, 'utf-8');
-
-    // Split the file contents into lines and filter out empty lines
-    const lines = data.split('\n');
-    const nonEmptyLines = lines.filter((line) => line.trim() !== '');
-
-    // Join the non-empty lines back together
-    const filteredContents = nonEmptyLines.join('\n');
-
-    // Write the filtered contents back to the file
-    await writeFileAsync(filePath, filteredContents);
-  } catch (err) {
-    console.error('Error processing file:', err);
   }
 }

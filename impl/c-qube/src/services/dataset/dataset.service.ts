@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   DatasetGrammar,
   DatasetUpdateRequest,
@@ -16,7 +16,7 @@ import { logToFile } from '../../utils/debug';
 import { EventService } from '../event/event.service';
 import { EventGrammar } from 'src/types/event';
 const pLimit = require('p-limit');
-const limit = pLimit(80);
+const limit = pLimit(10);
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs');
@@ -32,6 +32,7 @@ export type DatasetGrammarFilter = {
 
 @Injectable()
 export class DatasetService {
+  private readonly logger: Logger = new Logger(DatasetService.name);
   constructor(
     public prisma: PrismaService,
     private qbService: QueryBuilderService,
@@ -337,8 +338,9 @@ export class DatasetService {
     durs[0].dataset.schema.title = durs[0].dataset.tableName;
     await this.insertBulkDatasetData(durs[0].dataset, data).catch(
       async (error) => {
-        console.error('ERROR Inserting Data in Bulk: ', durs[0].dataset.name);
-        console.error('Trying them 1 by 1');
+        this.logger.error(
+          `ERROR Inserting Data in Bulk: ${durs[0].dataset.name}. Trying them 1 by 1`,
+        );
         // start ingesting one by one and print row if cannot be ingested
         let rowsIngested = 0;
         const errors: InsertionError[] = [];
@@ -348,7 +350,6 @@ export class DatasetService {
               rowsIngested += 1;
             })
             .catch((e) => {
-              console.error(e);
               errors.push({
                 error: e.message,
                 data: row,
@@ -356,7 +357,7 @@ export class DatasetService {
             });
         });
         const result = await Promise.all(promises);
-        console.error(`${rowsIngested}/${data.length}, rows inserted`);
+        this.logger.error(`${rowsIngested}/${data.length}, rows inserted`);
       },
     );
   }
