@@ -121,8 +121,15 @@ export class QueryBuilderService {
     const properties = schema.properties;
     for (const property in properties) {
       if (propertiesToSkip.includes(property)) continue;
+      if (
+        schema.properties[property].type === 'string' &&
+        schema.properties[property].format === 'date'
+      ) {
+        values.push(`'${data[property].toISOString()}'`);
+      } else {
+        values.push(`'${data[property]}'`);
+      }
       fields.push(property);
-      values.push(`'${data[property]}'`);
     }
 
     const query = `INSERT INTO ${psqlSchema}.${tableName} (${fields.join(

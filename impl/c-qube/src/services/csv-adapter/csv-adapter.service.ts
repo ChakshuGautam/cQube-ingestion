@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Logger, Injectable } from '@nestjs/common';
 import { JSONSchema4 } from 'json-schema';
 import { DataFrame } from 'nodejs-polars';
 import { PrismaService } from '../../prisma.service';
@@ -28,6 +28,7 @@ import {
   EventGrammarCSVFormat,
   getEGDefFromFile,
   isTimeDimensionPresent,
+  removeEmptyLines,
 } from './csv-adapter.utils';
 import { readdirSync } from 'fs';
 import { logToFile } from '../../utils/debug';
@@ -36,8 +37,10 @@ import { retryPromiseWithDelay } from '../../utils/retry';
 import { DatasetGrammar as DatasetGrammarModel } from '@prisma/client';
 const chalk = require('chalk');
 const fs = require('fs').promises;
+const fs1 = require('fs');
 const pl = require('nodejs-polars');
 const _ = require('lodash');
+const path = require('path');
 
 export enum ColumnType {
   string = 'string',
@@ -53,6 +56,7 @@ export type Column = {
 
 @Injectable()
 export class CsvAdapterService {
+  private readonly logger: Logger = new Logger(CsvAdapterService.name);
   constructor(
     public dimensionService: DimensionService,
     public eventService: EventService,
@@ -650,10 +654,35 @@ export class CsvAdapterService {
   }
 
   public async ingestData(filter: any) {
-    const s = spinner();
+    // const s = spinner();
     // s.start('🚧 1. Deleting Old Data');
     // await this.nukeDatasets();
     // s.stop('✅ 1. The Data has been Nuked');
+
+    function getFilesInDirectory(directoryPath, fileList = []) {
+      const files = fs1.readdirSync(directoryPath);
+
+      for (const file of files) {
+        const filePath = path.join(directoryPath, file);
+        const stat = fs1.statSync(filePath);
+
+        if (stat.isDirectory()) {
+          getFilesInDirectory(filePath, fileList);
+        } else {
+          fileList.push(filePath);
+        }
+      }
+      return fileList;
+    }
+
+    // iterate over all *.data.csv files inside programs folder
+    const files = getFilesInDirectory('./ingest/programs');
+    let promises = [];
+    for (let i = 0; i < files.length; i++) {
+      promises.push(removeEmptyLines(files[i]));
+    }
+    await Promise.all(promises);
+    console.log(`Cleaned all files`);
 
     // Insert events into the datasets
     const callback = (
@@ -664,8 +693,8 @@ export class CsvAdapterService {
       //console.debug('callback', err, events.length);
     };
 
-    s.start('🚧 1. Ingest Events');
-
+    // s.start('🚧 1. Ingest Events');
+    promises = [];
     const datasetGrammars: DatasetGrammar[] =
       await this.datasetService.getNonCompoundDatasetGrammars(filter);
 
@@ -700,17 +729,31 @@ export class CsvAdapterService {
             ) as DatasetUpdateRequest[];
           // console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
           if (datasetUpdateRequest.length > 0) {
-            await this.datasetService.processDatasetUpdateRequest(
-              datasetUpdateRequest,
+            promises.push(
+              this.datasetService
+                .processDatasetUpdateRequest(datasetUpdateRequest)
+                .then(() => {
+                  this.logger.verbose(
+                    `Ingested without any error ${events.length} events for ${datasetGrammars[i].name}`,
+                  );
+                })
+                .catch((e) => {
+                  this.logger.verbose(
+                    `Ingested with error ${events.length} events for ${datasetGrammars[i].name}`,
+                  );
+                }),
             );
           } else {
             // No events
+            this.logger.warn(`No events for ${datasetGrammars[i].name}`);
           }
         }
       } catch (e) {
         console.error(e);
       }
     }
+
+    await Promise.all(promises);
 
     const compoundDatasetGrammars: DatasetGrammar[] =
       await this.datasetService.getCompoundDatasetGrammars(filter);
@@ -772,7 +815,7 @@ export class CsvAdapterService {
         );
       }
     }
-    s.stop('🚧 4. Ingest Events');
+    // s.stop('🚧 4. Ingest Events');
   }
 
   public async nuke() {
@@ -811,14 +854,20 @@ export class CsvAdapterService {
 
   public async nukeDatasets() {
     try {
+      const promises = [];
+      this.logger.log('Starting delete');
       const datasets: any[] = await this.prisma
         .$queryRaw`select 'truncate table "' || tablename || '" cascade;'
         from pg_tables where schemaname = 'datasets';`;
+      this.logger.log('step 1 done');
       for (let i = 0; i < datasets.length; i++) {
         const parts = datasets[i]['?column?'].split('"');
         const query = parts[0] + '"datasets"."' + parts[1] + '"' + parts[2];
-        await this.prisma.$executeRawUnsafe(query);
+        promises.push(this.prisma.$executeRawUnsafe(query));
       }
+      await Promise.all(promises).then((results) => {
+        this.logger.log(`step 2 done ${results.length} datasets truncated`);
+      });
     } catch (e) {
       console.error(e);
     }

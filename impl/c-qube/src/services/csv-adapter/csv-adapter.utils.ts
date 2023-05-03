@@ -18,7 +18,8 @@ const readline = require('readline');
 
 import * as csv from 'csv-parser';
 import { hash, unhash } from '../../utils/hash';
-
+import { DateParser } from './csv-parser/dateparser';
+import { promisify } from 'util';
 const fs1 = require('fs');
 
 export const createDimensionGrammarFromCSVDefinition = async (
@@ -502,6 +503,8 @@ export const createDatasetDataToBeInserted = async (
     eventGrammar.instrument_field,
   );
 
+  const dateParser = new DateParser('dd/MM/yy');
+
   const datasetEvents: cQubeEvent[] = [];
   for (let row = 1; row < df.length - 1; row++) {
     const rowData = df[row];
@@ -514,16 +517,23 @@ export const createDatasetDataToBeInserted = async (
       // rowObject[eventGrammars.dimension.dimension.name.name] =
       // rowData[dimenstionIndex];
       if (timeDimensionIndex > -1) {
+        const date = dateParser.parseDate(rowData[timeDimensionIndex]);
         if (timeDimension === 'Daily') {
-          rowObject['date'] = getDate(rowData[timeDimensionIndex]);
+          rowObject['date'] = date;
+          // rowObject['date'] = getDate(rowData[timeDimensionIndex]);
         } else if (timeDimension === 'Weekly') {
-          rowObject['week'] = getWeek(rowData[timeDimensionIndex]);
-          rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+          rowObject['week'] = DateParser.getWeek(date);
+          rowObject['year'] = DateParser.getYear(date);
+          // rowObject['week'] = getWeek(rowData[timeDimensionIndex]);
+          // rowObject['year'] = getYear(rowData[timeDimensionIndex]);
         } else if (timeDimension === 'Monthly') {
-          rowObject['month'] = getMonth(rowData[timeDimensionIndex]);
-          rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+          rowObject['month'] = DateParser.getMonth(date);
+          rowObject['year'] = DateParser.getYear(date);
+          // rowObject['month'] = getMonth(rowData[timeDimensionIndex]);
+          // rowObject['year'] = getYear(rowData[timeDimensionIndex]);
         } else if (timeDimension === 'Yearly') {
-          rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+          rowObject['year'] = DateParser.getYear(date);
+          // rowObject['year'] = getYear(rowData[timeDimensionIndex]);
         }
       }
       datasetEvents.push({ data: rowObject, spec: eventGrammar });
@@ -579,6 +589,7 @@ export const createCompoundDatasetDataToBeInserted = async (
   );
 
   const datasetEvents: cQubeEvent[] = [];
+  const dateParser = new DateParser('dd/MM/yy');
 
   for (let row = 1; row < df.length - 1; row++) {
     const rowData = df[row];
@@ -593,15 +604,22 @@ export const createCompoundDatasetDataToBeInserted = async (
         rowObject[property] = rowData[dimensionIndex];
       }
       if (datasetGrammar.timeDimension) {
+        const date = dateParser.parseDate(rowData[timeDimensionIndex]);
         if (datasetGrammar.timeDimension.type === 'Daily') {
-          rowObject['date'] = getDate(rowData[timeDimensionIndex]);
+          rowObject['date'] = date;
+          // rowObject['date'] = getDate(rowData[timeDimensionIndex]);
         } else if (datasetGrammar.timeDimension.type === 'Weekly') {
-          rowObject['week'] = getWeek(rowData[timeDimensionIndex]);
-          rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+          rowObject['week'] = DateParser.getWeek(date);
+          rowObject['year'] = DateParser.getYear(date);
+          // rowObject['week'] = getWeek(rowData[timeDimensionIndex]);
+          // rowObject['year'] = getYear(rowData[timeDimensionIndex]);
         } else if (datasetGrammar.timeDimension.type === 'Monthly') {
-          rowObject['month'] = getMonth(rowData[timeDimensionIndex]);
-          rowObject['year'] = getYear(rowData[timeDimensionIndex]);
+          rowObject['month'] = DateParser.getMonth(date);
+          rowObject['year'] = DateParser.getYear(date);
+          // rowObject['month'] = getMonth(rowData[timeDimensionIndex]);
+          // rowObject['year'] = getYear(rowData[timeDimensionIndex]);
         } else if (datasetGrammar.timeDimension.type === 'Yearly') {
+          rowObject['year'] = DateParser.getYear(date);
           rowObject['year'] = getYear(rowData[timeDimensionIndex]);
         }
       }
@@ -909,13 +927,12 @@ async function processSleep(time) {
   return new Promise((resolve) => setTimeout(resolve, time));
 }
 
-function removeEmptyLines(filePath) {
-  // Read the file contents
-  fs.readFile(filePath, 'utf-8', (err, data) => {
-    if (err) {
-      console.error('Error reading file:', err);
-      return;
-    }
+export async function removeEmptyLines(filePath: string): Promise<void> {
+  const readFileAsync = promisify(fs1.readFile);
+  const writeFileAsync = promisify(fs1.writeFile);
+  try {
+    // Read the file contents
+    const data = await readFileAsync(filePath, 'utf-8');
 
     // Split the file contents into lines and filter out empty lines
     const lines = data.split('\n');
@@ -925,12 +942,8 @@ function removeEmptyLines(filePath) {
     const filteredContents = nonEmptyLines.join('\n');
 
     // Write the filtered contents back to the file
-    fs.writeFile(filePath, filteredContents, (err) => {
-      if (err) {
-        console.error('Error writing file:', err);
-      } else {
-        console.log('Empty lines removed successfully');
-      }
-    });
-  });
+    await writeFileAsync(filePath, filteredContents);
+  } catch (err) {
+    console.error('Error processing file:', err);
+  }
 }

@@ -355,7 +355,7 @@ export class DatasetService {
             });
         });
         const result = await Promise.all(promises);
-        console.error(rowsIngested, 'rows inserted');
+        console.error(`${rowsIngested}/${data.length}, rows inserted`);
       },
     );
   }
