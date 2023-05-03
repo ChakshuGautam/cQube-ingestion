@@ -33,6 +33,7 @@ import { readdirSync } from 'fs';
 import { logToFile } from '../../utils/debug';
 import { spinner } from '@clack/prompts';
 import { retryPromiseWithDelay } from '../../utils/retry';
+import { DatasetGrammar as DatasetGrammarModel } from '@prisma/client';
 const chalk = require('chalk');
 const fs = require('fs').promises;
 const pl = require('nodejs-polars');
@@ -545,7 +546,7 @@ export class CsvAdapterService {
               }
             }
             const allExistingDGs =
-              await this.datasetService.getCompoundDatasetGrammars();
+              await this.datasetService.getCompoundDatasetGrammars({});
             const hashTable = {};
             for (let i = 0; i < allExistingDGs.length; i++) {
               // Table Name = program_name_<hash>
@@ -576,7 +577,7 @@ export class CsvAdapterService {
 
             for (let l = 0; l < defaultTimeDimensions.length; l++) {
               const allExistingDGs =
-                await this.datasetService.getCompoundDatasetGrammars();
+                await this.datasetService.getCompoundDatasetGrammars({});
               const hashTable = {};
               for (let i = 0; i < allExistingDGs.length; i++) {
                 // Table Name = program_name_<hash>
@@ -648,23 +649,12 @@ export class CsvAdapterService {
     // Insert events into the datasets
   }
 
-  public async ingestData(ingestionFolder, ingestConfigFileName) {
+  public async ingestData(filter: any) {
     const s = spinner();
     // s.start('🚧 1. Deleting Old Data');
     // await this.nukeDatasets();
     // s.stop('✅ 1. The Data has been Nuked');
 
-    // Parse the config
-    s.start('🚧 2. Reading your config');
-
-    const config = JSON.parse(
-      await readFile(ingestionFolder + '/' + ingestConfigFileName, 'utf8'),
-    );
-    const regexEventGrammar = /\-event\.grammar.csv$/i;
-    const defaultTimeDimensions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
-    const dimensionGrammarFolder = config?.dimensions.input?.files;
-
-    s.stop('✅ 2. Config parsing completed');
     // Insert events into the datasets
     const callback = (
       err: any,
@@ -674,10 +664,10 @@ export class CsvAdapterService {
       //console.debug('callback', err, events.length);
     };
 
-    s.start('🚧 3. Ingest Events');
+    s.start('🚧 1. Ingest Events');
 
     const datasetGrammars: DatasetGrammar[] =
-      await this.datasetService.getNonCompoundDatasetGrammars();
+      await this.datasetService.getNonCompoundDatasetGrammars(filter);
 
     for (let i = 0; i < datasetGrammars.length; i++) {
       // EventGrammar doesn't include anything other thatn the fields
@@ -723,7 +713,7 @@ export class CsvAdapterService {
     }
 
     const compoundDatasetGrammars: DatasetGrammar[] =
-      await this.datasetService.getCompoundDatasetGrammars();
+      await this.datasetService.getCompoundDatasetGrammars(filter);
 
     // Ingest Compound DatasetGrammar
     for (let m = 0; m < compoundDatasetGrammars.length; m++) {

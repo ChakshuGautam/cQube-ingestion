@@ -8,6 +8,7 @@ import {
 import {
   DatasetGrammar as DatasetGrammarModel,
   EventGrammar as EventGrammarModel,
+  PrismaClient,
 } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
 import { QueryBuilderService } from '../query-builder/query-builder.service';
@@ -23,6 +24,10 @@ const fs = require('fs');
 type InsertionError = {
   error: string;
   data: any;
+};
+
+export type DatasetGrammarFilter = {
+  wildcard?: string;
 };
 
 @Injectable()
@@ -173,12 +178,18 @@ export class DatasetService {
       );
   }
 
-  async getCompoundDatasetGrammars(): Promise<DatasetGrammar[]> {
+  async getCompoundDatasetGrammars(filter: any): Promise<DatasetGrammar[]> {
+    const prismaFilters = {
+      isCompound: true,
+    };
+    if (filter?.name !== undefined) {
+      prismaFilters['name'] = {
+        contains: filter.name,
+      };
+    }
     return this.prisma.datasetGrammar
       .findMany({
-        where: {
-          isCompound: true,
-        },
+        where: prismaFilters,
       })
       .then(
         async (models: DatasetGrammarModel[]): Promise<DatasetGrammar[]> => {
@@ -190,12 +201,18 @@ export class DatasetService {
       );
   }
 
-  async getNonCompoundDatasetGrammars(): Promise<DatasetGrammar[]> {
+  async getNonCompoundDatasetGrammars(filter: any): Promise<DatasetGrammar[]> {
+    const prismaFilters = {
+      isCompound: false,
+    };
+    if (filter?.name !== undefined) {
+      prismaFilters['name'] = {
+        contains: filter.name,
+      };
+    }
     return this.prisma.datasetGrammar
       .findMany({
-        where: {
-          isCompound: false,
-        },
+        where: prismaFilters,
       })
       .then(
         async (models: DatasetGrammarModel[]): Promise<DatasetGrammar[]> => {
