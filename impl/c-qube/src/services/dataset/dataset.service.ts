@@ -16,7 +16,7 @@ import { logToFile } from '../../utils/debug';
 import { EventService } from '../event/event.service';
 import { EventGrammar } from 'src/types/event';
 const pLimit = require('p-limit');
-const limit = pLimit(40);
+const limit = pLimit(80);
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs');
@@ -348,6 +348,7 @@ export class DatasetService {
               rowsIngested += 1;
             })
             .catch((e) => {
+              console.error(e);
               errors.push({
                 error: e.message,
                 data: row,

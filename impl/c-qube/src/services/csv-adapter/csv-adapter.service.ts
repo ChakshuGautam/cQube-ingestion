@@ -28,6 +28,7 @@ import {
   EventGrammarCSVFormat,
   getEGDefFromFile,
   isTimeDimensionPresent,
+  processCsv,
   removeEmptyLines,
 } from './csv-adapter.utils';
 import { readdirSync } from 'fs';
@@ -677,12 +678,20 @@ export class CsvAdapterService {
 
     // iterate over all *.data.csv files inside programs folder
     const files = getFilesInDirectory('./ingest/programs');
+
     let promises = [];
+    for (let i = 0; i < files.length; i++) {
+      promises.push(
+        processCsv(files[i], files[i].split('.csv')[0] + '_temp.csv'),
+      );
+    }
+    await Promise.all(promises);
+    promises = [];
     for (let i = 0; i < files.length; i++) {
       promises.push(removeEmptyLines(files[i]));
     }
     await Promise.all(promises);
-    console.log(`Cleaned all files`);
+    this.logger.verbose(`Cleaned all files`);
 
     // Insert events into the datasets
     const callback = (

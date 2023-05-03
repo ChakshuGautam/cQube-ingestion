@@ -482,7 +482,7 @@ export const createDatasetDataToBeInserted = async (
   //   df.push(lines[i].split(',').map((value) => value.trim()));
   // }
 
-  await processCsv(filePath, filePath.split('.csv')[0] + '_temp.csv');
+  // await processCsv(filePath, filePath.split('.csv')[0] + '_temp.csv');
   const df = await readCSV(filePath);
   const getIndexForHeader = (headers: string[], header: string): number => {
     return headers.indexOf(header);
@@ -569,7 +569,7 @@ export const createCompoundDatasetDataToBeInserted = async (
   //   df.push(lines[i].split(',').map((value) => value.trim()));
   // }
 
-  await processCsv(eventFilePath, eventFilePath.split('.csv')[0] + '_temp.csv');
+  // await processCsv(eventFilePath, eventFilePath.split('.csv')[0] + '_temp.csv');
   const df = await readCSV(eventFilePath);
 
   const getIndexForHeader = (headers: string[], header: string): number => {
@@ -884,7 +884,7 @@ async function readCSV(filePath: string): Promise<string[][]> {
   });
 }
 
-async function processCsv(input, output) {
+export async function processCsv(input, output) {
   return new Promise((resolve, reject) => {
     if (fs1.existsSync(output)) {
       fs1.unlinkSync(output);
