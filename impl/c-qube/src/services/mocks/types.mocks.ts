@@ -4,16 +4,16 @@ import {
   DatasetUpdateRequest,
   DimensionMapping,
   TimeDimension,
-} from 'src/types/dataset';
-import { Dimension, DimensionGrammar, Store } from 'src/types/dimension';
+} from '../../types/dataset';
+import { Dimension, DimensionGrammar, Store } from '../../types/dimension';
 import {
   EventGrammar,
   Instrument,
   InstrumentType,
   Event,
-} from 'src/types/event';
+} from '../../types/event';
 
-function mockDimensionMapping(
+export function mockDimensionMapping(
   overrides?: Partial<DimensionMapping>,
 ): DimensionMapping {
   return {
@@ -34,7 +34,9 @@ function mockDimensionMapping(
   };
 }
 
-function mockTimeDimension(overrides?: Partial<TimeDimension>): TimeDimension {
+export function mockTimeDimension(
+  overrides?: Partial<TimeDimension>,
+): TimeDimension {
   return {
     key: 'defaultKey',
     type: 'defaultType',
@@ -42,7 +44,7 @@ function mockTimeDimension(overrides?: Partial<TimeDimension>): TimeDimension {
   };
 }
 
-function mockDatasetGrammar(
+export function mockDatasetGrammar(
   overrides?: Partial<DatasetGrammar>,
 ): DatasetGrammar {
   return {
@@ -54,7 +56,7 @@ function mockDatasetGrammar(
   };
 }
 
-function mockDataset(overrides?: Partial<Dataset>): Dataset {
+export function mockDataset(overrides?: Partial<Dataset>): Dataset {
   return {
     data: {},
     spec: mockDatasetGrammar(),
@@ -62,7 +64,7 @@ function mockDataset(overrides?: Partial<Dataset>): Dataset {
   };
 }
 
-function mockDatasetUpdateRequest(
+export function mockDatasetUpdateRequest(
   overrides?: Partial<DatasetUpdateRequest>,
 ): DatasetUpdateRequest {
   return {
@@ -78,7 +80,7 @@ function mockDatasetUpdateRequest(
   };
 }
 
-function mockStore(overrides?: Partial<Store>): Store {
+export function mockStore(overrides?: Partial<Store>): Store {
   return {
     indexes: [],
     primaryId: 'defaultPrimaryId',
@@ -86,7 +88,7 @@ function mockStore(overrides?: Partial<Store>): Store {
   };
 }
 
-function mockDimensionGrammar(
+export function mockDimensionGrammar(
   overrides?: Partial<DimensionGrammar>,
 ): DimensionGrammar {
   return {
@@ -98,7 +100,7 @@ function mockDimensionGrammar(
   };
 }
 
-function mockDimension(overrides?: Partial<Dimension>): Dimension {
+export function mockDimension(overrides?: Partial<Dimension>): Dimension {
   return {
     grammar: mockDimensionGrammar(),
     data: {},
@@ -106,7 +108,7 @@ function mockDimension(overrides?: Partial<Dimension>): Dimension {
   };
 }
 
-function mockInstrument(overrides?: Partial<Instrument>): Instrument {
+export function mockInstrument(overrides?: Partial<Instrument>): Instrument {
   return {
     type: InstrumentType.COUNTER,
     name: 'defaultName',
@@ -114,7 +116,9 @@ function mockInstrument(overrides?: Partial<Instrument>): Instrument {
   };
 }
 
-function mockEventGrammar(overrides?: Partial<EventGrammar>): EventGrammar {
+export function mockEventGrammar(
+  overrides?: Partial<EventGrammar>,
+): EventGrammar {
   return {
     name: 'defaultName',
     instrument: mockInstrument(),
@@ -127,7 +131,7 @@ function mockEventGrammar(overrides?: Partial<EventGrammar>): EventGrammar {
   };
 }
 
-function mockEvent(overrides?: Partial<Event>): Event {
+export function mockEvent(overrides?: Partial<Event>): Event {
   return {
     data: {},
     spec: mockEventGrammar(),
