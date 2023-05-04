@@ -5,13 +5,6 @@ import { PrismaService } from '../../prisma.service';
 import { DimensionService } from '../dimension/dimension.service';
 import { DatasetService } from '../dataset/dataset.service';
 import { DimensionGrammar } from 'src/types/dimension';
-import {
-  createDatasetGrammarsFromEG,
-  createDimensionGrammarFromCSVDefinition,
-  createEventGrammar,
-  createEventGrammarFromCSVDefinition,
-  EventDimensionMapping,
-} from './csv-adapter.utils';
 import { DatasetGrammar } from 'src/types/dataset';
 import { EventGrammar } from 'src/types/event';
 import { EventService } from '../event/event.service';
