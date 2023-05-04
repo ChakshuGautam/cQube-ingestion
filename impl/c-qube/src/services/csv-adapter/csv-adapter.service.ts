@@ -17,31 +17,35 @@ import { Pipe } from 'src/types/pipe';
 import { TransformerContext } from 'src/types/transformer';
 import { readFile } from 'fs/promises';
 import {
-  createCompoundDatasetDataToBeInserted,
-  createCompoundDatasetGrammars,
-  createCompoundDatasetGrammarsWithoutTimeDimensions,
-  createDatasetDataToBeInserted,
-  createDatasetGrammarsFromEG,
-  createDatasetGrammarsFromEGWithoutTimeDimension,
-  createDimensionGrammarFromCSVDefinition,
-  createEventGrammarFromCSVDefinition,
   EventGrammarCSVFormat,
-  getEGDefFromFile,
   isTimeDimensionPresent,
 } from './csv-adapter.utils';
 import { readdirSync } from 'fs';
 import { logToFile } from '../../utils/debug';
 import { spinner } from '@clack/prompts';
 import { retryPromiseWithDelay } from '../../utils/retry';
-import { DatasetGrammar as DatasetGrammarModel } from '@prisma/client';
 import {
   getFilesInDirectory,
   processCsv,
   removeEmptyLines,
-} from './csv-parser/csvcleaner';
+} from './csv-parser/utils/csvcleaner';
+import {
+  createCompoundDatasetDataToBeInserted,
+  createDatasetDataToBeInserted,
+} from './csv-parser/dataset/helper';
+import {
+  createEventGrammarFromCSVDefinition,
+  getEGDefFromFile,
+} from './csv-parser/eventgrammar/parser';
+import {
+  createCompoundDatasetGrammars,
+  createCompoundDatasetGrammarsWithoutTimeDimensions,
+  createDatasetGrammarsFromEG,
+  createDatasetGrammarsFromEGWithoutTimeDimension,
+} from './csv-parser/dataset/parser';
+import { createDimensionGrammarFromCSVDefinition } from './csv-parser/dimensiongrammar/parser';
 const chalk = require('chalk');
 const fs = require('fs').promises;
-const fs1 = require('fs');
 const pl = require('nodejs-polars');
 const _ = require('lodash');
 const pLimit = require('p-limit');
