@@ -1,5 +1,5 @@
-import { DatasetGrammar, DimensionMapping } from 'src/types/dataset';
-import { DateParser } from '../utils/DateParser';
+import { DatasetGrammar, DimensionMapping } from '../../../../types/dataset';
+import { DateParser } from './../utils/dateparser';
 import {
   EventGrammar,
   InstrumentType,

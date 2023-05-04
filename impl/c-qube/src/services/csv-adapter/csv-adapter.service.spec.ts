@@ -4,19 +4,8 @@ import { CsvAdapterService, Column } from './csv-adapter.service';
 import { PrismaService } from '../../prisma.service';
 import { DimensionService } from '../dimension/dimension.service';
 import { DatasetService } from '../dataset/dataset.service';
-import { DimensionGrammar } from 'src/types/dimension';
-import { DatasetGrammar } from 'src/types/dataset';
-import { EventGrammar } from 'src/types/event';
 import { EventService } from '../event/event.service';
 import { DataFrame } from 'nodejs-polars';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const csvParser = require('csv-parser');
-
-import csvtojson from 'csvtojson';
-import { createObjectCsvWriter as createCsvWriter } from 'csv-writer';
-import { promisify } from 'util';
-import stream from 'stream';
-import { createReadStream } from 'fs';
 import * as csv from 'csv-parser';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
