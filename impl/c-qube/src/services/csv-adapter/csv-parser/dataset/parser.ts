@@ -15,19 +15,20 @@ export const createDatasetGrammarsFromEG = async (
   eventGrammars: EventGrammar[],
 ): Promise<DatasetGrammar[]> => {
   const datasetGrammars: DatasetGrammar[] = [];
-  for (let j = 0; j < defaultTimeDimensions.length; j++) {
-    for (let k = 0; k < eventGrammars.length; k++) {
-      // console.log(eventGrammars[k].file);
+
+  for (const timeDimension of defaultTimeDimensions) {
+    for (const eventGrammar of eventGrammars) {
       const datasetGrammar: DatasetGrammar =
         await createSingleDatasetGrammarsFromEG(
           folderName,
-          defaultTimeDimensions[j],
-          eventGrammars[k],
-          eventGrammars[k].file,
+          timeDimension,
+          eventGrammar,
+          eventGrammar.file,
         );
       datasetGrammars.push(datasetGrammar);
     }
   }
+
   return datasetGrammars;
 };
 
@@ -36,14 +37,16 @@ export const createDatasetGrammarsFromEGWithoutTimeDimension = async (
   eventGrammars: EventGrammar[],
 ): Promise<DatasetGrammar[]> => {
   const datasetGrammars: DatasetGrammar[] = [];
-  for (let k = 0; k < eventGrammars.length; k++) {
+
+  for (const eventGrammar of eventGrammars) {
     const datasetGrammar: DatasetGrammar =
       await createSingleDatasetGrammarsFromEGWithoutTimeDimension(
         folderName,
-        eventGrammars[k],
+        eventGrammar,
       );
     datasetGrammars.push(datasetGrammar);
   }
+
   return datasetGrammars;
 };
 
