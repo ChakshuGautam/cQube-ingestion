@@ -1,4 +1,4 @@
-import { DateParser } from './DateParser';
+import { DateParser } from './dateparser';
 
 describe('DateParser', () => {
   const dateFormat1 = 'dd/MM/yy';
