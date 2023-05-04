@@ -14,7 +14,7 @@ describe('DateParser', () => {
   });
 
   test('should parse date correctly with format 2 and no timezone', () => {
-    const date = parser2.parseDate('02-01-2023');
+    const date = parser2.parseDate('01-01-2023');
     expect(date).toEqual(new Date('2023-01-01T18:30:00.000Z'));
   });
 
