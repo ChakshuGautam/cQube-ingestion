@@ -4,10 +4,10 @@ import {
   TimeDimension,
 } from '../../../../types/dataset';
 import { EventGrammar } from 'src/types/event';
-import { EventGrammarCSVFormat, FieldType } from '../../csv-adapter.utils';
 import { DimensionGrammar } from '../../../../types/dimension';
 import { getEGDefFromFile } from '../eventgrammar/parser';
 import { hash } from '../../../../utils/hash';
+import { EventGrammarCSVFormat, FieldType } from '../../types/parser';
 
 export const createDatasetGrammarsFromEG = async (
   folderName: string,

@@ -16,10 +16,7 @@ import { defaultTransformers } from '../transformer/default.transformers';
 import { Pipe } from 'src/types/pipe';
 import { TransformerContext } from 'src/types/transformer';
 import { readFile } from 'fs/promises';
-import {
-  EventGrammarCSVFormat,
-  isTimeDimensionPresent,
-} from './csv-adapter.utils';
+import { isTimeDimensionPresent } from './csv-adapter.utils';
 import { readdirSync } from 'fs';
 import { logToFile } from '../../utils/debug';
 import { spinner } from '@clack/prompts';
@@ -44,24 +41,13 @@ import {
   createDatasetGrammarsFromEGWithoutTimeDimension,
 } from './csv-parser/dataset/parser';
 import { createDimensionGrammarFromCSVDefinition } from './csv-parser/dimensiongrammar/parser';
+import { EventGrammarCSVFormat } from './types/parser';
 const chalk = require('chalk');
 const fs = require('fs').promises;
 const pl = require('nodejs-polars');
 const _ = require('lodash');
 const pLimit = require('p-limit');
 const limit = pLimit(10);
-
-export enum ColumnType {
-  string = 'string',
-  integer = 'integer',
-  float = 'float',
-  date = 'date',
-}
-
-export type Column = {
-  name: string;
-  type: ColumnType;
-};
 
 @Injectable()
 export class CsvAdapterService {
@@ -877,13 +863,18 @@ export class CsvAdapterService {
     }
   }
 
-  public async nukeDatasets() {
+  public async nukeDatasets(filter: any) {
     try {
       const promises = [];
       this.logger.log('Starting delete');
-      const datasets: any[] = await this.prisma
-        .$queryRaw`select 'truncate table "' || tablename || '" cascade;'
-        from pg_tables where schemaname = 'datasets';`;
+
+      const query = `
+          SELECT 'TRUNCATE TABLE "' || tablename || '" CASCADE;'
+          FROM pg_tables
+          WHERE schemaname = 'datasets'
+          AND tablename ILIKE '%${filter.name}%';`;
+
+      const datasets: any[] = await this.prisma.$queryRawUnsafe(`${query}`);
       this.logger.log('step 1 done');
       for (let i = 0; i < datasets.length; i++) {
         const parts = datasets[i]['?column?'].split('"');

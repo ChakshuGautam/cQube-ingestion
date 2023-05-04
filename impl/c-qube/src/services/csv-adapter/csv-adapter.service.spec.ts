@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { QueryBuilderService } from '../query-builder/query-builder.service';
-import { CsvAdapterService, Column } from './csv-adapter.service';
+import { CsvAdapterService } from './csv-adapter.service';
 import { PrismaService } from '../../prisma.service';
 import { DimensionService } from '../dimension/dimension.service';
 import { DatasetService } from '../dataset/dataset.service';

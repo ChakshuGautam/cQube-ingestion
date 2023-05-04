@@ -60,12 +60,32 @@ async function bootstrap() {
       await application.close();
       process.exit(0);
     })
-    .command('nuke-datasets', 'Nuke the datasets', {}, async (argv) => {
-      process.env['DEBUG'] = argv.debug.toString();
-      await csvAdapterService.nukeDatasets();
-      await application.close();
-      process.exit(0);
-    })
+    .command(
+      'nuke-datasets',
+      'Nuke the datasets',
+      (yargs) => {
+        yargs.option('filter', {
+          alias: 'f',
+          type: 'string',
+          default: 'none',
+          describe: 'Filter datasets to ingest',
+        });
+      },
+      async (argv) => {
+        process.env['DEBUG'] = argv.debug.toString();
+        const filter = argv.filter;
+
+        if (filter === 'none') {
+          await csvAdapterService.nukeDatasets({});
+        } else {
+          await csvAdapterService.nukeDatasets({
+            name: filter,
+          });
+        }
+        await application.close();
+        process.exit(0);
+      },
+    )
     .demandCommand(1, 'Please provide a valid command')
     .help()
     .version()

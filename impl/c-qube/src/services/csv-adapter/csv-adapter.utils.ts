@@ -1,28 +1,5 @@
-import { DimensionGrammar } from 'src/types/dimension';
-
-import { ColumnType } from './csv-adapter.service';
-
 import { getEGDefFromFile } from './csv-parser/eventgrammar/parser';
-
-export type EventDimensionMapping = {
-  dimensionGrammar: DimensionGrammar;
-  dimensionGrammarKey: string;
-  eventGrammarKey: string;
-};
-
-export enum FieldType {
-  timeDimension = 'timeDimension',
-  dimension = 'dimension',
-  metric = 'metric',
-}
-
-export type EventGrammarCSVFormat = {
-  dimensionName: string | null; //row1
-  dimensionGrammarKey: string | null; //row2
-  fieldDataType: ColumnType; //row3
-  fieldName: string; //row4
-  fieldType: FieldType; //row5
-};
+import { EventGrammarCSVFormat, FieldType } from './types/parser';
 
 export function getDGDefsFromEGDefs(eventGrammarDef: EventGrammarCSVFormat[]) {
   return eventGrammarDef.filter(

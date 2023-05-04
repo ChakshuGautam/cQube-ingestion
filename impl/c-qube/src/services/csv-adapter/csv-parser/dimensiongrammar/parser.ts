@@ -1,5 +1,5 @@
 import { DimensionGrammar } from 'src/types/dimension';
-import { Column } from '../../csv-adapter.service';
+import { Column } from '../../types/parser';
 const fs = require('fs').promises;
 
 export const createDimensionGrammarFromCSVDefinition = async (

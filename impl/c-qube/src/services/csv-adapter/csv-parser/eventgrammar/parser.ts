@@ -1,14 +1,15 @@
 import { EventGrammar, InstrumentType } from '../../../../types/event';
-import { Column, ColumnType } from '../../csv-adapter.service';
-import {
-  EventDimensionMapping,
-  EventGrammarCSVFormat,
-  FieldType,
-  getDGDefsFromEGDefs,
-} from '../../csv-adapter.utils';
+import { getDGDefsFromEGDefs } from '../../csv-adapter.utils';
 import { createDimensionGrammarFromCSVDefinition } from '../dimensiongrammar/parser';
 import { DimensionMapping } from '../../../../types/dataset';
 import { JSONSchema4 } from 'json-schema';
+import {
+  Column,
+  ColumnType,
+  EventDimensionMapping,
+  EventGrammarCSVFormat,
+  FieldType,
+} from '../../types/parser';
 const fs = require('fs').promises;
 
 export async function getEGDefFromFile(csvFilePath: string) {

@@ -350,6 +350,7 @@ export class DatasetService {
               rowsIngested += 1;
             })
             .catch((e) => {
+              this.logger.error(e);
               errors.push({
                 error: e.message,
                 data: row,
