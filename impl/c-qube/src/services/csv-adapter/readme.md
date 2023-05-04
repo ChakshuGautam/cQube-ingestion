@@ -219,3 +219,7 @@ persist 0. Service => Extract JSONSchema
 
 1. JSONSchema => Query
 2. Query => Executed
+
+### Dataset Parser
+
+![Dataset Parser](./_docs/images/cqube-dastaset-parser.jpg 'Title')
