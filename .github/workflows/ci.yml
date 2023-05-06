@@ -32,6 +32,8 @@ jobs:
         run: |
           touch .env
           echo "DATABASE_URL="postgres://timescaledb:postgrespassword@localhost:5432/postgres?sslmode=disable"" > .env
+      
+      
 
       - name: build
         working-directory: impl/c-qube
@@ -61,3 +63,8 @@ jobs:
           yarn test:docker:up
           while ! docker-compose -f docker-compose.test.yaml ps | grep -q "healthy"; do sleep 1; done
           yarn test:e2e
+
+      - name: Coveralls GitHub Action
+        uses: coverallsapp/github-action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
