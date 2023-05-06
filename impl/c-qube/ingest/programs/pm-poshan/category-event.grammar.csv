@@ -2,4 +2,4 @@ district,categorypm,
 district_id,category_name,
 string,string,integer
 district_id,category_name,category_value
-dimension,dimension,metric
+dimension,dimension,metric

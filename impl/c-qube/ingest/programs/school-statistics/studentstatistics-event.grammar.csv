@@ -2,4 +2,4 @@
 ,grade_state,school_id,schoolcategory_id,cluster_id,block_id,district_id,student_category,gender,academicyear_id,cwsn,
 date,string,string,string,string,string,string,string,string,string,string,integer
 date,grade_state,school_id,schoolcategory_id,cluster_id,block_id,district_id,student_category,gender,academicyear_id,cwsn,students_enrolled
-timeDimension,dimension,dimension,dimension,dimension,dimension,dimension,dimension,dimension,dimension,dimension,metric
+timeDimension,dimension,dimension,dimension,dimension,dimension,dimension,dimension,dimension,dimension,dimension,metric

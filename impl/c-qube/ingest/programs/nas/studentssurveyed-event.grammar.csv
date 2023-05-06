@@ -2,4 +2,4 @@ state,district,
 state_id,district_id,
 string,string,number
 state_id,district_id,students_surveyed
-dimension,dimension,metric
+dimension,dimension,metric
