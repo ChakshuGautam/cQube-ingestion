@@ -25,23 +25,24 @@ import {
   getFilesInDirectory,
   processCsv,
   removeEmptyLines,
-} from './csv-parser/utils/csvcleaner';
+} from './parser/utils/csvcleaner';
 import {
   createCompoundDatasetDataToBeInserted,
   createDatasetDataToBeInserted,
-} from './csv-parser/dataset/helper';
+} from './parser/dataset/helper';
 import {
   createEventGrammarFromCSVDefinition,
   getEGDefFromFile,
-} from './csv-parser/eventgrammar/parser';
+} from './parser/eventgrammar/parser';
 import {
   createCompoundDatasetGrammars,
   createCompoundDatasetGrammarsWithoutTimeDimensions,
   createDatasetGrammarsFromEG,
   createDatasetGrammarsFromEGWithoutTimeDimension,
-} from './csv-parser/dataset/parser';
-import { createDimensionGrammarFromCSVDefinition } from './csv-parser/dimensiongrammar/parser';
+} from './parser/dataset/parser';
+import { createDimensionGrammarFromCSVDefinition } from './parser/dimensiongrammar/parser';
 import { EventGrammarCSVFormat } from './types/parser';
+import { DimensionGrammarService } from './parser/dimensiongrammar/dimension-grammar.service';
 const chalk = require('chalk');
 const fs = require('fs').promises;
 const pl = require('nodejs-polars');
@@ -57,6 +58,7 @@ export class CsvAdapterService {
     public eventService: EventService,
     public datasetService: DatasetService,
     public prisma: PrismaService,
+    public dimensionGrammarService: DimensionGrammarService,
   ) {}
 
   async csvToDomainSpec(
@@ -357,9 +359,10 @@ export class CsvAdapterService {
       if (regexDimensionGrammar.test(inputFilesForDimensions[i])) {
         const currentDimensionGrammarFileName =
           dimensionGrammarFolder + `/${inputFilesForDimensions[i]}`;
-        const dimensionGrammar = await createDimensionGrammarFromCSVDefinition(
-          currentDimensionGrammarFileName,
-        );
+        const dimensionGrammar =
+          await this.dimensionGrammarService.createDimensionGrammarFromCSVDefinition(
+            currentDimensionGrammarFileName,
+          );
         const dimensionDataFileName = currentDimensionGrammarFileName.replace(
           'grammar',
           'data',

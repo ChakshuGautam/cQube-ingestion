@@ -1,4 +1,4 @@
-import { getEGDefFromFile } from './csv-parser/eventgrammar/parser';
+import { getEGDefFromFile } from './parser/eventgrammar/parser';
 import { EventGrammarCSVFormat, FieldType } from './types/parser';
 
 export function getDGDefsFromEGDefs(eventGrammarDef: EventGrammarCSVFormat[]) {

@@ -16,15 +16,23 @@ export class DateParser {
       const dateWithTimezone = zonedTimeToUtc(parsedDate, this.timezone);
       return dateWithTimezone;
     } else {
-      const dateWithoutTimezone = new Date(
-        new Date(
+      return new Date(
+        Date.UTC(
           parsedDate.getFullYear(),
           parsedDate.getMonth(),
           parsedDate.getDate(),
         ),
       );
-      dateWithoutTimezone.setDate(dateWithoutTimezone.getDate() + 1);
-      return dateWithoutTimezone;
+      // const dateWithoutTimezone = new Date(
+      //   new Date(
+      //     parsedDate.getFullYear(),
+      //     parsedDate.getMonth(),
+      //     parsedDate.getDate(),
+      //     'GMT',
+      //   ),
+      // );
+      // dateWithoutTimezone.setDate(dateWithoutTimezone.getDate() + 1);
+      // return dateWithoutTimezone;
     }
   }
 

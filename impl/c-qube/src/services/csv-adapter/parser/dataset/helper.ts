@@ -1,10 +1,6 @@
 import { DatasetGrammar, DimensionMapping } from '../../../../types/dataset';
-import { DateParser } from './../utils/dateparser';
-import {
-  EventGrammar,
-  InstrumentType,
-  Event as cQubeEvent,
-} from 'src/types/event';
+import { DateParser } from '../utils/dateparser';
+import { EventGrammar, Event as cQubeEvent } from 'src/types/event';
 import { readCSV } from '../utils/csvreader';
 
 export const createDatasetDataToBeInserted = async (
@@ -12,7 +8,6 @@ export const createDatasetDataToBeInserted = async (
   datasetGrammar: DatasetGrammar,
 ): Promise<cQubeEvent[]> => {
   const eventGrammar = datasetGrammar.eventGrammar;
-  const dimensionMapping: DimensionMapping[] = datasetGrammar.dimensions;
   // const propertyName = await getPropertyforDatasetGrammarFromEG(eventGrammar);
   // Get all keys from datasetGrammar.schema.properties
   const propertyName = Object.keys(datasetGrammar.schema.properties)

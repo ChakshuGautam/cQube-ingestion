@@ -11,6 +11,7 @@ import { CsvAdapterService } from './services/csv-adapter/csv-adapter.service';
 import { EventService } from './services/event/event.service';
 import { InstrumenttypeService } from './services/instrumenttype/instrumenttype.service';
 import { VizService } from './services/viz/viz.service';
+import { DimensionGrammarService } from './services/csv-adapter/parser/dimensiongrammar/dimension-grammar.service';
 
 @Module({
   imports: [],
@@ -20,6 +21,7 @@ import { VizService } from './services/viz/viz.service';
     PrismaService,
     QueryBuilderService,
     DimensionService,
+    DimensionGrammarService,
     DatasetService,
     PipeService,
     TransformerService,
