@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JSONSchema4 } from 'json-schema';
+import { QueryBuilderSchema } from '../../types/QueryBuilderSchema';
+import { UpdateStatementData } from '../../types/UpdateStatementData';
 
 type fk = {
   column: string;
@@ -27,7 +29,7 @@ export class QueryBuilderService {
   }
 
   addFKConstraintDuringCreation(
-    schema: JSONSchema4,
+    schema: JSONSchema4 | QueryBuilderSchema,
     createStatement: string,
   ): string {
     createStatement = this.cleanStatement(createStatement);
@@ -44,7 +46,10 @@ export class QueryBuilderService {
     return this.cleanStatement(createStatement);
   }
 
-  generateCreateStatement(schema: JSONSchema4, autoPrimaryKey = false): string {
+  generateCreateStatement(
+    schema: JSONSchema4 | QueryBuilderSchema,
+    autoPrimaryKey = false,
+  ): string {
     const tableName = schema.title;
     const psqlSchema = schema.psql_schema;
     const primaryKeySegment = autoPrimaryKey ? '\n id SERIAL PRIMARY KEY,' : '';
@@ -52,7 +57,7 @@ export class QueryBuilderService {
 
     const properties = schema.properties;
     for (const property in properties) {
-      const column: JSONSchema4 = properties[property];
+      const column = properties[property];
       createStatement += `  ${property} `;
       if (column.type === 'string' && column.format === 'date-time') {
         createStatement += 'TIMESTAMP';
@@ -92,7 +97,9 @@ export class QueryBuilderService {
     return this.cleanStatement(createStatement);
   }
 
-  generateIndexStatement(schema: JSONSchema4): string[] | null {
+  generateIndexStatement(
+    schema: JSONSchema4 | QueryBuilderSchema,
+  ): string[] | null {
     const psqlSchema = schema.psql_schema;
     const indexStatements = [];
     if (schema.indexes) {
@@ -110,7 +117,10 @@ export class QueryBuilderService {
     return indexStatements.map((statement) => this.cleanStatement(statement));
   }
 
-  generateInsertStatement(schema: JSONSchema4, data: any): string {
+  generateInsertStatement(
+    schema: JSONSchema4 | QueryBuilderSchema,
+    data: any,
+  ): string {
     const tableName = schema.title;
     const psqlSchema = schema.psql_schema;
     const fields = [];
@@ -138,7 +148,10 @@ export class QueryBuilderService {
     return this.cleanStatement(query);
   }
 
-  generateBulkInsertStatement(schema: JSONSchema4, data: any[]): string {
+  generateBulkInsertStatement(
+    schema: JSONSchema4 | QueryBuilderSchema,
+    data: any[],
+  ): string {
     const tableName = schema.title;
     const psqlSchema = schema.psql_schema;
     const fields = [];
@@ -174,7 +187,61 @@ export class QueryBuilderService {
     return this.cleanStatement(query);
   }
 
-  generateUpdateStatement(schema: JSONSchema4, data: any): string[] {
-    throw new Error('Method not implemented.');
+  generateUpdateStatement(
+    schema: JSONSchema4 | QueryBuilderSchema,
+    data: UpdateStatementData,
+  ): string {
+    const tableName = schema.title;
+    const psqlSchema = schema.psql_schema;
+
+    // check if the keys of data.properties and data.conditions are a subset of schema.properties or not
+    const schemaPropertiesSet = new Set(Object.keys(schema.properties));
+    const dataPropertiesSet = new Set(Object.keys(data.properties));
+    const conditionPropertiesSet = new Set(Object.keys(data.conditions));
+
+    const dataPropIntersection = new Set();
+    const conditionPropIntersection = new Set();
+    for (const schemaProp of schemaPropertiesSet) {
+      if (dataPropertiesSet.has(schemaProp))
+        dataPropIntersection.add(schemaProp);
+      if (conditionPropertiesSet.has(schemaProp))
+        conditionPropIntersection.add(schemaProp);
+    }
+
+    if (
+      dataPropIntersection.size !== dataPropertiesSet.size ||
+      conditionPropIntersection.size !== conditionPropertiesSet.size
+    ) {
+      throw new Error(
+        `The properties of the update statement are not a subset of the schema properties`,
+      );
+    }
+
+    let query = `UPDATE ${psqlSchema}.${tableName} SET `;
+    for (const key in data.properties) {
+      const type = schema.properties[key].type;
+      const value = data.properties[key].value;
+      query += `${key} = ${type === 'string' ? "'" + value + "'" : value}, `;
+    }
+    query = query.slice(0, -2); // remove last comma and space
+
+    const conditions = Object.keys(data.conditions);
+    console.log('conditions: ', conditions);
+    if (conditions.length > 0) {
+      query += ' WHERE ';
+
+      conditions.forEach((condition) => {
+        const op = data.conditions[condition].operator;
+        const type = data.conditions[condition].type;
+        const value = data.conditions[condition].value;
+        query += `${condition} ${op} ${type === 'number' || type === 'boolean' ? value : "'" + value + "'"
+          } and `;
+      });
+      query = query.slice(0, -5); // remove last 'and' and space
+    }
+
+    query += ';';
+
+    return query;
   }
 }

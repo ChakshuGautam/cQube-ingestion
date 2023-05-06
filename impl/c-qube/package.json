@@ -25,6 +25,7 @@
   "dependencies": {
     "@clack/prompts": "^0.6.1",
     "@nestjs/common": "^9.0.0",
+    "@nestjs/config": "^2.3.1",
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
     "@prisma/client": "4.8.1",
@@ -33,19 +34,18 @@
     "csv-parser": "^3.0.0",
     "csv-writer": "^1.6.0",
     "csvtojson": "^2.0.10",
-    "date-fns": "^2.30.0",
-    "date-fns-tz": "^2.0.0",
-    "nodejs-polars-linux-x64-gnu": "^0.7.2",
     "lodash": "^4.17.21",
     "nestjs-pino": "^3.1.2",
     "nodejs-polars": "^0.7.2",
+    "nodejs-polars-linux-x64-gnu": "^0.7.2",
     "picocolors": "^1.0.0",
     "pino-http": "^8.3.3",
     "reflect-metadata": "^0.1.13",
     "retry": "^0.13.1",
     "rxjs": "^7.2.0",
     "to-json-schema": "^0.2.5",
-    "yargs": "^17.7.1"
+    "yargs": "^17.7.1",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
@@ -88,5 +88,11 @@
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
     "testTimeout": 300000
+  },
+  "exports": {
+    ".": {
+      "types": "./index.d.ts"
+    },
+    "./package.json": "./package.json"
   }
 }

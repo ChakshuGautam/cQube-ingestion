@@ -15,6 +15,8 @@ import { QueryBuilderService } from '../query-builder/query-builder.service';
 import { logToFile } from '../../utils/debug';
 import { EventService } from '../event/event.service';
 import { EventGrammar } from 'src/types/event';
+import { retryPromiseWithDelay } from '../../utils/retry';
+
 const pLimit = require('p-limit');
 const limit = pLimit(10);
 
@@ -357,8 +359,17 @@ export class DatasetService {
               });
             });
         });
+<<<<<<< HEAD
         const result = await Promise.all(promises);
         this.logger.error(`${rowsIngested}/${data.length}, rows inserted`);
+=======
+        await Promise.all(promises);
+        fs.writeFileSync(
+          `./logs/log-${Date.now()}.json`,
+          JSON.stringify({ errors }),
+        );
+        console.error(rowsIngested, 'rows inserted');
+>>>>>>> d6b698ca7b17ab0dc61b6c4780487d6a5ab1f822
       },
     );
   }
