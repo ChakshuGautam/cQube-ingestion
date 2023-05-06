@@ -2,4 +2,4 @@
 ,district_id,block_id,cluster_id,school_id,schoolcategory_id,grade_state,
 date,string,string,string,string,string,string,integer
 date,district_id,block_id,cluster_id,school_id,schoolcategory_id,grade_state,teachers_marked_present
-timeDimension,dimension,dimension,dimension,dimension,dimension,dimension,metric
+timeDimension,dimension,dimension,dimension,dimension,dimension,dimension,metric
