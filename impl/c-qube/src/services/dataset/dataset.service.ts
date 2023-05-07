@@ -15,6 +15,7 @@ import { QueryBuilderService } from '../query-builder/query-builder.service';
 import { logToFile } from '../../utils/debug';
 import { EventService } from '../event/event.service';
 import { EventGrammar } from 'src/types/event';
+import { readCSV } from '../csv-adapter/parser/utils/csvreader';
 const pLimit = require('p-limit');
 const limit = pLimit(10);
 
@@ -318,6 +319,44 @@ export class DatasetService {
     await this.prisma.$queryRawUnsafe(insertQuery);
   }
 
+  async removeFKErrors(
+    durs: DatasetUpdateRequest,
+    data: any[],
+  ): Promise<any[]> {
+    const eventGrammarFile = durs.dataset.eventGrammarFile;
+    const fkAttrMap = {};
+    const grammarFileRows = await readCSV(eventGrammarFile);
+    grammarFileRows[0].forEach((table, index) => {
+      if (table.trim() !== '') {
+        fkAttrMap[grammarFileRows[3][index]] = { table };
+      }
+    });
+    const processedData = {};
+    data.forEach((dataItem: any) => {
+      Object.keys(dataItem).forEach((key) => {
+        if (!processedData[key]) {
+          processedData[key] = [];
+        }
+        processedData[key].push(dataItem[key]);
+      });
+    });
+    for (const attr in fkAttrMap) {
+      let fkValues: string[] = await this.prisma.$queryRawUnsafe(
+        `SELECT DISTINCT ${attr} from dimensions.${fkAttrMap[attr].table};`,
+      );
+      fkValues = fkValues.map((value) => value[attr]);
+
+      if (processedData[attr]) {
+        const violations = processedData[attr]?.filter((value: any) => {
+          return !fkValues.includes(value);
+        });
+        data = data.filter((dataItem) => !violations?.includes(dataItem[attr]));
+      }
+    }
+    // TODO: Implement outputting the violations to output folder
+    return data;
+  }
+
   async processDatasetUpdateRequest(
     durs: DatasetUpdateRequest[],
   ): Promise<void> {
@@ -334,9 +373,9 @@ export class DatasetService {
     for (const dur of durs) {
       data.push({ ...dur.updateParams, ...dur.filterParams });
     }
-    // TODO check for FK constraints before insert
+    const sanitisedInput = await this.removeFKErrors(durs[0], data);
     durs[0].dataset.schema.title = durs[0].dataset.tableName;
-    await this.insertBulkDatasetData(durs[0].dataset, data).catch(
+    await this.insertBulkDatasetData(durs[0].dataset, sanitisedInput).catch(
       async (error) => {
         this.logger.error(
           `ERROR Inserting Data in Bulk: ${durs[0].dataset.name}. Trying them 1 by 1`,

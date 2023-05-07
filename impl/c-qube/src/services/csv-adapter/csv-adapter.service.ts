@@ -794,6 +794,7 @@ export class CsvAdapterService {
                       );
                     })
                     .catch((e) => {
+                      console.log('error in ingest-data: ', e);
                       this.logger.verbose(
                         `Ingested with error ${events.length} events for ${datasetGrammars[i].name}`,
                       );

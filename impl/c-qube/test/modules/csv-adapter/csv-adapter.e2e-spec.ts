@@ -13,6 +13,7 @@ import { DimensionGrammarService } from './../../../src/services/csv-adapter/par
 describe('AppController (e2e)', () => {
   let app: INestApplication;
   let csvAdapterService: CsvAdapterService;
+  const ingestionFolder = './test/fixtures/ingestionConfigs';
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -34,7 +35,6 @@ describe('AppController (e2e)', () => {
   });
 
   it('ingest test data', async () => {
-    const ingestionFolder = './test/fixtures/ingestionConfigs';
     const ingestionConfigFileName = 'config.test.json';
     await csvAdapterService.ingest(ingestionFolder, ingestionConfigFileName);
 
@@ -47,5 +47,13 @@ describe('AppController (e2e)', () => {
     });
     console.log('res: ', res);
     expect(res).toMatchObject(smallResponse);
+  });
+
+  it('should do partial ingestion due to fk', async () => {
+    const ingestionConfigFileName = 'config.fktest.json';
+    await csvAdapterService.ingest(ingestionFolder, ingestionConfigFileName);
+    await csvAdapterService.ingestData({});
+
+    // const res: any =
   });
 });

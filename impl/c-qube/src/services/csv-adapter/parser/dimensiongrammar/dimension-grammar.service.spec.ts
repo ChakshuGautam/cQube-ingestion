@@ -108,7 +108,7 @@ describe('DimensionGrammarService', () => {
 
   describe('getPrimaryKeyAndIndexes', () => {
     it('should get the primary key and indexes from row1 and row3', () => {
-      const row1 = ['PK', '', '', '', '', '', ''];
+      const row1 = ['PK', '', '', '', '', '', '', '', '', '', '', '', ''];
       const row3 = [
         'school_id',
         'school_name',
