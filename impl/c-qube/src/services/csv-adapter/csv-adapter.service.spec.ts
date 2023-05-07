@@ -7,6 +7,7 @@ import { DatasetService } from '../dataset/dataset.service';
 import { EventService } from '../event/event.service';
 import { DataFrame } from 'nodejs-polars';
 import * as csv from 'csv-parser';
+import { DimensionGrammarService } from './parser/dimensiongrammar/dimension-grammar.service';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs').promises;
@@ -33,6 +34,7 @@ describe('CsvAdapterService', () => {
         PrismaService,
         DimensionService,
         DatasetService,
+        DimensionGrammarService,
       ],
     }).compile();
 
@@ -163,6 +165,20 @@ describe('CsvAdapterService', () => {
 
     expect(response).toBe('success');
     expect(responseWithError).toBe('error from test');
+  });
+
+  it('should validate event data with grammar', async () => {
+    const grammarFilePath =
+      './test/fixtures/test-csvs/grammar-validator/validate-grammar.grammar.csv';
+
+    const dataFilePath =
+      './test/fixtures/test-csvs/grammar-validator/validate-grammar.data.csv';
+    try {
+      await service.validateEventDataWithGrammar(grammarFilePath, dataFilePath);
+      expect(true).toBe(true);
+    } catch (err) {
+      expect(err.message).toBe('Invalid Data');
+    }
   });
 
   // it('should create dimensions out of CSV', async () => {
