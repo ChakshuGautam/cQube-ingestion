@@ -29,6 +29,8 @@ describe('remove empty lines', () => {
       'test/fixtures/test-csvs/csvcleaner/withoutEmpty.csv',
       'test/fixtures/test-csvs/csvreader/invalid.reader.csv',
       'test/fixtures/test-csvs/csvreader/valid.reader.csv',
+      'test/fixtures/test-csvs/grammar-validator/validate-grammar.data.csv',
+      'test/fixtures/test-csvs/grammar-validator/validate-grammar.grammar.csv',
     ]);
   });
 });
