@@ -17,15 +17,19 @@ jobs:
         node-version: [16, 18]
 
     steps:
-      - uses: actions/checkout@v2
       - name: Run DBs
+        working-directory: .
         run: docker-compose up -d
 
+      - uses: actions/checkout@v2
+
       - name: Use Node.js ${{ matrix.node-version }}
+        # working-directory: impl/c-qube
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
+          cache-dependency-path: impl/c-qube/yarn.lock
 
       - run: yarn install
       - run: yarn build
