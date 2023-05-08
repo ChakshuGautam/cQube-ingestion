@@ -167,6 +167,20 @@ describe('CsvAdapterService', () => {
     expect(responseWithError).toBe('error from test');
   });
 
+  it('should validate event data with grammar', async () => {
+    const grammarFilePath =
+      './test/fixtures/test-csvs/grammar-validator/validate-grammar.grammar.csv';
+
+    const dataFilePath =
+      './test/fixtures/test-csvs/grammar-validator/validate-grammar.data.csv';
+    try {
+      await service.validateEventDataWithGrammar(grammarFilePath, dataFilePath);
+      expect(true).toBe(true);
+    } catch (err) {
+      expect(err.message).toBe('Invalid Data');
+    }
+  });
+
   // it('should create dimensions out of CSV', async () => {
   //   const dimensionGrammar: DimensionGrammar =
   //     await createDimensionGrammarFromCSVDefinition(

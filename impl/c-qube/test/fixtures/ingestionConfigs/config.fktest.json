@@ -1,0 +1,34 @@
+{
+  "globals": {
+    "onlyCreateWhitelisted": true
+  },
+  "dimensions": {
+    "namespace": "dimensions",
+    "fileNameFormat": "${dimensionName}.${index}.dimensions.data.csv",
+    "input": {
+      "files": "./ingest/dimensions"
+    }
+  },
+  "programs": [
+    {
+      "name": "FK Test Program",
+      "namespace": "fk_test_program",
+      "description": "FK Test Program",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./test/fixtures/ingestionConfigs/programs/fk-test"
+      },
+      "./output": {
+        "location": "./output/programs/fk-test"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "academicyear,district",
+          "academicyear,block",
+          "academicyear,cluster"
+        ],
+        "blacklisted": []
+      }
+    }
+  ]
+}

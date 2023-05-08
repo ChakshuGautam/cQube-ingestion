@@ -108,9 +108,22 @@ describe('DimensionGrammarService', () => {
 
   describe('getPrimaryKeyAndIndexes', () => {
     it('should get the primary key and indexes from row1 and row3', () => {
-      const row1 = 'PK,,,,,,,';
-      const row3 =
-        'school_id,school_name,schoolcategory_id,cluster_id,cluster_name,block_id,block_name,district_id,district_name,latitude,longitude';
+      const row1 = ['PK', '', '', '', '', '', '', '', '', '', '', '', ''].join(
+        ',',
+      );
+      const row3 = [
+        'school_id',
+        'school_name',
+        'schoolcategory_id',
+        'cluster_id',
+        'cluster_name',
+        'block_id',
+        'block_name',
+        'district_id',
+        'district_name',
+        'latitude',
+        'longitude',
+      ].join(',');
 
       const { pk, indexes } = getPrimaryKeyAndIndexes(row1, row3);
 
@@ -121,10 +134,32 @@ describe('DimensionGrammarService', () => {
 
   describe('getDimensionColumns', () => {
     it('should get the dimension columns from row2 and row3', () => {
-      const row2 =
-        'string,string,string,string,string,string,string,string,string,string,string';
-      const row3 =
-        'school_id,school_name,schoolcategory_id,cluster_id,cluster_name,block_id,block_name,district_id,district_name,latitude,longitude';
+      const row2 = [
+        'string',
+        'string',
+        'string',
+        'string',
+        'string',
+        'string',
+        'string',
+        'string',
+        'string',
+        'string',
+        'string',
+      ].join(',');
+      const row3 = [
+        'school_id',
+        'school_name',
+        'schoolcategory_id',
+        'cluster_id',
+        'cluster_name',
+        'block_id',
+        'block_name',
+        'district_id',
+        'district_name',
+        'latitude',
+        'longitude',
+      ].join(',');
 
       const dimensionColumns = getDimensionColumns(row2, row3);
 

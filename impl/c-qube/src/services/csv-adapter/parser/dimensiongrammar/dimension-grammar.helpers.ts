@@ -1,14 +1,14 @@
 import { DimensionGrammar } from 'src/types/dimension';
 import { Column, ColumnType } from '../../types/parser';
-const fs = require('fs').promises;
+import { readCSV } from '../utils/csvreader';
+import { promises as fs } from 'fs';
 
 export const createDimensionGrammarFromCSVDefinition = async (
   csvFilePath: string,
-  readFile: (path: string, encoding: string) => Promise<string> = fs.readFile,
 ): Promise<DimensionGrammar | null> => {
-  const fileContent = await readFile(csvFilePath, 'utf-8');
+  const fileContent = await fs.readFile(csvFilePath, 'utf-8');
   const [row1, row2, row3] = fileContent.split('\n').map((row) => row.trim());
-
+  // const [row1, row2, row3] = await readCSV(csvFilePath);
   if (!isValidCSVFormat(row1, row2, row3)) {
     console.error(`Invalid CSV format for file: ${csvFilePath}`);
     return null;
