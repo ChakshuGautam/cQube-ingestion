@@ -6,10 +6,9 @@ import {
 } from '../../../../services/mocks/types.mocks';
 
 describe('createSingleDatasetGrammarsFromEGWithoutTimeDimension', () => {
-  it('should stop making the ci fail', () => {
+  it('should make the test pass', () => {
     expect(true).toBe(true);
   });
-
   // it('should create a dataset grammar without a time dimension', async () => {
   //   const folderName = 'testFolder';
   //   const eventGrammar: EventGrammar = mockEventGrammar({

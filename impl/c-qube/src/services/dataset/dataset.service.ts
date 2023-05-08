@@ -374,6 +374,7 @@ export class DatasetService {
     for (const dur of durs) {
       data.push({ ...dur.updateParams, ...dur.filterParams });
     }
+    // TODO check for FK constraints before insert
     const sanitisedInput = await this.removeFKErrors(durs[0], data);
     durs[0].dataset.schema.title = durs[0].dataset.tableName;
     await this.insertBulkDatasetData(durs[0].dataset, sanitisedInput).catch(

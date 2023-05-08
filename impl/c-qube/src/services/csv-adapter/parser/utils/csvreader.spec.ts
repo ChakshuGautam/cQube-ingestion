@@ -54,7 +54,6 @@ describe('CSVReader', () => {
     }
   });
 
-  // Weird: The below test causes time out
   // test('should throw because of no file found', async () => {
   //   try {
   //     await readCSV('./test/fixtures/test-csvs/csvreader/invalid.reader1.csv');
