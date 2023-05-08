@@ -17,8 +17,9 @@ export class DimensionGrammarService {
   async createDimensionGrammarFromCSVDefinition(
     csvFilePath: string,
   ): Promise<DimensionGrammar | null> {
-    // const [row1, row2, row3] = fileContent.split('\n').map((row) => row.trim());
-    const [row1, row2, row3] = await readCSV(csvFilePath);
+    const fileContent = await fs.readFile(csvFilePath, 'utf-8');
+    const [row1, row2, row3] = fileContent.split('\n').map((row) => row.trim());
+    // const [row1, row2, row3] = await readCSV(csvFilePath);
 
     if (!isValidCSVFormat(row1, row2, row3)) {
       this.logger.error(

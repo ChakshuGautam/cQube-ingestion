@@ -345,6 +345,7 @@ export class DatasetService {
         `SELECT DISTINCT ${attr} from dimensions.${fkAttrMap[attr].table};`,
       );
       fkValues = fkValues.map((value) => value[attr]);
+      // if (fkValues.length === 0) return [];
 
       if (processedData[attr]) {
         const violations = processedData[attr]?.filter((value: any) => {

@@ -103,6 +103,7 @@ export class DimensionService {
 
     // iterate over indexQuery and execute each query
     for (const query of indexQuery) {
+
       await this.prisma.$queryRawUnsafe(query).catch((e) => {
         console.error(dimensionGrammar.name);
         console.error(query);

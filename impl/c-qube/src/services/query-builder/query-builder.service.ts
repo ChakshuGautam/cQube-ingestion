@@ -93,7 +93,9 @@ export class QueryBuilderService {
   }
 
   generateIndexStatement(schema: JSONSchema4): string[] | null {
+    // console.log(schema?.indexes);
     const psqlSchema = schema.psql_schema;
+    // console.log(psqlSchema);
     const indexStatements = [];
     if (schema.indexes) {
       const indexes = schema.indexes;

@@ -1,12 +1,14 @@
 import { DimensionGrammar } from 'src/types/dimension';
 import { Column, ColumnType } from '../../types/parser';
 import { readCSV } from '../utils/csvreader';
+import { promises as fs } from 'fs';
 
 export const createDimensionGrammarFromCSVDefinition = async (
   csvFilePath: string,
 ): Promise<DimensionGrammar | null> => {
-  const [row1, row2, row3] = await readCSV(csvFilePath);
-
+  const fileContent = await fs.readFile(csvFilePath, 'utf-8');
+  const [row1, row2, row3] = fileContent.split('\n').map((row) => row.trim());
+  // const [row1, row2, row3] = await readCSV(csvFilePath);
   if (!isValidCSVFormat(row1, row2, row3)) {
     console.error(`Invalid CSV format for file: ${csvFilePath}`);
     return null;
@@ -31,41 +33,39 @@ export const getDimensionNameFromFilePath = (csvFilePath: string): string => {
 };
 
 export const getPrimaryKeyAndIndexes = (
-  row1: string[],
-  row3: string[],
+  row1: string,
+  row3: string,
 ): { pk: string; indexes: string[] } => {
-  const pk: string = row3[row1.indexOf('PK')];
+  const pk: string = row3.split(',')[row1.split(',').indexOf('PK')];
 
   const indexes: string[] = row1
+    .split(',')
     .map((value, index) => (value === 'Index' ? index : -1))
     .filter((value) => value !== -1)
-    .map((value) => row3[value]);
+    .map((value) => row3.split(',')[value]);
 
   return { pk, indexes };
 };
 
-export const getDimensionColumns = (
-  row2: string[],
-  row3: string[],
-): Column[] => {
-  return row2.map((value, index) => {
+export const getDimensionColumns = (row2: string, row3: string): Column[] => {
+  return row2.split(',').map((value, index) => {
     return {
-      name: row3[index],
+      name: row3.split(',')[index],
       type: ColumnType[value as keyof typeof ColumnType],
     };
   });
 };
 
 export const isValidCSVFormat = (
-  row1: string[],
-  row2: string[],
-  row3: string[],
+  row1: string,
+  row2: string,
+  row3: string,
 ): boolean => {
   try {
     // Add validation logic here
-    const isValidRow1 = row1.length >= 1;
-    const isValidRow2 = row2.length >= 1;
-    const isValidRow3 = row3.length >= 1;
+    const isValidRow1 = row1.split(',').length >= 1;
+    const isValidRow2 = row2.split(',').length >= 1;
+    const isValidRow3 = row3.split(',').length >= 1;
 
     // console.log(
     //   row1.split(',').length,
@@ -79,8 +79,8 @@ export const isValidCSVFormat = (
       isValidRow1 &&
       isValidRow2 &&
       isValidRow3 &&
-      row2.length === row3.length &&
-      row1.length === row3.length
+      row2.split(',').length === row3.split(',').length &&
+      row1.split(',').length === row3.split(',').length
     );
   } catch (e) {
     return false;
