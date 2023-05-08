@@ -8,6 +8,7 @@ import { EventService } from './../../../src/services/event/event.service';
 import { DatasetService } from './../../../src/services/dataset/dataset.service';
 import { DimensionService } from './../../../src/services/dimension/dimension.service';
 import { QueryBuilderService } from './../../../src/services/query-builder/query-builder.service';
+import { DimensionGrammarService } from './../../../src/services/csv-adapter/parser/dimensiongrammar/dimension-grammar.service';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -23,6 +24,7 @@ describe('AppController (e2e)', () => {
         PrismaService,
         DimensionService,
         QueryBuilderService,
+        DimensionGrammarService,
       ],
     }).compile();
 

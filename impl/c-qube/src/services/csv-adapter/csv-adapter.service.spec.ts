@@ -7,6 +7,7 @@ import { DatasetService } from '../dataset/dataset.service';
 import { EventService } from '../event/event.service';
 import { DataFrame } from 'nodejs-polars';
 import * as csv from 'csv-parser';
+import { DimensionGrammarService } from './parser/dimensiongrammar/dimension-grammar.service';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs').promises;
@@ -33,6 +34,7 @@ describe('CsvAdapterService', () => {
         PrismaService,
         DimensionService,
         DatasetService,
+        DimensionGrammarService,
       ],
     }).compile();
 

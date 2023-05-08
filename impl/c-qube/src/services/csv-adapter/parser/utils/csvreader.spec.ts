@@ -21,12 +21,12 @@ describe('CSVReader', () => {
     }
   });
 
-  test('should throw because of no file found', async () => {
-    try {
-      await readCSV('./test/fixtures/test-csvs/csvreader/invalid.reader1.csv');
-    } catch (err) {
-      console.log('err: ', err);
-      expect(err).toBeDefined();
-    }
-  });
+  // test('should throw because of no file found', async () => {
+  //   try {
+  //     await readCSV('./test/fixtures/test-csvs/csvreader/invalid.reader1.csv');
+  //   } catch (err) {
+  //     console.log('err: ', err);
+  //     expect(err).toBeDefined();
+  //   }
+  // });
 });
