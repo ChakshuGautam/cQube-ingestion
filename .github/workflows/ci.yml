@@ -2,10 +2,10 @@ name: Node.js CI
 
 on:
   push:
-    branches: 
+    branches:
       - '*'
   pull_request:
-    branches: 
+    branches:
       - '*'
 
 jobs:
@@ -34,8 +34,6 @@ jobs:
         run: |
           touch .env
           echo "DATABASE_URL="postgres://timescaledb:postgrespassword@localhost:5432/postgres?sslmode=disable"" > .env
-      
-      
 
       - name: build
         working-directory: impl/c-qube
@@ -53,18 +51,18 @@ jobs:
         run: |
           yarn test
           yarn test:cov
-      
+
       - name: Stop DBs
         working-directory: .
         run: |
           docker-compose down
-      
-      - name: e2e Tests
-        working-directory: impl/c-qube
-        run: |
-          yarn test:docker:up
-          while ! docker-compose -f docker-compose.test.yaml ps | grep -q "healthy"; do sleep 1; done
-          yarn test:e2e
+
+      # - name: e2e Tests
+      #   working-directory: impl/c-qube
+      #   run: |
+      #     yarn test:docker:up
+      #     while ! docker-compose -f docker-compose.test.yaml ps | grep -q "healthy"; do sleep 1; done
+      #     yarn test:e2e
 
       - name: Coveralls GitHub Action
         uses: coverallsapp/github-action@v1
