@@ -17,11 +17,11 @@ jobs:
         node-version: [16, 18]
 
     steps:
-      - name: Run DBs
-        working-directory: .
-        run: docker-compose up -d
-
       - uses: actions/checkout@v2
+
+      - name: Run DBs
+        # working-directory: .
+        run: docker-compose up -d
 
       - name: Use Node.js ${{ matrix.node-version }}
         # working-directory: impl/c-qube
