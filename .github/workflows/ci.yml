@@ -64,7 +64,7 @@ jobs:
       #     while ! docker-compose -f docker-compose.test.yaml ps | grep -q "healthy"; do sleep 1; done
       #     yarn test:e2e
 
-      - name: Coveralls GitHub Action
-        uses: coverallsapp/github-action@v1
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
