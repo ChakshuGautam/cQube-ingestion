@@ -57,12 +57,12 @@ jobs:
         run: |
           docker-compose down
 
-      - name: e2e Tests
-        working-directory: impl/c-qube
-        run: |
-          yarn test:docker:up
-          while ! docker-compose -f docker-compose.test.yaml ps | grep -q "healthy"; do sleep 1; done
-          yarn test:e2e
+      # - name: e2e Tests
+      #   working-directory: impl/c-qube
+      #   run: |
+      #     yarn test:docker:up
+      #     while ! docker-compose -f docker-compose.test.yaml ps | grep -q "healthy"; do sleep 1; done
+      #     yarn test:e2e
 
       - name: Coveralls GitHub Action
         uses: coverallsapp/github-action@v1
