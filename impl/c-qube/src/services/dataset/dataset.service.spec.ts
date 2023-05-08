@@ -62,7 +62,7 @@ describe('DatasetService', () => {
         count: 2,
         sum: 69,
         avg: 34.5,
-        state_id: '13',
+        state_id: '9999',
         program_name: 'NISHTHA 3.0',
       },
       {
@@ -83,7 +83,7 @@ describe('DatasetService', () => {
         count: 2,
         sum: 60,
         avg: 30,
-        state_id: '13',
+        state_id: '9999',
         program_name: 'NISHTHA 2.0',
       },
     ];
