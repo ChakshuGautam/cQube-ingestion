@@ -27,6 +27,7 @@ export interface DatasetGrammar {
   eventGrammar?: EventGrammar;
   tableName?: string;
   tableNameExpanded?: string;
+  outputFolder?: string;
 }
 
 export interface Dataset {
