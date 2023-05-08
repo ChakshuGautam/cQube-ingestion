@@ -12,9 +12,9 @@ jobs:
   CQube-Impl:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [16, 18]
+    # strategy:
+    #   matrix:
+    #     node-version: [16, 18]
 
     steps:
       - uses: actions/checkout@v2
@@ -23,11 +23,11 @@ jobs:
         # working-directory: .
         run: docker-compose up -d
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 16
         # working-directory: impl/c-qube
         uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 16
           cache: 'yarn'
           cache-dependency-path: impl/c-qube/yarn.lock
 
