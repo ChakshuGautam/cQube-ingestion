@@ -5,7 +5,7 @@ import {
 } from '../../../../types/dataset';
 import { EventGrammar } from 'src/types/event';
 import { DimensionGrammar } from '../../../../types/dimension';
-import { getEGDefFromFile } from '../eventgrammar/parser';
+import { getEGDefFromFile } from '../event-grammar/parser';
 import { hash } from '../../../../utils/hash';
 import { EventGrammarCSVFormat, FieldType } from '../../types/parser';
 

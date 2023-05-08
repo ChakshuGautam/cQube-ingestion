@@ -1,6 +1,6 @@
 import { EventGrammar, InstrumentType } from '../../../../types/event';
 import { getDGDefsFromEGDefs } from '../../csv-adapter.utils';
-import { createDimensionGrammarFromCSVDefinition } from '../dimensiongrammar/parser';
+import { createDimensionGrammarFromCSVDefinition } from '../dimension-grammar/parser';
 import { DimensionMapping } from '../../../../types/dataset';
 import { JSONSchema4 } from 'json-schema';
 import {

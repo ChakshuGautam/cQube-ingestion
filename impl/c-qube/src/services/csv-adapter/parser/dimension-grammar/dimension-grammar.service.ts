@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { promises as fs } from 'fs';
 import {
-  createCompositeDimensionGrammar,
   getDimensionColumns,
   getDimensionNameFromFilePath,
   getPrimaryKeyAndIndexes,
