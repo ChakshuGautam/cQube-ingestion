@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { CACHE_MANAGER, Inject, Injectable, Logger } from '@nestjs/common';
 import {
   DatasetGrammar,
   DatasetUpdateRequest,
@@ -16,8 +16,12 @@ import { logToFile } from '../../utils/debug';
 import { EventService } from '../event/event.service';
 import { EventGrammar } from 'src/types/event';
 import { readCSV } from '../csv-adapter/parser/utils/csvreader';
+import { table } from 'console';
 const pLimit = require('p-limit');
 const limit = pLimit(10);
+import memoize from 'fast-memoize';
+import { Cache } from 'cache-manager';
+import { all } from 'nodejs-polars/bin/lazy/functions';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs');
@@ -38,6 +42,7 @@ export class DatasetService {
     public prisma: PrismaService,
     private qbService: QueryBuilderService,
     private eventGrammarService: EventService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   counterAggregates(): any {
@@ -319,6 +324,50 @@ export class DatasetService {
     await this.prisma.$queryRawUnsafe(insertQuery);
   }
 
+  async getDimensionData(attr: string, table: string): Promise<any[]> {
+    const startTime = performance.now();
+    const olderData: any[] = await this.cacheManager.get(
+      `dimensions.${table}.${attr}`,
+    );
+    const endTime = performance.now();
+    if (olderData) {
+      this.logger.verbose(
+        `Got older data from cache for ${table}.${attr} in ${
+          endTime - startTime
+        }ms. Total records - ${olderData.length}`,
+      );
+      return olderData as any[];
+    } else {
+      const startTime = performance.now();
+      const query = `SELECT * from dimensions.${table};`;
+      const data: any[] = await this.prisma.$queryRawUnsafe(query);
+      let returnData = [];
+      const allAtts = Object.keys(data[0]);
+      for (let i = 0; i < allAtts.length; i++) {
+        const attrib = allAtts[i];
+        const attrData = [];
+        for (const row of data) {
+          attrData.push({ [attrib]: row[attrib] });
+        }
+        await this.cacheManager.set(
+          `dimensions.${table}.${attrib}`,
+          attrData,
+          3600000,
+        );
+        if (attrib === attr) {
+          returnData = attrData;
+        }
+      }
+      const endTime = performance.now();
+      this.logger.log(
+        `Getting data from database ${table}.${attr} took ${
+          endTime - startTime
+        }ms`,
+      );
+      return returnData as any[];
+    }
+  }
+
   async removeFKErrors(
     durs: DatasetUpdateRequest,
     data: any[],
@@ -341,9 +390,11 @@ export class DatasetService {
       });
     });
     for (const attr in fkAttrMap) {
-      let fkValues: string[] = await this.prisma.$queryRawUnsafe(
-        `SELECT DISTINCT ${attr} from dimensions.${fkAttrMap[attr].table};`,
+      let fkValues: string[] = await this.getDimensionData(
+        attr,
+        fkAttrMap[attr].table,
       );
+      // let fkValues: string[] = await this.prisma.$queryRawUnsafe(query);
       fkValues = fkValues.map((value) => value[attr]);
       // if (fkValues.length === 0) return [];
 
@@ -375,7 +426,14 @@ export class DatasetService {
       data.push({ ...dur.updateParams, ...dur.filterParams });
     }
     // TODO check for FK constraints before insert
+    const startTime = performance.now();
     const sanitisedInput = await this.removeFKErrors(durs[0], data);
+    const endTime = performance.now();
+    this.logger.log(
+      `Time taken: ${(endTime - startTime).toFixed(4)} ms for ${
+        durs[0].dataset.name
+      }`,
+    );
     durs[0].dataset.schema.title = durs[0].dataset.tableName;
     await this.insertBulkDatasetData(durs[0].dataset, sanitisedInput).catch(
       async (error) => {

@@ -12,9 +12,10 @@ import { EventService } from './services/event/event.service';
 import { InstrumenttypeService } from './services/instrumenttype/instrumenttype.service';
 import { VizService } from './services/viz/viz.service';
 import { DimensionGrammarService } from './services/csv-adapter/parser/dimension-grammar/dimension-grammar.service';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
-  imports: [],
+  imports: [CacheModule.register()],
   controllers: [AppController],
   providers: [
     AppService,
