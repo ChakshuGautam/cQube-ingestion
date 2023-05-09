@@ -235,17 +235,20 @@ export class CsvAdapterService {
     }[] = [];
     for (let j = 0; j < config?.programs.length; j++) {
       const inputFiles = readdirSync(config?.programs[j].input?.files);
+      const outDir = config?.programs[j]['./output']?.location;
       for (let i = 0; i < inputFiles?.length; i++) {
         const compoundDimensions: string[] =
           config.programs[j].dimensions.whitelisted;
         for (let k = 0; k < compoundDimensions.length; k++) {
           const eventGrammarFiles = [];
+          const outputFiles = [];
           const compoundDimensionsToBeInEG = compoundDimensions[k].split(',');
           // Find relevant Event Grammar Files that include all compound dimensions
           if (regexEventGrammar.test(inputFiles[i])) {
             // console.log(config?.programs[j].input?.files + `/${inputFiles[i]}`);
             const filePathForEventGrammar =
               config?.programs[j].input?.files + `/${inputFiles[i]}`;
+            const outputPathForEventGrammar = outDir + `/${inputFiles[i]}`;
             const fileContentForEventGrammar = await fs.readFile(
               filePathForEventGrammar,
               'utf-8',
@@ -266,6 +269,7 @@ export class CsvAdapterService {
               //   filePathForEventGrammar,
               // });
               eventGrammarFiles.push(filePathForEventGrammar);
+              outputFiles.push(outputPathForEventGrammar);
             }
           }
           //iterate over all defaultTimeDimension
