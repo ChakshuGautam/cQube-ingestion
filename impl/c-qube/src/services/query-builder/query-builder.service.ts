@@ -11,8 +11,6 @@ type fk = {
 
 @Injectable()
 export class QueryBuilderService {
-  constructor() {}
-
   cleanStatement(statement: string): string {
     return (
       statement
