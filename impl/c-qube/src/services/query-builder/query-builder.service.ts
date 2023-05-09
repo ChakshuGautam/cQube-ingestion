@@ -213,9 +213,7 @@ export class QueryBuilderService {
     let joinStatements = '';
     let whereStatements = '';
 
-    console.log('schema: ', schema);
     if (schema.fk !== undefined) {
-      console.log('fk here: ', schema.fk);
       schema.fk.forEach((fk: fk) => {
         const referenceTable = fk.reference.table;
         const referenceColumn = fk.reference.column;
