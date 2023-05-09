@@ -1,10 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DimensionGrammarService } from './dimension-grammar.service';
 import { promises as fsMock } from 'fs';
-import assert from 'assert';
 import {
-  createCompositeDimensionGrammar,
-  createDimensionGrammarFromCSVDefinition,
   getDimensionColumns,
   getDimensionNameFromFilePath,
   getPrimaryKeyAndIndexes,

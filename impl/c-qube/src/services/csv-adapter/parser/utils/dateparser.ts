@@ -1,5 +1,5 @@
 import { parse, format as formatDate } from 'date-fns';
-import { utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz';
+import { zonedTimeToUtc } from 'date-fns-tz';
 
 export class DateParser {
   private format: string;
