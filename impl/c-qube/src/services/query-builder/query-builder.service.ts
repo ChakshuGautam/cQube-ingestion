@@ -136,7 +136,7 @@ export class QueryBuilderService {
     return this.cleanStatement(query);
   }
 
-  generateBulkInsertStatement(schema: JSONSchema4, data: any[]): string {
+  generateBulkInsertStatementOld(schema: JSONSchema4, data: any[]): string {
     const tableName = schema.title;
     const psqlSchema = schema.psql_schema;
     const fields = [];
@@ -169,6 +169,72 @@ export class QueryBuilderService {
     const query = `INSERT INTO ${psqlSchema}.${tableName} (${fields.join(
       ', ',
     )}) VALUES ${values.join(', ')};`;
+    return this.cleanStatement(query);
+  }
+
+  generateBulkInsertStatement(schema: JSONSchema4, data: any[]): string {
+    const tableName = schema.title;
+    const psqlSchema = schema.psql_schema;
+    const fields = [];
+    const values = [];
+
+    const propertiesToSkip = ['id'];
+
+    const properties = schema.properties;
+    for (const property in properties) {
+      if (propertiesToSkip.includes(property)) continue;
+      fields.push(property);
+    }
+
+    const tempTableName = `temp_${tableName}`;
+    const createTempTable = `CREATE TEMPORARY TABLE ${tempTableName} (LIKE ${psqlSchema}.${tableName});`;
+    const insertTempTable = `INSERT INTO ${tempTableName} (${fields.join(
+      ', ',
+    )}) VALUES `;
+    const rows = [];
+
+    for (const row of data) {
+      const rowValues = [];
+      for (const property in properties) {
+        if (propertiesToSkip.includes(property)) continue;
+        if (
+          schema.properties[property].type === 'string' &&
+          schema.properties[property].format === 'date'
+        ) {
+          rowValues.push(`'${row[property].toISOString()}'`);
+        } else {
+          rowValues.push(`'${row[property]}'`);
+        }
+      }
+      rows.push(`(${rowValues.join(', ')})`);
+    }
+    const insertTempTableRows = `${insertTempTable}${rows.join(', ')};`;
+
+    let joinStatements = '';
+    let whereStatements = '';
+
+    console.log('schema: ', schema);
+    if (schema.fk !== undefined) {
+      console.log('fk here: ', schema.fk);
+      schema.fk.forEach((fk: fk) => {
+        const referenceTable = fk.reference.table;
+        const referenceColumn = fk.reference.column;
+        const childColumn = fk.column;
+        joinStatements += ` LEFT JOIN ${referenceTable} ON ${tempTableName}.${childColumn} = ${referenceTable}.${referenceColumn}`;
+        whereStatements += ` AND ${referenceTable}.${referenceColumn} IS NOT NULL`;
+      });
+    }
+
+    const filteredInsert = `INSERT INTO ${psqlSchema}.${tableName} (${fields.join(
+      ', ',
+    )})
+        SELECT ${fields.join(', ')} FROM ${tempTableName}
+        ${joinStatements === '' ? ' ' : joinStatements}
+        WHERE TRUE${whereStatements === '' ? ' ' : whereStatements};`;
+
+    const dropTempTable = `DROP TABLE ${tempTableName};`;
+
+    const query = `${createTempTable}\n${insertTempTableRows}\n${filteredInsert}\n${dropTempTable}`;
     return this.cleanStatement(query);
   }
 

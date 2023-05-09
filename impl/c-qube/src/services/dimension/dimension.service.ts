@@ -134,7 +134,7 @@ export class DimensionService {
     });
     data = _.uniqBy(data, 'name');
 
-    const insertQuery = this.qbService.generateBulkInsertStatement(
+    const insertQuery = this.qbService.generateBulkInsertStatementOld(
       dimensionGrammar.schema,
       data,
     );
@@ -165,7 +165,7 @@ export class DimensionService {
     dimensionGrammar: DimensionGrammar,
     data: any[],
   ): Promise<void> {
-    const insertQuery = this.qbService.generateBulkInsertStatement(
+    const insertQuery = this.qbService.generateBulkInsertStatementOld(
       dimensionGrammar.schema,
       data,
     );

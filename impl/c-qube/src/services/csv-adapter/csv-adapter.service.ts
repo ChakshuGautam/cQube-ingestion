@@ -189,6 +189,7 @@ export class CsvAdapterService {
     defaultTimeDimensions: string[],
     eventCounterColumns: string[],
   ): DatasetGrammar[] {
+    console.log('generate dataset grammar is called!');
     const datasetGrammars: DatasetGrammar[] = [];
     for (let i = 0; i < dimensionGrammars.length; i++) {
       for (let j = 0; j < defaultTimeDimensions.length; j++) {
@@ -216,9 +217,19 @@ export class CsvAdapterService {
               properties: {
                 [dimensionGrammars[i].name]: { type: 'string' },
               },
+              fk:
+                dimensionMapping.map((d: DimensionMapping) => {
+                  return {
+                    column: d.key,
+                    reference: {
+                      table: d.dimension.name.name,
+                      column: d.dimension.name.storage.primaryId,
+                    },
+                  };
+                }) ?? [],
             },
           };
-
+          console.log('generated Dataset grammar: ', dataserGrammar);
           datasetGrammars.push(dataserGrammar);
         }
       }

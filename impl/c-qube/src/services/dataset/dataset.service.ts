@@ -316,6 +316,7 @@ export class DatasetService {
       datasetGrammar.schema,
       data,
     );
+    console.log('query: ', insertQuery);
     await this.prisma.$queryRawUnsafe(insertQuery);
   }
 
