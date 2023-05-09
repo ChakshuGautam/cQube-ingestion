@@ -447,7 +447,6 @@ export class CsvAdapterService {
     const eventGrammarsGlobal: EventGrammar[] = [];
     for (let j = 0; j < config?.programs.length; j++) {
       const inputFiles = readdirSync(config?.programs[j].input?.files);
-      const outputFolder = config?.programs[j]['./output']?.files;
       // For 1TimeDimension + 1EventCounter + 1Dimension
       for (let i = 0; i < inputFiles?.length; i++) {
         if (regexEventGrammar.test(inputFiles[i])) {
@@ -511,8 +510,6 @@ export class CsvAdapterService {
             // console.log(config?.programs[j].input?.files + `/${inputFiles[i]}`);
             const filePathForEventGrammar =
               config?.programs[j].input?.files + `/${inputFiles[i]}`;
-            const outputFolder = config?.programs[j]['./output']?.files;
-
             const fileContentForEventGrammar = await fs.readFile(
               filePathForEventGrammar,
               'utf-8',

@@ -99,7 +99,6 @@ export class DatasetService {
       isCompound: model.isCompound,
       eventGrammarFile: model.eventGrammarFile,
       eventGrammar: eventGrammar,
-      outputFolder: model.outputDatasetErrors,
     };
   }
 
@@ -135,7 +134,6 @@ export class DatasetService {
           program: datasetGrammar.program,
           eventGrammarFile: datasetGrammar.eventGrammarFile,
           eventGrammarId: eventGrammar?.id,
-          outputDatasetErrors: datasetGrammar.outputFolder,
         },
       })
       .then((model: DatasetGrammarModel) => {
