@@ -641,9 +641,11 @@ export class CsvAdapterService {
     );
 
     // Create Empty Dataset Tables
-    for (let i = 0; i < datasetGrammarsGlobal.length; i++) {
-      await this.datasetService.createDataset(datasetGrammarsGlobal[i]);
-    }
+    await Promise.all(
+      datasetGrammarsGlobal.map((x) =>
+        retryPromiseWithDelay(this.datasetService.createDataset(x), 20, 5000),
+      ),
+    );
 
     s.stop('✅ 5. Dataset Grammars have been ingested');
     // Insert events into the datasets
