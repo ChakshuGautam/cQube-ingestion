@@ -317,11 +317,25 @@ export class DatasetService {
     datasetGrammar: DatasetGrammar,
     data: any[],
   ): Promise<void> {
-    const insertQuery = this.qbService.generateBulkInsertStatement(
+    const insertQueries = this.qbService.generateBulkInsertStatement(
       datasetGrammar.schema,
       data,
     );
-    await this.prisma.$queryRawUnsafe(insertQuery);
+    console.log(insertQueries);
+    try {
+      const transactions = insertQueries.map((q: string) => {
+        console.log(q);
+        if (q.startsWith('SELECT')) return this.prisma.$queryRawUnsafe(q);
+        else return this.prisma.$executeRawUnsafe(q);
+      });
+      console.log(transactions);
+      await this.prisma.$transaction(transactions);
+      // await this.prisma.$queryRawUnsafe();
+    } catch (err) {
+      console.error(err);
+      // console.error(insertQuery);
+      throw err;
+    }
   }
 
   async getDimensionData(attr: string, table: string): Promise<any[]> {
@@ -332,8 +346,7 @@ export class DatasetService {
     const endTime = performance.now();
     if (olderData) {
       this.logger.verbose(
-        `Got older data from cache for ${table}.${attr} in ${
-          endTime - startTime
+        `Got older data from cache for ${table}.${attr} in ${endTime - startTime
         }ms. Total records - ${olderData.length}`,
       );
       return olderData as any[];
@@ -360,8 +373,7 @@ export class DatasetService {
       }
       const endTime = performance.now();
       this.logger.log(
-        `Getting data from database ${table}.${attr} took ${
-          endTime - startTime
+        `Getting data from database ${table}.${attr} took ${endTime - startTime
         }ms`,
       );
       return returnData as any[];
@@ -430,13 +442,13 @@ export class DatasetService {
     const sanitisedInput = await this.removeFKErrors(durs[0], data);
     const endTime = performance.now();
     this.logger.log(
-      `Time taken: ${(endTime - startTime).toFixed(4)} ms for ${
-        durs[0].dataset.name
+      `Time taken: ${(endTime - startTime).toFixed(4)} ms for ${durs[0].dataset.name
       }`,
     );
     durs[0].dataset.schema.title = durs[0].dataset.tableName;
     await this.insertBulkDatasetData(durs[0].dataset, sanitisedInput).catch(
       async (error) => {
+        console.log('error: ', error);
         this.logger.error(
           `ERROR Inserting Data in Bulk: ${durs[0].dataset.name}. Trying them 1 by 1`,
         );
