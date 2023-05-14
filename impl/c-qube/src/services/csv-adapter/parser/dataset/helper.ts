@@ -2,6 +2,7 @@ import { DatasetGrammar, DimensionMapping } from '../../../../types/dataset';
 import { DateParser } from '../utils/dateparser';
 import { EventGrammar, Event as cQubeEvent } from 'src/types/event';
 import { readCSV } from '../utils/csvreader';
+const fs = require('fs');
 
 export const createDatasetDataToBeInserted = async (
   timeDimension: string,
@@ -18,6 +19,8 @@ export const createDatasetDataToBeInserted = async (
   const filePath = eventGrammar.file.replace('grammar', 'data');
 
   const df = await readCSV(filePath);
+  if (!df || !df[0]) return;
+
   const getIndexForHeader = (headers: string[], header: string): number => {
     return headers.indexOf(header);
   };
@@ -91,8 +94,17 @@ export const createCompoundDatasetDataToBeInserted = async (
   delete properties.year;
 
   console.log('eventFilePath: ', eventFilePath);
+
+  // checking if the file is empty or not
+  const stats = fs.statSync(eventFilePath);
+  if (stats.size === 0) {
+    console.log(`File at ${eventFilePath} is empty`);
+    return;
+  }
+
   const df = await readCSV(eventFilePath);
   console.log('df: ', df);
+  if (!df || !df[0]) return;
   const getIndexForHeader = (headers: string[], header: string): number => {
     return headers.indexOf(header);
   };
@@ -100,6 +112,7 @@ export const createCompoundDatasetDataToBeInserted = async (
   // Get headers
   const headers = df[0];
   console.log('headers: ', headers);
+  if (!headers) return;
   // Get index for timeDimension
   const timeDimensionIndex = getIndexForHeader(headers, 'date');
 
