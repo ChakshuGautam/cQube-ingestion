@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { DimensionGrammar, Store } from 'src/types/dimension';
 import { DimensionGrammar as DimensionGrammarModel } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
@@ -9,12 +9,13 @@ const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const _ = require('lodash');
-
+import { Cache } from 'cache-manager';
 @Injectable()
 export class DimensionService {
   constructor(
     public prisma: PrismaService,
     private qbService: QueryBuilderService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   dbModelToDimensionGrammar(model: DimensionGrammarModel): DimensionGrammar {
@@ -134,41 +135,54 @@ export class DimensionService {
     });
     data = _.uniqBy(data, 'name');
 
-    const insertQuery = this.qbService.generateBulkInsertStatement(
+    const insertQuery = this.qbService.generateBulkInsertStatementOld(
       dimensionGrammar.schema,
       data,
     );
 
-    await this.prisma.$queryRawUnsafe(insertQuery).catch(async (err) => {
-      console.log('After', dimensionGrammar.name, data.length);
-      if (data.length < 50) {
-        console.log(data);
-      }
-      // save data to CSV
-      // const csvWriter = createCsvWriter({
-      //   path: `fixtures/${dimensionGrammar.name}.csv`,
-      //   header: [
-      //     { id: 'name', title: 'name' },
-      //     { id: 'id', title: 'id' },
-      //   ],
-      // });
-      // await csvWriter.writeRecords(data).then(() => {
-      //   console.log('...Done');
-      // });
+    await this.prisma
+      .$queryRawUnsafe(insertQuery)
+      .then(async (s) => {
+        // const key = `${dimensionGrammar.schema.psql_schema}.${dimensionGrammar.schema.title}.${dimensionGrammar.storage.primaryId}`;
+        // console.log('key: ', key);
+        // await this.cacheManager.set(
+        //   key,
+        //   data.map((item) => item[dimensionGrammar.storage.primaryId]),
+        // );
+      })
+      .catch(async (err) => {
+        console.log('After', dimensionGrammar.name, data.length);
+        if (data.length < 50) {
+          console.log(data);
+        }
+        // save data to CSV
+        // const csvWriter = createCsvWriter({
+        //   path: `fixtures/${dimensionGrammar.name}.csv`,
+        //   header: [
+        //     { id: 'name', title: 'name' },
+        //     { id: 'id', title: 'id' },
+        //   ],
+        // });
+        // await csvWriter.writeRecords(data).then(() => {
+        //   console.log('...Done');
+        // });
 
-      console.error(dimensionGrammar.name);
-      console.error(err);
-    });
+        console.error(dimensionGrammar.name);
+        console.error(err);
+      });
   }
 
   async insertBulkDimensionDataV2(
     dimensionGrammar: DimensionGrammar,
     data: any[],
   ): Promise<void> {
-    const insertQuery = this.qbService.generateBulkInsertStatement(
+    // console.log('data in insertBulkDimensionDataV2: ', data.length);
+    const insertQuery = this.qbService.generateBulkInsertStatementOld(
       dimensionGrammar.schema,
       data,
     );
+
+    // console.log('dimensionGrammar: ', dimensionGrammar.schema);
 
     await this.prisma.$queryRawUnsafe(insertQuery).catch(async (err) => {
       console.log('After', dimensionGrammar.name, data.length);
@@ -179,5 +193,13 @@ export class DimensionService {
       console.error(dimensionGrammar.name);
       console.error(err);
     });
+
+    //inserting this dimension data into cache
+    // const key = `${dimensionGrammar.schema.psql_schema}.${dimensionGrammar.schema.title}.${dimensionGrammar.storage.primaryId}`;
+    // console.log('key: ', key);
+    // await this.cacheManager.set(
+    //   key,
+    //   data.map((item) => item[dimensionGrammar.storage.primaryId]),
+    // );
   }
 }
