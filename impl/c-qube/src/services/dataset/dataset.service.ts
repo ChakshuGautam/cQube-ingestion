@@ -1,4 +1,4 @@
-import { CACHE_MANAGER, Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   DatasetGrammar,
   DatasetUpdateRequest,
@@ -19,11 +19,7 @@ import { readCSV } from '../csv-adapter/parser/utils/csvreader';
 import { table } from 'console';
 const pLimit = require('p-limit');
 const limit = pLimit(10);
-import memoize from 'fast-memoize';
-import { Cache } from 'cache-manager';
-import { all } from 'nodejs-polars/bin/lazy/functions';
 
-import { Prisma } from '@prisma/client';
 import { Pool, QueryResult } from 'pg';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs');
@@ -44,7 +40,6 @@ export class DatasetService {
     public prisma: PrismaService,
     private qbService: QueryBuilderService,
     private eventGrammarService: EventService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @Inject('DATABASE_POOL') private pool: Pool,
   ) {}
 
@@ -366,97 +361,6 @@ export class DatasetService {
     //   console.error(err);
     //   throw err;
     // }
-  }
-
-  async getDimensionData(attr: string, table: string): Promise<any[]> {
-    const startTime = performance.now();
-    const olderData: any[] = await this.cacheManager.get(
-      `dimensions.${table}.${attr} `,
-    );
-    const endTime = performance.now();
-    if (olderData) {
-      this.logger.verbose(
-        `Got older data from cache for ${table}.${attr} in ${endTime - startTime
-        } ms.Total records - ${olderData.length} `,
-      );
-      return olderData as any[];
-    } else {
-      const startTime = performance.now();
-      const query = `SELECT * from dimensions.${table}; `;
-      const data: any[] = await this.prisma.$queryRawUnsafe(query);
-      let returnData = [];
-      const allAtts = Object.keys(data[0]);
-      for (let i = 0; i < allAtts.length; i++) {
-        const attrib = allAtts[i];
-        const attrData = [];
-        for (const row of data) {
-          attrData.push({ [attrib]: row[attrib] });
-        }
-        await this.cacheManager.set(
-          `dimensions.${table}.${attrib}`,
-          attrData,
-          3600000,
-        );
-        if (attrib === attr) {
-          returnData = attrData;
-        }
-      }
-      const endTime = performance.now();
-      this.logger.log(
-        `Getting data from database ${table}.${attr} took ${endTime - startTime
-        } ms`,
-      );
-      return returnData as any[];
-    }
-  }
-  async removeFKErrors(
-    durs: DatasetUpdateRequest,
-    data: any[],
-  ): Promise<any[]> {
-    const eventGrammarFile = durs.dataset.eventGrammarFile;
-    const fkAttrMap = {};
-    const grammarFileRows = await readCSV(eventGrammarFile);
-    grammarFileRows[0].forEach((table, index) => {
-      if (table.trim() !== '') {
-        fkAttrMap[grammarFileRows[3][index]] = { table };
-      }
-    });
-    const processedData = {};
-    data.forEach((dataItem: any) => {
-      Object.keys(dataItem).forEach((key) => {
-        if (!processedData[key]) {
-          processedData[key] = [];
-        }
-        processedData[key].push(dataItem[key]);
-      });
-    });
-    for (const attr in fkAttrMap) {
-      // let fkValues: string[] = await this.getDimensionData(
-      //   attr,
-      //   fkAttrMap[attr].table,
-      // );
-      const key = `dimensions.${fkAttrMap[attr].table}.${attr}`;
-      this.logger.debug(`getting key: ${key}`);
-      let fkValues: string[] = await this.cacheManager.get(key);
-
-      if (!fkValues) {
-        fkValues = await this.getDimensionData(attr, fkAttrMap[attr].table);
-      } else {
-        this.logger.verbose('got from cache');
-      }
-      // let fkValues: string[] = await this.prisma.$queryRawUnsafe(query);
-      fkValues = fkValues.map((value) => value[attr]);
-      // if (fkValues.length === 0) return [];
-
-      if (processedData[attr]) {
-        const violations = processedData[attr]?.filter((value: any) => {
-          return !fkValues.includes(value);
-        });
-        data = data.filter((dataItem) => !violations?.includes(dataItem[attr]));
-      }
-    }
-    // TODO: Implement outputting the violations to output folder
-    return data;
   }
 
   async processDatasetUpdateRequest(
