@@ -90,15 +90,16 @@ export const createCompoundDatasetDataToBeInserted = async (
   delete properties.count;
   delete properties.year;
 
+  console.log('eventFilePath: ', eventFilePath);
   const df = await readCSV(eventFilePath);
-
+  console.log('df: ', df);
   const getIndexForHeader = (headers: string[], header: string): number => {
     return headers.indexOf(header);
   };
 
   // Get headers
   const headers = df[0];
-
+  console.log('headers: ', headers);
   // Get index for timeDimension
   const timeDimensionIndex = getIndexForHeader(headers, 'date');
 

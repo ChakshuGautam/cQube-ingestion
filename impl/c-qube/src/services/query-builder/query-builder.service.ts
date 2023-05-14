@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { JSONSchema4 } from 'json-schema';
 
+const fs = require('fs');
+
 type fk = {
   column: string;
   reference: {
@@ -172,11 +174,11 @@ export class QueryBuilderService {
     return this.cleanStatement(query);
   }
 
-  generateBulkInsertStatement(schema: JSONSchema4, data: any[]): string[] {
+  generateBulkInsertStatement(schema: JSONSchema4, data: any[]): string {
     const tableName = schema.title;
     const psqlSchema = schema.psql_schema;
     const fields = [];
-    const values = [];
+    // const values = [];
 
     const queries = [];
 
@@ -189,17 +191,16 @@ export class QueryBuilderService {
     }
 
     const tempTableName = `temp_${tableName}`;
-    const createTempTable = `CREATE TEMPORARY TABLE ${tempTableName} (LIKE ${psqlSchema}.${tableName});`;
+    const createTempTable = `CREATE TABLE IF NOT EXISTS ${tempTableName} (LIKE ${psqlSchema}.${tableName});`;
     queries.push(createTempTable);
-    const insertTempTable = `INSERT INTO ${tempTableName} (${fields.join(
-      ', ',
-    )}) VALUES `;
+    const autoGen = `ALTER TABLE ${tempTableName} ADD COLUMN id SERIAL PRIMARY KEY;`;
+    queries.push(autoGen);
     const rows = [];
-
+    let id = 1;
     for (const row of data) {
       const rowValues = [];
       for (const property in properties) {
-        if (propertiesToSkip.includes(property)) continue;
+        // if (propertiesToSkip.includes(property)) continue;
         if (
           schema.properties[property].type === 'string' &&
           schema.properties[property].format === 'date'
@@ -209,10 +210,16 @@ export class QueryBuilderService {
           rowValues.push(`'${row[property]}'`);
         }
       }
+      rowValues.push(id + '');
+      id++;
       rows.push(`(${rowValues.join(', ')})`);
     }
+    const tempTableFields = [...fields, 'id'];
+    const insertTempTable = `INSERT INTO ${tempTableName} (${tempTableFields.join(
+      ', ',
+    )}) VALUES `;
     const insertTempTableRows = `${insertTempTable}${rows.join(', ')};`;
-    queries.push(insertTempTableRows);
+    queries.push(this.cleanStatement(insertTempTable));
     let joinStatements = '';
     let whereStatements = '';
 
@@ -221,23 +228,34 @@ export class QueryBuilderService {
         const referenceTable = fk.reference.table;
         const referenceColumn = fk.reference.column;
         const childColumn = fk.column;
-        joinStatements += ` LEFT JOIN ${referenceTable} ON ${tempTableName}.${childColumn} = ${referenceTable}.${referenceColumn}`;
-        whereStatements += ` AND ${referenceTable}.${referenceColumn} IS NOT NULL`;
+        joinStatements += ` LEFT JOIN dimensions.${referenceTable} ON ${tempTableName}.${childColumn} = dimensions.${referenceTable}.${childColumn}`;
+        whereStatements += ` AND dimensions.${referenceTable}.${childColumn} IS NOT NULL`;
       });
     }
 
     const filteredInsert = `INSERT INTO ${psqlSchema}.${tableName} (${fields.join(
       ', ',
     )})
-        SELECT ${fields.join(', ')} FROM ${tempTableName}
+        SELECT ${fields
+        .map((field) => `${tempTableName}.${field}`)
+        .join(', ')} FROM ${tempTableName}
         ${joinStatements === '' ? ' ' : joinStatements}
         WHERE TRUE${whereStatements === '' ? ' ' : whereStatements};`;
 
     queries.push(filteredInsert);
+
     const dropTempTable = `DROP TABLE ${tempTableName};`;
     queries.push(dropTempTable);
     const query = `${createTempTable}\n${insertTempTableRows}\n${filteredInsert}\n${dropTempTable}`;
-    return queries.map((q) => this.cleanStatement(q)); // this.cleanStatement(query);
+    // const query = `${createTempTable}\n${insertTempTableRows}\n${filteredInsert}`;
+    // if (query.toLowerCase().includes('null')) {
+    //   console.log('NULL Query: ', query);
+    // }
+    // return queries.map((q) => this.cleanStatement(q)); // this.cleanStatement(query);
+    // append query to the content of file query.txt
+    fs.appendFileSync('query.txt', query);
+    // console.log('query: ', query);
+    return this.cleanStatement(query);
   }
 
   generateUpdateStatement(schema: JSONSchema4, data: any): string[] {

@@ -23,6 +23,8 @@ import memoize from 'fast-memoize';
 import { Cache } from 'cache-manager';
 import { all } from 'nodejs-polars/bin/lazy/functions';
 
+import { Prisma } from '@prisma/client';
+import { Pool, QueryResult } from 'pg';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs');
 
@@ -43,6 +45,7 @@ export class DatasetService {
     private qbService: QueryBuilderService,
     private eventGrammarService: EventService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @Inject('DATABASE_POOL') private pool: Pool,
   ) {}
 
   counterAggregates(): any {
@@ -313,6 +316,18 @@ export class DatasetService {
     await this.prisma.$queryRawUnsafe(insertQuery);
   }
 
+  async insertBulkDatasetDataOld(
+    datasetGrammar: DatasetGrammar,
+    data: any[],
+  ): Promise<void> {
+    const insertQueries = this.qbService.generateBulkInsertStatementOld(
+      datasetGrammar.schema,
+      data,
+    );
+    this.logger.debug(`Executing query: ${insertQueries}`);
+    return await this.prisma.$queryRawUnsafe(insertQueries);
+  }
+
   async insertBulkDatasetData(
     datasetGrammar: DatasetGrammar,
     data: any[],
@@ -321,38 +336,53 @@ export class DatasetService {
       datasetGrammar.schema,
       data,
     );
-    console.log(insertQueries);
-    try {
-      const transactions = insertQueries.map((q: string) => {
-        console.log(q);
-        if (q.startsWith('SELECT')) return this.prisma.$queryRawUnsafe(q);
-        else return this.prisma.$executeRawUnsafe(q);
-      });
-      console.log(transactions);
-      await this.prisma.$transaction(transactions);
-      // await this.prisma.$queryRawUnsafe();
-    } catch (err) {
-      console.error(err);
-      // console.error(insertQuery);
-      throw err;
-    }
+
+    return this.pool.query(insertQueries).then((res: QueryResult) => {
+      return res.rows;
+    });
+
+    // try {
+    //   await this.prisma
+    //     .$transaction(
+    //       insertQueries.map((q: string) => {
+    //         this.logger.debug(`Executing query: ${q}`);
+    //         return this.prisma.$queryRawUnsafe(q);
+    //       }),
+    //     )
+    //     .catch((err) => {
+    //       console.log(err);
+    //     });
+    //   insertQueries.forEach(async (q: string) => {
+    //     await this.prisma
+    //       .$queryRawUnsafe(q)
+    //       .then((res) => {
+    //         this.logger.log('query successful');
+    //       })
+    //       .catch((err) => {
+    //         this.logger.error(`err in query raw unsafe: `, err);
+    //       });
+    //   });
+    // } catch (err) {
+    //   console.error(err);
+    //   throw err;
+    // }
   }
 
   async getDimensionData(attr: string, table: string): Promise<any[]> {
     const startTime = performance.now();
     const olderData: any[] = await this.cacheManager.get(
-      `dimensions.${table}.${attr}`,
+      `dimensions.${table}.${attr} `,
     );
     const endTime = performance.now();
     if (olderData) {
       this.logger.verbose(
         `Got older data from cache for ${table}.${attr} in ${endTime - startTime
-        }ms. Total records - ${olderData.length}`,
+        } ms.Total records - ${olderData.length} `,
       );
       return olderData as any[];
     } else {
       const startTime = performance.now();
-      const query = `SELECT * from dimensions.${table};`;
+      const query = `SELECT * from dimensions.${table}; `;
       const data: any[] = await this.prisma.$queryRawUnsafe(query);
       let returnData = [];
       const allAtts = Object.keys(data[0]);
@@ -374,12 +404,11 @@ export class DatasetService {
       const endTime = performance.now();
       this.logger.log(
         `Getting data from database ${table}.${attr} took ${endTime - startTime
-        }ms`,
+        } ms`,
       );
       return returnData as any[];
     }
   }
-
   async removeFKErrors(
     durs: DatasetUpdateRequest,
     data: any[],
@@ -402,10 +431,19 @@ export class DatasetService {
       });
     });
     for (const attr in fkAttrMap) {
-      let fkValues: string[] = await this.getDimensionData(
-        attr,
-        fkAttrMap[attr].table,
-      );
+      // let fkValues: string[] = await this.getDimensionData(
+      //   attr,
+      //   fkAttrMap[attr].table,
+      // );
+      const key = `dimensions.${fkAttrMap[attr].table}.${attr}`;
+      this.logger.debug(`getting key: ${key}`);
+      let fkValues: string[] = await this.cacheManager.get(key);
+
+      if (!fkValues) {
+        fkValues = await this.getDimensionData(attr, fkAttrMap[attr].table);
+      } else {
+        this.logger.verbose('got from cache');
+      }
       // let fkValues: string[] = await this.prisma.$queryRawUnsafe(query);
       fkValues = fkValues.map((value) => value[attr]);
       // if (fkValues.length === 0) return [];
@@ -438,16 +476,25 @@ export class DatasetService {
       data.push({ ...dur.updateParams, ...dur.filterParams });
     }
     // TODO check for FK constraints before insert
-    const startTime = performance.now();
-    const sanitisedInput = await this.removeFKErrors(durs[0], data);
-    const endTime = performance.now();
-    this.logger.log(
-      `Time taken: ${(endTime - startTime).toFixed(4)} ms for ${durs[0].dataset.name
-      }`,
-    );
+    // const startTime = performance.now();
+    // const sanitisedInput = await this.removeFKErrors(durs[0], data);
+    // const endTime = performance.now();
+    // this.logger.log(
+    //   `Time taken: ${(endTime - startTime).toFixed(4)} ms for ${durs[0].dataset.name
+    //   }`,
+    // );
     durs[0].dataset.schema.title = durs[0].dataset.tableName;
-    await this.insertBulkDatasetData(durs[0].dataset, sanitisedInput).catch(
-      async (error) => {
+    const startTime = performance.now();
+    await this.insertBulkDatasetData(durs[0].dataset, data)
+      .then((res) => {
+        this.logger.verbose('Bulk insertion successful');
+        const endTime = performance.now();
+        this.logger.log(
+          `Time taken: ${(endTime - startTime).toFixed(4)} ms for ${durs[0].dataset.name
+          }`,
+        );
+      })
+      .catch(async (error) => {
         console.log('error: ', error);
         this.logger.error(
           `ERROR Inserting Data in Bulk: ${durs[0].dataset.name}. Trying them 1 by 1`,
@@ -469,9 +516,8 @@ export class DatasetService {
             });
         });
         const result = await Promise.all(promises);
-        this.logger.error(`${rowsIngested}/${data.length}, rows inserted`);
-      },
-    );
+        this.logger.error(`${rowsIngested} /${data.length}, rows inserted`);
+      });
   }
   addNonTimeDimension(dimension: DimensionMapping): {
     [k: string]: any;
