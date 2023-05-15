@@ -252,8 +252,6 @@ export class QueryBuilderService {
     //   console.log('NULL Query: ', query);
     // }
     // return queries.map((q) => this.cleanStatement(q)); // this.cleanStatement(query);
-    // append query to the content of file query.txt
-    fs.appendFileSync('query.txt', query);
     // console.log('query: ', query);
     return this.cleanStatement(query);
   }
