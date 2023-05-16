@@ -36,13 +36,19 @@ export const getPrimaryKeyAndIndexes = (
   row1: string,
   row3: string,
 ): { pk: string; indexes: string[] } => {
-  const pk: string = row3.split(',')[row1.split(',').indexOf('PK')];
+  const pk: string =
+    row3.split(',')[
+    row1
+      .split(',')
+      .map((word: string) => word.trim())
+      .indexOf('PK')
+    ];
 
   const indexes: string[] = row1
     .split(',')
-    .map((value, index) => (value === 'Index' ? index : -1))
+    .map((value, index) => (value.trim() === 'Index' ? index : -1))
     .filter((value) => value !== -1)
-    .map((value) => row3.split(',')[value]);
+    .map((value) => row3.split(',').map((word: string) => word.trim())[value]);
 
   return { pk, indexes };
 };
@@ -50,8 +56,8 @@ export const getPrimaryKeyAndIndexes = (
 export const getDimensionColumns = (row2: string, row3: string): Column[] => {
   return row2.split(',').map((value, index) => {
     return {
-      name: row3.split(',')[index],
-      type: ColumnType[value as keyof typeof ColumnType],
+      name: row3.split(',').map((word: string) => word.trim())[index],
+      type: ColumnType[value.trim() as keyof typeof ColumnType],
     };
   });
 };

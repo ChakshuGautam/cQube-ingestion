@@ -20,23 +20,29 @@ export const createDimensionGrammarFromCSVDefinition = async (
     .split('-')[0];
 
   // Find text "PK" in the first row
-  const pk: string = row3.split(',')[row1.split(',').indexOf('PK')];
+  const pk: string =
+    row3.split(',')[
+    row1
+      .split(',')
+      .map((word: string) => word.trim())
+      .indexOf('PK')
+    ];
 
   // get
   const indexes: string[] = row1
     .split(',')
     .map((value, index) => {
-      if (value === 'Index') return index;
+      if (value.trim() === 'Index') return index;
       else return -1;
     })
     .filter((value) => value !== -1)
-    .map((value) => row3.split(',')[value]);
+    .map((value) => row3.split(',').map((word: string) => word.trim())[value]);
 
   // row 2 and 3
   const dimensionColumns: Column[] = row2.split(',').map((value, index) => {
     return {
-      name: row3.split(',')[index],
-      type: value,
+      name: row3.split(',').map((word: string) => word.trim())[index],
+      type: value.trim(),
     };
   });
 

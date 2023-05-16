@@ -31,16 +31,26 @@ export async function getEGDefFromFile(csvFilePath: string) {
     .map((value, index) => {
       return {
         dimensionName:
-          row1.split(',')[index] === '' ? null : row1.split(',')[index],
+          row1.split(',')[index].trim() === ''
+            ? null
+            : row1.split(',')[index].trim(),
         dimensionGrammarKey:
-          row2.split(',')[index] === '' ? null : row2.split(',')[index],
-        fieldDataType: row3.split(',')[index] as ColumnType,
-        fieldName: row4.split(',')[index],
-        fieldType: row5.split(',')[index] as FieldType,
+          row2.split(',')[index].trim() === ''
+            ? null
+            : row2.split(',')[index].trim(),
+        fieldDataType: row3.split(',')[index].trim() as ColumnType,
+        fieldName: row4.split(',')[index].trim(),
+        fieldType: row5.split(',')[index].trim() as FieldType,
       };
     });
   // Find text "metric" in trow 5 get it's index and get the value from row 4
-  const instrumentField = row4.split(',')[row5.split(',').indexOf('metric')];
+  const instrumentField =
+    row4.split(',')[
+    row5
+      .split(',')
+      .map((word: string) => word.trim())
+      .indexOf('metric')
+    ];
   return { eventGrammarDef, instrumentField };
 }
 

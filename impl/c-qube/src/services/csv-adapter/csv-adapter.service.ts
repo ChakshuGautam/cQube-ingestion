@@ -240,7 +240,9 @@ export class CsvAdapterService {
           config.programs[j].dimensions.whitelisted;
         for (let k = 0; k < compoundDimensions.length; k++) {
           const eventGrammarFiles = [];
-          const compoundDimensionsToBeInEG = compoundDimensions[k].split(',');
+          const compoundDimensionsToBeInEG = compoundDimensions[k]
+            .split(',')
+            .map((word: string) => word.trim());
           // Find relevant Event Grammar Files that include all compound dimensions
           if (regexEventGrammar.test(inputFiles[i])) {
             // console.log(config?.programs[j].input?.files + `/${inputFiles[i]}`);
@@ -253,6 +255,7 @@ export class CsvAdapterService {
             const dimensionsInEG = fileContentForEventGrammar
               .split('\n')[0]
               .split(',')
+              .map((word: string) => word.trim())
               .filter((x) => x !== '');
 
             if (
