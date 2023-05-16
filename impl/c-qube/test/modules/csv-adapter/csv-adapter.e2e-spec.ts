@@ -51,42 +51,73 @@ describe('AppController (e2e)', () => {
   });
 
   it('complete ingestion', async () => {
-    expect.assertions(0);
-    const ingest = await csvAdapterService.nuke();
-    const ingestData = await csvAdapterService.ingest(
+    await csvAdapterService.nuke();
+    await csvAdapterService.ingest(
       './test/fixtures/ingestionConfigs',
       'config.complete.json',
     );
-    const somevar = await csvAdapterService.ingestData(
+    await csvAdapterService.ingestData(
       {},
       './test/fixtures/ingestionConfigs/programs/test-complete-ingestion',
     );
-    // const tabs = await csvAdapterService.prisma.$queryRaw('SHOW TABLES')
+    const data: string[] = await csvAdapterService.prisma.$queryRawUnsafe(
+      'SELECT * FROM datasets.test_complete_ingestion_meeting_conducted_daily_academicyear',
+    );
+
+    let distIds: any[] = await csvAdapterService.prisma.$queryRawUnsafe(
+      'SELECT DISTINCT district_id from datasets.test_complete_ingestion_meeting_conducted_weekly_district',
+    );
+    distIds = distIds.map((item) => item['district_id']);
+    distIds = distIds.filter((item, idx) => distIds.indexOf(item) === idx);
+
+    expect(data).toBeDefined();
+    expect(data.length).toBeDefined();
+    expect(data.length).toBeGreaterThan(0);
+    expect(distIds.sort()).toEqual(['101', '102', '201', '202']);
   });
 
   it('partial ingestion', async () => {
-    expect.assertions(0);
-    const ingest = await csvAdapterService.nuke();
-    const ingestData = await csvAdapterService.ingest(
+    await csvAdapterService.ingest(
       './test/fixtures/ingestionConfigs',
       'config.partial.json',
     );
-    const somevar = await csvAdapterService.ingestData(
+    await csvAdapterService.ingestData(
       {},
       './test/fixtures/ingestionConfigs/programs/test-partial-ingestion',
     );
+
+    const data: string[] = await csvAdapterService.prisma.$queryRawUnsafe(
+      'SELECT * FROM datasets.test_partial_ingestion_meeting_conducted_daily_academicyear',
+    );
+
+    let distIds: any[] = await csvAdapterService.prisma.$queryRawUnsafe(
+      'SELECT DISTINCT district_id from datasets.test_partial_ingestion_meeting_conducted_weekly_district',
+    );
+    distIds = distIds.map((item) => item['district_id']);
+    distIds = distIds.filter((item, idx) => distIds.indexOf(item) === idx);
+
+    expect(data).toBeDefined();
+    expect(data.length).toBeDefined();
+    expect(data.length).toBeGreaterThan(0);
+    expect(distIds.sort()).toEqual(['101', '102', '201', '202']);
   });
 
   it('skipping empty files', async () => {
-    expect.assertions(0);
-    const ingest = await csvAdapterService.nuke();
-    const ingestData = await csvAdapterService.ingest(
+    await csvAdapterService.nuke();
+    await csvAdapterService.ingest(
       './test/fixtures/ingestionConfigs',
       'config.skip.json',
     );
-    const somevar = await csvAdapterService.ingestData(
+    await csvAdapterService.ingestData(
       {},
       './test/fixtures/ingestionConfigs/programs/test-skipping-ingestion',
     );
+
+    const data = await csvAdapterService.prisma.$queryRawUnsafe(
+      'SELECT * FROM datasets.test_skipping_ingestion_meeting_conducted_daily_academicyear',
+    );
+
+    expect(data).toBeDefined();
+    expect(data).toEqual([]);
   });
 });
