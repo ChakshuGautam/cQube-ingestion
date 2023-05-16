@@ -33,7 +33,7 @@ import {
 import {
   createEventGrammarFromCSVDefinition,
   getEGDefFromFile,
-} from './parser/event-grammar/parser';
+} from './parser/event-grammar/event-grammar.service';
 import {
   createCompoundDatasetGrammars,
   createCompoundDatasetGrammarsWithoutTimeDimensions,
