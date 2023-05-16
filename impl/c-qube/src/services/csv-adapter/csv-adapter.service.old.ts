@@ -29,7 +29,7 @@ import {
 import {
   createCompoundDatasetDataToBeInserted,
   createDatasetDataToBeInserted,
-} from './parser/dataset/helper';
+} from './parser/dataset/dataset-grammar.helper';
 import {
   createEventGrammarFromCSVDefinition,
   getEGDefFromFile,
@@ -39,7 +39,7 @@ import {
   createCompoundDatasetGrammarsWithoutTimeDimensions,
   createDatasetGrammarsFromEG,
   createDatasetGrammarsFromEGWithoutTimeDimension,
-} from './parser/dataset/parser';
+} from './parser/dataset/dataset-grammar.service';
 import { EventGrammarCSVFormat } from './types/parser';
 import { DimensionGrammarService } from './parser/dimension-grammar/dimension-grammar.service';
 const chalk = require('chalk');

@@ -361,16 +361,6 @@ export const createCompoundDatasetGrammarsWithoutTimeDimensions = async (
         }
       }
     }
-    // const fk =
-    //   dimensionMapping.map((d: DimensionMapping) => {
-    //     return {
-    //       column: d.key,
-    //       reference: {
-    //         table: d.dimension.name.name,
-    //         column: d.dimension.name.storage.primaryId,
-    //       },
-    //     };
-    //   }) ?? [];
 
     const datasetGrammar: DatasetGrammar = {
       // content_subject_daily_total_interactions
