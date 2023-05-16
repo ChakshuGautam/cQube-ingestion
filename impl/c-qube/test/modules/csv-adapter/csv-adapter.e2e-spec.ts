@@ -51,28 +51,42 @@ describe('AppController (e2e)', () => {
   });
 
   it('complete ingestion', async () => {
-    await csvAdapterService.ingest(
+    expect.assertions(0);
+    const ingest = await csvAdapterService.nuke();
+    const ingestData = await csvAdapterService.ingest(
       './test/fixtures/ingestionConfigs',
       'config.complete.json',
     );
-    await csvAdapterService.ingestData(
+    const somevar = await csvAdapterService.ingestData(
+      {},
       './test/fixtures/ingestionConfigs/programs/test-complete-ingestion',
     );
+    // const tabs = await csvAdapterService.prisma.$queryRaw('SHOW TABLES')
   });
 
   it('partial ingestion', async () => {
-    await csvAdapterService.ingest();
-    // SQL Query to this table => nishtha_perc_certification_programnishtha
-    // Convert it to JSON
-    // outputDatasets/nishtha_perc_certification_programnishtha
-    // expect(outputDatasets/nishtha_perc_certification_programnishtha.json).toBe(SQL Query Output);
+    expect.assertions(0);
+    const ingest = await csvAdapterService.nuke();
+    const ingestData = await csvAdapterService.ingest(
+      './test/fixtures/ingestionConfigs',
+      'config.partial.json',
+    );
+    const somevar = await csvAdapterService.ingestData(
+      {},
+      './test/fixtures/ingestionConfigs/programs/test-partial-ingestion',
+    );
   });
 
   it('skipping empty files', async () => {
-    await csvAdapterService.ingest();
-    // SQL Query to this table => nishtha_perc_certification_programnishtha
-    // Convert it to JSON
-    // outputDatasets/nishtha_perc_certification_programnishtha
-    // expect(outputDatasets/nishtha_perc_certification_programnishtha.json).toBe(SQL Query Output);
+    expect.assertions(0);
+    const ingest = await csvAdapterService.nuke();
+    const ingestData = await csvAdapterService.ingest(
+      './test/fixtures/ingestionConfigs',
+      'config.skip.json',
+    );
+    const somevar = await csvAdapterService.ingestData(
+      {},
+      './test/fixtures/ingestionConfigs/programs/test-skipping-ingestion',
+    );
   });
 });
