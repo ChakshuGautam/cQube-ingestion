@@ -1,5 +1,10 @@
 import { DimensionGrammar } from 'src/types/dimension';
-import { Column } from '../../types/parser';
+import {
+  Column,
+  ColumnType,
+  EventGrammarCSVFormat,
+  FieldType,
+} from '../../types/parser';
 const fs = require('fs').promises;
 
 export const createDimensionGrammarFromCSVDefinition = async (
@@ -89,4 +94,67 @@ export const createCompositeDimensionGrammars = (
       indexes: [{ columns: [indexes.map((i) => i)] }],
     },
   } as DimensionGrammar;
+};
+
+export const processCSVtoEventGrammarDefJSON = (
+  dimensionName: string,
+  dimensionGrammarKey: string,
+  fieldDataType: string,
+  fieldName: string,
+  fieldType: string,
+): EventGrammarCSVFormat[] => {
+  // Vertical columns for CSV File
+  // | dimensionName |
+  // | dimensionGrammarKey |
+  // | fieldDataType |
+  // | fieldName |
+  // | fieldType |
+  return fieldType.split(',').map((value, index) => {
+    return {
+      dimensionName:
+        dimensionName.split(',')[index].trim() === ''
+          ? null
+          : dimensionName.split(',')[index].trim(),
+      dimensionGrammarKey:
+        dimensionGrammarKey.split(',')[index].trim() === ''
+          ? null
+          : dimensionGrammarKey.split(',')[index].trim(),
+      fieldDataType: fieldDataType.split(',')[index].trim() as ColumnType,
+      fieldName: fieldName.split(',')[index].trim(),
+      fieldType: fieldType.split(',')[index].trim() as FieldType,
+    };
+  });
+};
+
+export const getInstrumentField = (
+  fieldName: string,
+  fieldType: string,
+): string => {
+  // Find text "metric" in row 5 get it's index and get the value from row 4
+  return fieldName.split(',')[
+    fieldType
+      .split(',')
+      .map((word: string) => word.trim())
+      .indexOf('metric')
+  ];
+};
+
+export const mapPropertiesFromColumns = (columns: Column[]): any => {
+  const properties = {};
+  for (const column of columns) {
+    switch (column.type) {
+      case 'date':
+        properties[column.name] = {
+          type: 'string',
+          format: 'date',
+        };
+        break;
+      default:
+        properties[column.name] = {
+          type: column.type,
+          unique: true,
+        };
+    }
+  }
+  return properties;
 };
