@@ -92,7 +92,6 @@ describe('CsvAdapterService', () => {
           readStream.close();
           writeStream.end();
           writeStream.on('finish', async () => {
-            console.log('onfinish');
             // await fs1.renameSync(output, input);
             resolve(output);
           });
@@ -105,7 +104,6 @@ describe('CsvAdapterService', () => {
 
     try {
       await processCSV(inputFile, outputFile);
-      console.log(`CSV file successfully processed and saved as ${outputFile}`);
     } catch (error) {
       console.error('Error processing CSV file:', error);
     }
@@ -115,7 +113,7 @@ describe('CsvAdapterService', () => {
     const df: DataFrame = pl.readCSV('fixtures/dimension-with-comma.csv', {
       quoteChar: "'",
     });
-    console.log(df);
+    // console.log(df);
   });
 
   it('should parse dataframe with comma', async () => {
