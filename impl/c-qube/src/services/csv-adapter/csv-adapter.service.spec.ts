@@ -7,8 +7,9 @@ import { DatasetService } from '../dataset/dataset.service';
 import { EventService } from '../event/event.service';
 import { DataFrame } from 'nodejs-polars';
 import * as csv from 'csv-parser';
-import { DimensionGrammarService } from './parser/dimensiongrammar/dimension-grammar.service';
-
+import { DimensionGrammarService } from './parser/dimension-grammar/dimension-grammar.service';
+import { Pool } from 'pg';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs').promises;
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -24,9 +25,19 @@ const retry = require('retry');
 
 describe('CsvAdapterService', () => {
   let service: CsvAdapterService;
+  const databasePoolFactory = async (configService: ConfigService) => {
+    return new Pool({
+      user: configService.get('DB_USERNAME'),
+      host: configService.get('DB_HOST'),
+      database: configService.get('DB_NAME'),
+      password: configService.get('DB_PASSWORD'),
+      port: configService.get<number>('DB_PORT'),
+    });
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [ConfigModule],
       providers: [
         CsvAdapterService,
         EventService,
@@ -35,6 +46,11 @@ describe('CsvAdapterService', () => {
         DimensionService,
         DatasetService,
         DimensionGrammarService,
+        {
+          provide: 'DATABASE_POOL',
+          inject: [ConfigService],
+          useFactory: databasePoolFactory,
+        },
       ],
     }).compile();
 
