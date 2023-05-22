@@ -73,6 +73,8 @@ export const createCompositeDimensionGrammars = (
     };
   }
 
+  console.log('properties: ', properties);
+
   return {
     name: name,
     description: '',
