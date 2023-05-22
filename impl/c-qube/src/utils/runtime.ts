@@ -1,5 +1,5 @@
 export async function measureExecutionTime<T>(
-  func: (any) => Promise<T>,
+  func: (...args) => Promise<T>,
 ): Promise<T> {
   const startTime = performance.now();
   const result = await func();

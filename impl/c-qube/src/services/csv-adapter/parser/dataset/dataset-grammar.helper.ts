@@ -93,8 +93,6 @@ export const createCompoundDatasetDataToBeInserted = async (
   delete properties.count;
   delete properties.year;
 
-  console.log('eventFilePath: ', eventFilePath);
-
   // checking if the file is empty or not
   const stats = fs.statSync(eventFilePath);
   if (stats.size === 0) {
@@ -103,7 +101,6 @@ export const createCompoundDatasetDataToBeInserted = async (
   }
 
   const df = await readCSV(eventFilePath);
-  console.log('df: ', df);
   if (!df || !df[0]) return;
   const getIndexForHeader = (headers: string[], header: string): number => {
     return headers.indexOf(header);
@@ -111,7 +108,6 @@ export const createCompoundDatasetDataToBeInserted = async (
 
   // Get headers
   const headers = df[0];
-  console.log('headers: ', headers);
   if (!headers) return;
   // Get index for timeDimension
   const timeDimensionIndex = getIndexForHeader(headers, 'date');

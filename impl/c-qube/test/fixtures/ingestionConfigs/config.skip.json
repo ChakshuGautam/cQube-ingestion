@@ -1,0 +1,34 @@
+{
+  "globals": {
+    "onlyCreateWhitelisted": true
+  },
+  "dimensions": {
+    "namespace": "dimensions",
+    "fileNameFormat": "${dimensionName}.${index}.dimensions.data.csv",
+    "input": {
+      "files": "./ingest/dimensions"
+    }
+  },
+  "programs": [
+    {
+      "name": "Test skipping Ingestion",
+      "namespace": "test_skipping_ingestion",
+      "description": "Test skipping Ingestion",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./test/fixtures/ingestionConfigs/programs/test-skipping-ingestion"
+      },
+      "./output": {
+        "location": "./output/programs/test-skipping-ingestion"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "academicyear,district",
+          "academicyear,block",
+          "academicyear,cluster"
+        ],
+        "blacklisted": []
+      }
+    }
+  ]
+}

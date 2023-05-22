@@ -29,17 +29,17 @@ import {
 import {
   createCompoundDatasetDataToBeInserted,
   createDatasetDataToBeInserted,
-} from './parser/dataset/helper';
+} from './parser/dataset/dataset-grammar.helper';
 import {
   createEventGrammarFromCSVDefinition,
   getEGDefFromFile,
-} from './parser/event-grammar/parser';
+} from './parser/event-grammar/event-grammar.service';
 import {
   createCompoundDatasetGrammars,
   createCompoundDatasetGrammarsWithoutTimeDimensions,
   createDatasetGrammarsFromEG,
   createDatasetGrammarsFromEGWithoutTimeDimension,
-} from './parser/dataset/parser';
+} from './parser/dataset/dataset-grammar.service';
 import { EventGrammarCSVFormat } from './types/parser';
 import { DimensionGrammarService } from './parser/dimension-grammar/dimension-grammar.service';
 const chalk = require('chalk');

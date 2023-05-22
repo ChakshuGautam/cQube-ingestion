@@ -5,7 +5,7 @@ import {
 } from '../../../../types/dataset';
 import { EventGrammar } from 'src/types/event';
 import { DimensionGrammar } from '../../../../types/dimension';
-import { getEGDefFromFile } from '../event-grammar/parser';
+import { getEGDefFromFile } from '../event-grammar/event-grammar.service';
 import { hash } from '../../../../utils/hash';
 import { EventGrammarCSVFormat, FieldType } from '../../types/parser';
 
@@ -361,16 +361,6 @@ export const createCompoundDatasetGrammarsWithoutTimeDimensions = async (
         }
       }
     }
-    // const fk =
-    //   dimensionMapping.map((d: DimensionMapping) => {
-    //     return {
-    //       column: d.key,
-    //       reference: {
-    //         table: d.dimension.name.name,
-    //         column: d.dimension.name.storage.primaryId,
-    //       },
-    //     };
-    //   }) ?? [];
 
     const datasetGrammar: DatasetGrammar = {
       // content_subject_daily_total_interactions

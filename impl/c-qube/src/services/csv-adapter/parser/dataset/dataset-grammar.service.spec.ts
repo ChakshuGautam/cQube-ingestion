@@ -1,9 +1,9 @@
 import { EventGrammar } from '../../../../types/event';
-import { createSingleDatasetGrammarsFromEGWithoutTimeDimension } from './parser';
+import { createSingleDatasetGrammarsFromEGWithoutTimeDimension } from './dataset-grammar.service';
 import {
   mockDimensionMapping,
   mockEventGrammar,
-} from '../../../../services/mocks/types.mocks';
+} from '../../../mocks/types.mocks';
 
 describe('createSingleDatasetGrammarsFromEGWithoutTimeDimension', () => {
   it('should make the test pass', () => {
