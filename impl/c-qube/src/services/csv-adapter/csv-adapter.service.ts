@@ -55,7 +55,10 @@ export class CsvAdapterService {
     public dimensionGrammarService: DimensionGrammarService,
   ) {}
 
-  public async ingest() {
+  public async ingest(
+    ingestionFolder = './ingest',
+    ingestionConfigFileName = 'config.json',
+  ) {
     const s = spinner();
     s.start('🚧 1. Deleting Old Data');
     await this.nuke();
@@ -65,9 +68,9 @@ export class CsvAdapterService {
 
     // Parse the config
     s.start('🚧 2. Reading your config');
-    const ingestionFolder = './ingest';
+    // const ingestionFolder = './ingest';
     const config = JSON.parse(
-      await readFile(ingestionFolder + '/config.json', 'utf8'),
+      await readFile(ingestionFolder + '/' + ingestionConfigFileName, 'utf8'),
     );
     const regexEventGrammar = /\-event\.grammar.csv$/i;
     const defaultTimeDimensions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
@@ -388,14 +391,14 @@ export class CsvAdapterService {
     // Insert events into the datasets
   }
 
-  public async ingestData(filter: any) {
+  public async ingestData(filter: any, programDir = './ingest/programs') {
     // const s = spinner();
     // s.start('🚧 1. Deleting Old Data');
     // await this.nukeDatasets();
     // s.stop('✅ 1. The Data has been Nuked');
 
     // iterate over all *.data.csv files inside programs folder
-    const files = getFilesInDirectory('./ingest/programs');
+    const files = getFilesInDirectory(programDir);
 
     let promises = [];
     for (let i = 0; i < files.length; i++) {
