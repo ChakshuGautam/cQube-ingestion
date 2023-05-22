@@ -13,6 +13,7 @@ describe('EventGrammarService', () => {
     const csvFilePath =
       './test/fixtures/unit-test-csvs/state-dimension.grammar.csv';
     const data = await createDimensionGrammarFromCSVDefinition(csvFilePath);
+    console.log('data: ', data);
     expect(data).toEqual({
       description: '',
       name: 'state',
