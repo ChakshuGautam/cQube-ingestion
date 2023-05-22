@@ -12,7 +12,7 @@ const fs = require('fs');
 describe('EventGrammarService', () => {
   it('tests createDimensionGrammarFromCSVDefinition', async () => {
     const csvFilePath =
-      './test/fixtures/test-csvs/event-grammars/state-dimension.grammar.csv';
+      './test/fixtures/test-csvs/event-grammars/test-dimension.grammar.csv';
 
     const fileContent = fs.readFileSync(csvFilePath, 'utf8');
     console.log('fileContent: ', fileContent.split('\n'));
@@ -21,7 +21,7 @@ describe('EventGrammarService', () => {
     console.log('data: ', data);
     expect(data).toEqual({
       description: '',
-      name: 'state',
+      name: 'test',
       type: 'dynamic',
       storage: {
         indexes: ['name'],
@@ -30,7 +30,7 @@ describe('EventGrammarService', () => {
         bucket_size: null,
       },
       schema: {
-        title: 'state',
+        title: 'test',
         psql_schema: 'dimensions',
         properties: {
           state_id: { type: 'string', unique: true },
