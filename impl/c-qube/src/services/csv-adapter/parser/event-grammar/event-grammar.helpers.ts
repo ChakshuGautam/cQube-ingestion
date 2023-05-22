@@ -12,6 +12,7 @@ export const createDimensionGrammarFromCSVDefinition = async (
   csvFilePath: string,
 ): Promise<DimensionGrammar> => {
   // read csvPath
+  console.log('csvFilePath: ', csvFilePath);
   const [row1, row2, row3] = await readCSVFile(csvFilePath);
 
   console.log('row1: ', row1);
