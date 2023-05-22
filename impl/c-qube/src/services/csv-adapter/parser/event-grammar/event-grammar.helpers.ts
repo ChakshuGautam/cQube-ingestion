@@ -14,7 +14,7 @@ export const createDimensionGrammarFromCSVDefinition = async (
   // read csvPath
   const [row1, row2, row3] = await readCSVFile(csvFilePath);
 
-  // Naming convention for eventis => `<event name>-event.csv`
+  // Naming convention for event is => `<event name>-event.csv`
   // Naming comvention for dimension is => `<dimension name>-dimenstion.csv`
   const dimensionName = csvFilePath
     .split('/')
@@ -46,6 +46,8 @@ export const createDimensionGrammarFromCSVDefinition = async (
       type: value.trim() as ColumnType,
     };
   });
+  console.log('dimensionNme: ', dimensionName);
+  console.log('dimensionColumns: ', dimensionColumns);
 
   const dimensionGrammar = createCompositeDimensionGrammars(
     dimensionColumns,
