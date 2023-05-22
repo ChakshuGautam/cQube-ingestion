@@ -10,7 +10,8 @@ import { createCompositeDimensionGrammar } from '../dimension-grammar/dimension-
 
 describe('EventGrammarService', () => {
   it('tests createDimensionGrammarFromCSVDefinition', async () => {
-    const csvFilePath = './ingest/dimensions/state-dimension.grammar.csv';
+    const csvFilePath =
+      './test/fixtures/unit-test-csvs/state-dimension.grammar.csv';
     const data = await createDimensionGrammarFromCSVDefinition(csvFilePath);
     expect(data).toEqual({
       description: '',
