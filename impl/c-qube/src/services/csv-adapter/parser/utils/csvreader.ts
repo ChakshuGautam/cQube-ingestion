@@ -6,7 +6,7 @@ import * as csv from 'csv-parser';
 export async function readCSV(filePath: string): Promise<string[][]> {
   return new Promise((resolve, reject) => {
     const rows: string[][] = [];
-
+    // TODO: Add checking here
     fs1
       .createReadStream(filePath)
       .pipe(csv({ separator: ',', headers: false, quote: "'" }))
@@ -23,6 +23,7 @@ export async function readCSV(filePath: string): Promise<string[][]> {
 }
 
 export async function readCSVFile(filePath: string): Promise<string[]> {
+  console.log('filePath in readCSVFile: ', filePath);
   const fileContent = await fs.readFile(filePath, 'utf-8');
 
   return fileContent
