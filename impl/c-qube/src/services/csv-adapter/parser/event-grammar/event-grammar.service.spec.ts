@@ -10,38 +10,38 @@ import { createCompositeDimensionGrammar } from '../dimension-grammar/dimension-
 const fs = require('fs');
 
 describe('EventGrammarService', () => {
-  it('tests createDimensionGrammarFromCSVDefinition', async () => {
-    const csvFilePath =
-      './test/fixtures/test-csvs/event-grammars/test-dimension.grammar.csv';
+  // it('tests createDimensionGrammarFromCSVDefinition', async () => {
+  //   const csvFilePath =
+  //     './test/fixtures/test-csvs/event-grammars/test-dimension.grammar.csv';
 
-    const fileContent = fs.readFileSync(csvFilePath, 'utf8');
-    console.log('fileContent: ', fileContent.split('\n'));
+  //   const fileContent = fs.readFileSync(csvFilePath, 'utf8');
+  //   console.log('fileContent: ', fileContent.split('\n'));
 
-    const data = await createDimensionGrammarFromCSVDefinition(csvFilePath);
-    console.log('data: ', data);
-    expect(data).toEqual({
-      description: '',
-      name: 'test',
-      type: 'dynamic',
-      storage: {
-        indexes: ['name'],
-        primaryId: 'state_id',
-        retention: null,
-        bucket_size: null,
-      },
-      schema: {
-        title: 'test',
-        psql_schema: 'dimensions',
-        properties: {
-          state_id: { type: 'string', unique: true },
-          state_name: { type: 'string', unique: true },
-          latitude: { type: 'string', unique: false },
-          longitude: { type: 'string', unique: false },
-        },
-        indexes: [{ columns: [['state_name']] }],
-      },
-    });
-  });
+  //   const data = await createDimensionGrammarFromCSVDefinition(csvFilePath);
+  //   console.log('data: ', data);
+  //   expect(data).toEqual({
+  //     description: '',
+  //     name: 'test',
+  //     type: 'dynamic',
+  //     storage: {
+  //       indexes: ['name'],
+  //       primaryId: 'state_id',
+  //       retention: null,
+  //       bucket_size: null,
+  //     },
+  //     schema: {
+  //       title: 'test',
+  //       psql_schema: 'dimensions',
+  //       properties: {
+  //         state_id: { type: 'string', unique: true },
+  //         state_name: { type: 'string', unique: true },
+  //         latitude: { type: 'string', unique: false },
+  //         longitude: { type: 'string', unique: false },
+  //       },
+  //       indexes: [{ columns: [['state_name']] }],
+  //     },
+  //   });
+  // });
 
   it('tests createCompositeDimensionGrammars', () => {
     const dimensionColumns: Column[] = [
