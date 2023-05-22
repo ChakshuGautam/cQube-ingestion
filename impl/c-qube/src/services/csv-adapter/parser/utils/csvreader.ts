@@ -23,7 +23,6 @@ export async function readCSV(filePath: string): Promise<string[][]> {
 }
 
 export async function readCSVFile(filePath: string): Promise<string[]> {
-  console.log('filePath in readCSVFile: ', filePath);
   const fileContent = await fs.readFile(filePath, 'utf-8');
 
   return fileContent
