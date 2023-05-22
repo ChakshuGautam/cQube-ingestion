@@ -12,7 +12,7 @@ const fs = require('fs');
 describe('EventGrammarService', () => {
   it('tests createDimensionGrammarFromCSVDefinition', async () => {
     const csvFilePath =
-      './test/fixtures/unit-test-csvs/state-dimension.grammar.csv';
+      './test/fixtures/test-csvs/event-grammars/state-dimension.grammar.csv';
 
     const fileContent = fs.readFileSync(csvFilePath, 'utf8');
     console.log('fileContent: ', fileContent.split('\n'));
