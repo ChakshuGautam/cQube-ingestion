@@ -1,18 +1,14 @@
 import { DatasetGrammar, DimensionMapping } from '../../../../types/dataset';
-import { DateParser } from './../utils/dateparser';
-import {
-  EventGrammar,
-  InstrumentType,
-  Event as cQubeEvent,
-} from 'src/types/event';
+import { DateParser } from '../utils/dateparser';
+import { EventGrammar, Event as cQubeEvent } from 'src/types/event';
 import { readCSV } from '../utils/csvreader';
+const fs = require('fs');
 
 export const createDatasetDataToBeInserted = async (
   timeDimension: string,
   datasetGrammar: DatasetGrammar,
 ): Promise<cQubeEvent[]> => {
   const eventGrammar = datasetGrammar.eventGrammar;
-  const dimensionMapping: DimensionMapping[] = datasetGrammar.dimensions;
   // const propertyName = await getPropertyforDatasetGrammarFromEG(eventGrammar);
   // Get all keys from datasetGrammar.schema.properties
   const propertyName = Object.keys(datasetGrammar.schema.properties)
@@ -23,6 +19,8 @@ export const createDatasetDataToBeInserted = async (
   const filePath = eventGrammar.file.replace('grammar', 'data');
 
   const df = await readCSV(filePath);
+  if (!df || !df[0]) return;
+
   const getIndexForHeader = (headers: string[], header: string): number => {
     return headers.indexOf(header);
   };
@@ -95,15 +93,22 @@ export const createCompoundDatasetDataToBeInserted = async (
   delete properties.count;
   delete properties.year;
 
-  const df = await readCSV(eventFilePath);
+  // checking if the file is empty or not
+  const stats = fs.statSync(eventFilePath);
+  if (stats.size === 0) {
+    console.log(`File at ${eventFilePath} is empty`);
+    return;
+  }
 
+  const df = await readCSV(eventFilePath);
+  if (!df || !df[0]) return;
   const getIndexForHeader = (headers: string[], header: string): number => {
     return headers.indexOf(header);
   };
 
   // Get headers
   const headers = df[0];
-
+  if (!headers) return;
   // Get index for timeDimension
   const timeDimensionIndex = getIndexForHeader(headers, 'date');
 

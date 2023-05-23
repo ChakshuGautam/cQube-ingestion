@@ -1,5 +1,6 @@
 [![Node.js CI](https://github.com/ChakshuGautam/cQube-POCs/actions/workflows/ci.yml/badge.svg)](https://github.com/ChakshuGautam/cQube-POCs/actions/workflows/ci.yml)
 
+[![Coverage Status](https://coveralls.io/repos/github/techsavvyash/cQube-POCs/badge.svg?branch=master)](https://coveralls.io/github/techsavvyash/cQube-POCs?branch=master)
 ### Documentation
 
 [Find Docs in docs folder](docs/)

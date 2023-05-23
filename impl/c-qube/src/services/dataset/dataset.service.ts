@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   DatasetGrammar,
   DatasetUpdateRequest,
@@ -15,9 +15,12 @@ import { QueryBuilderService } from '../query-builder/query-builder.service';
 import { logToFile } from '../../utils/debug';
 import { EventService } from '../event/event.service';
 import { EventGrammar } from 'src/types/event';
+import { readCSV } from '../csv-adapter/parser/utils/csvreader';
+import { table } from 'console';
 const pLimit = require('p-limit');
 const limit = pLimit(10);
 
+import { Pool, QueryResult } from 'pg';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs');
 
@@ -37,6 +40,7 @@ export class DatasetService {
     public prisma: PrismaService,
     private qbService: QueryBuilderService,
     private eventGrammarService: EventService,
+    @Inject('DATABASE_POOL') private pool: Pool,
   ) {}
 
   counterAggregates(): any {
@@ -307,15 +311,56 @@ export class DatasetService {
     await this.prisma.$queryRawUnsafe(insertQuery);
   }
 
+  async insertBulkDatasetDataOld(
+    datasetGrammar: DatasetGrammar,
+    data: any[],
+  ): Promise<void> {
+    const insertQueries = this.qbService.generateBulkInsertStatementOld(
+      datasetGrammar.schema,
+      data,
+    );
+    this.logger.debug(`Executing query: ${insertQueries}`);
+    return await this.prisma.$queryRawUnsafe(insertQueries);
+  }
+
   async insertBulkDatasetData(
     datasetGrammar: DatasetGrammar,
     data: any[],
   ): Promise<void> {
-    const insertQuery = this.qbService.generateBulkInsertStatement(
+    const insertQueries = this.qbService.generateBulkInsertStatement(
       datasetGrammar.schema,
       data,
     );
-    await this.prisma.$queryRawUnsafe(insertQuery);
+
+    return this.pool.query(insertQueries).then((res: QueryResult) => {
+      return res.rows;
+    });
+
+    // try {
+    //   await this.prisma
+    //     .$transaction(
+    //       insertQueries.map((q: string) => {
+    //         this.logger.debug(`Executing query: ${q}`);
+    //         return this.prisma.$queryRawUnsafe(q);
+    //       }),
+    //     )
+    //     .catch((err) => {
+    //       console.log(err);
+    //     });
+    //   insertQueries.forEach(async (q: string) => {
+    //     await this.prisma
+    //       .$queryRawUnsafe(q)
+    //       .then((res) => {
+    //         this.logger.log('query successful');
+    //       })
+    //       .catch((err) => {
+    //         this.logger.error(`err in query raw unsafe: `, err);
+    //       });
+    //   });
+    // } catch (err) {
+    //   console.error(err);
+    //   throw err;
+    // }
   }
 
   async processDatasetUpdateRequest(
@@ -335,9 +380,26 @@ export class DatasetService {
       data.push({ ...dur.updateParams, ...dur.filterParams });
     }
     // TODO check for FK constraints before insert
+    // const startTime = performance.now();
+    // const sanitisedInput = await this.removeFKErrors(durs[0], data);
+    // const endTime = performance.now();
+    // this.logger.log(
+    //   `Time taken: ${(endTime - startTime).toFixed(4)} ms for ${durs[0].dataset.name
+    //   }`,
+    // );
     durs[0].dataset.schema.title = durs[0].dataset.tableName;
-    await this.insertBulkDatasetData(durs[0].dataset, data).catch(
-      async (error) => {
+    const startTime = performance.now();
+    await this.insertBulkDatasetData(durs[0].dataset, data)
+      .then((res) => {
+        this.logger.verbose('Bulk insertion successful');
+        const endTime = performance.now();
+        this.logger.log(
+          `Time taken: ${(endTime - startTime).toFixed(4)} ms for ${durs[0].dataset.name
+          }`,
+        );
+      })
+      .catch(async (error) => {
+        console.log('error: ', error);
         this.logger.error(
           `ERROR Inserting Data in Bulk: ${durs[0].dataset.name}. Trying them 1 by 1`,
         );
@@ -358,9 +420,8 @@ export class DatasetService {
             });
         });
         const result = await Promise.all(promises);
-        this.logger.error(`${rowsIngested}/${data.length}, rows inserted`);
-      },
-    );
+        this.logger.error(`${rowsIngested} /${data.length}, rows inserted`);
+      });
   }
   addNonTimeDimension(dimension: DimensionMapping): {
     [k: string]: any;

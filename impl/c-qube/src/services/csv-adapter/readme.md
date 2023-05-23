@@ -128,10 +128,10 @@
 
 # File Types
 
-1. Dimension Grammar = {}.dimension.grammar.csv
-2. Event Grammar = {}.event.grammar.csv
-3. Dimension Data = {}.dimension.data.csv
-4. Event Data = {}.event.data.csv
+1. Dimension Grammar = {}-dimension.grammar.csv
+2. Event Grammar = {}-event.grammar.csv
+3. Dimension Data = {}-dimension.data.csv
+4. Event Data = {}-event.data.csv
 
 # Specifications
 
@@ -167,7 +167,7 @@ suggestive =
 2. Read the Dimension Grammar
 3. Valid files
 4. Check Dimension Data
-5. {}.dimension.grammar.csv => `DimensionGrammar`
+5. {}-dimension.grammar.csv => `DimensionGrammar`
 6. DimensionGrammar => Dimension Service to persist (Prisma Model) it // Populating Table
 7. Dimension Service => JSON Format
 8. {}.dimension.data.csv => `Dimension[]` // Creating Table

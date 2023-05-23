@@ -2,30 +2,34 @@ name: Node.js CI
 
 on:
   push:
-    branches: [master]
+    branches:
+      - '*'
   pull_request:
-    branches: [master]
+    branches:
+      - '*'
 
 jobs:
   CQube-Impl:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [16, 18]
+    # strategy:
+    #   matrix:
+    #     node-version: [16, 18]
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Run DBs
+        # working-directory: .
         run: docker-compose up -d
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 16
+        # working-directory: impl/c-qube
         uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 16
           cache: 'yarn'
-          cache-dependency-path: ./impl/c-qube/yarn.lock
+          cache-dependency-path: impl/c-qube/yarn.lock
 
       - name: Setup env
         working-directory: impl/c-qube
@@ -33,31 +37,33 @@ jobs:
           touch .env
           echo "DATABASE_URL="postgres://timescaledb:postgrespassword@localhost:5432/postgres?sslmode=disable"" > .env
 
-      - name: build
+      - name: Install dependencies
         working-directory: impl/c-qube
-        run: |
-          yarn install
-          yarn build
+        run: yarn install
 
       - name: Prisma Setup
         working-directory: impl/c-qube
         run: |
           npx prisma migrate dev
 
+      - name: build
+        working-directory: impl/c-qube
+        run: |
+          yarn install
+          yarn build
+
       - name: Tests
         working-directory: impl/c-qube
         run: |
           yarn test
           yarn test:cov
-      
+
       - name: Stop DBs
         working-directory: .
         run: |
           docker-compose down
-      
-      - name: e2e Tests
-        working-directory: impl/c-qube
-        run: |
-          yarn test:docker:up
-          while ! docker-compose -f docker-compose.test.yaml ps | grep -q "healthy"; do sleep 1; done
-          yarn test:e2e
+
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}

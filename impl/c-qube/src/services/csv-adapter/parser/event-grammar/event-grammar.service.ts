@@ -1,47 +1,41 @@
 import { EventGrammar, InstrumentType } from '../../../../types/event';
 import { getDGDefsFromEGDefs } from '../../csv-adapter.utils';
-import { createDimensionGrammarFromCSVDefinition } from '../dimensiongrammar/parser';
+import {
+  createDimensionGrammarFromCSVDefinition,
+  getInstrumentField,
+  mapPropertiesFromColumns,
+  processCSVtoEventGrammarDefJSON,
+} from './event-grammar.helpers';
 import { DimensionMapping } from '../../../../types/dataset';
 import { JSONSchema4 } from 'json-schema';
 import {
   Column,
-  ColumnType,
   EventDimensionMapping,
   EventGrammarCSVFormat,
   FieldType,
 } from '../../types/parser';
-const fs = require('fs').promises;
+import { readCSVFile } from '../utils/csvreader';
 
 export async function getEGDefFromFile(csvFilePath: string) {
-  // TODO: removeEmptyLines; Caused an issue when ingesting data with first line as blank.
-  const fileContent = await fs.readFile(csvFilePath, 'utf-8');
-  const row1 = fileContent.split('\n')[0].trim();
-  const row2 = fileContent.split('\n')[1].trim();
-  const row3 = fileContent.split('\n')[2].trim();
-  const row4 = fileContent.split('\n')[3].trim();
-  const row5 = fileContent.split('\n')[4].trim();
+  const [
+    dimensionName,
+    dimensionGrammarKey,
+    fieldDataType,
+    fieldName,
+    fieldType,
+  ] = await readCSVFile(csvFilePath);
 
-  // Vertical columns for CSV File
-  // | dimensionName |
-  // | dimensionGrammarKey |
-  // | fieldDataType |
-  // | fieldName |
-  // | fieldType |
-  const eventGrammarDef: EventGrammarCSVFormat[] = row5
-    .split(',')
-    .map((value, index) => {
-      return {
-        dimensionName:
-          row1.split(',')[index] === '' ? null : row1.split(',')[index],
-        dimensionGrammarKey:
-          row2.split(',')[index] === '' ? null : row2.split(',')[index],
-        fieldDataType: row3.split(',')[index] as ColumnType,
-        fieldName: row4.split(',')[index],
-        fieldType: row5.split(',')[index] as FieldType,
-      };
-    });
-  // Find text "metric" in trow 5 get it's index and get the value from row 4
-  const instrumentField = row4.split(',')[row5.split(',').indexOf('metric')];
+  const eventGrammarDef: EventGrammarCSVFormat[] =
+    processCSVtoEventGrammarDefJSON(
+      dimensionName,
+      dimensionGrammarKey,
+      fieldDataType,
+      fieldName,
+      fieldType,
+    );
+  // Find text "metric" in row 5 get it's index and get the value from row 4
+  const instrumentField = getInstrumentField(fieldName, fieldType);
+
   return { eventGrammarDef, instrumentField };
 }
 
@@ -63,14 +57,14 @@ export const createEventGrammarFromCSVDefinition = async (
   // Find eventGrammarsDefs where field type is dimension
   const dimensionGrammarDefs = getDGDefsFromEGDefs(eventGrammarDef);
 
-  for (let i = 0; i < dimensionGrammarDefs.length; i++) {
+  for (const dimensionGrammarDef of dimensionGrammarDefs) {
     const dimensionGrammar = await createDimensionGrammarFromCSVDefinition(
-      `${dimensionFileBasePath}/${dimensionGrammarDefs[i].dimensionName}-dimension.grammar.csv`,
+      `${dimensionFileBasePath}/${dimensionGrammarDef.dimensionName}-dimension.grammar.csv`,
     );
     const mapping: EventDimensionMapping = {
       dimensionGrammar: dimensionGrammar,
-      dimensionGrammarKey: dimensionGrammarDefs[i].dimensionGrammarKey,
-      eventGrammarKey: dimensionGrammarDefs[i].fieldName,
+      dimensionGrammarKey: dimensionGrammarDef.dimensionGrammarKey,
+      eventGrammarKey: dimensionGrammarDef.fieldName,
     };
 
     // Ignore every other dimension and pick the other ones.
@@ -83,18 +77,18 @@ export const createEventGrammarFromCSVDefinition = async (
         };
       });
     eventColumns.push({
-      name: dimensionGrammarDefs[i].fieldName,
-      type: dimensionGrammarDefs[i].fieldDataType,
+      name: dimensionGrammarDef.fieldName,
+      type: dimensionGrammarDef.fieldDataType,
     });
 
-    // Naming convention for eventis => `<event name>-event.csv`
+    // Naming convention for event is => `<event name>-event.csv`
     // Naming comvention for dimension is => `<dimension name>-dimenstion.csv`
     const eventName =
       programNamespace +
       '_' +
       csvFilePath.split('/').pop().split('.')[0].split('-')[0] +
       '_' +
-      dimensionGrammarDefs[i].dimensionName +
+      dimensionGrammarDef.dimensionName +
       '_' +
       mapping.dimensionGrammarKey;
 
@@ -105,8 +99,6 @@ export const createEventGrammarFromCSVDefinition = async (
       instrumentField,
       csvFilePath,
     );
-
-    // console.log(JSON.stringify(eventGrammar, null, 2));
 
     eventGrammars.push(eventGrammar);
   }
@@ -121,20 +113,9 @@ export const createEventGrammar = (
   instrumentField: string,
   csvFilePath: string,
 ): EventGrammar => {
-  const properties = {};
-  for (let i = 0; i < columns.length; i++) {
-    if (columns[i].type === 'date') {
-      properties[columns[i].name] = {
-        type: 'string',
-        format: 'date',
-      };
-    } else {
-      properties[columns[i].name] = {
-        type: columns[i].type,
-        unique: true,
-      };
-    }
-  }
+  const properties = mapPropertiesFromColumns(columns);
+
+  // creating the event grammar object
   const eventGrammar: EventGrammar = {
     file: csvFilePath,
     name: eventName,

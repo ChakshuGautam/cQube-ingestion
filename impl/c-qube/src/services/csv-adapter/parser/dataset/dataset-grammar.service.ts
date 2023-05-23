@@ -5,7 +5,7 @@ import {
 } from '../../../../types/dataset';
 import { EventGrammar } from 'src/types/event';
 import { DimensionGrammar } from '../../../../types/dimension';
-import { getEGDefFromFile } from '../eventgrammar/parser';
+import { getEGDefFromFile } from '../event-grammar/event-grammar.service';
 import { hash } from '../../../../utils/hash';
 import { EventGrammarCSVFormat, FieldType } from '../../types/parser';
 
@@ -86,6 +86,16 @@ export const createSingleDatasetGrammarsFromEGWithoutTimeDimension = async (
           type: 'number',
         },
       },
+      fk:
+        dimensionMapping.map((d: DimensionMapping) => {
+          return {
+            column: d.key,
+            reference: {
+              table: d.dimension.name.name,
+              column: d.dimension.name.storage.primaryId,
+            },
+          };
+        }) ?? [],
     },
   };
   return datasetGrammar;
@@ -106,7 +116,7 @@ export const getPropertyforDatasetGrammarFromEG = async (
     if (
       eventGrammarDef[i].fieldType === FieldType.dimension &&
       eventGrammarDef[i].dimensionName ===
-        eventGrammar.dimension[0].dimension.name.name
+      eventGrammar.dimension[0].dimension.name.name
     ) {
       propertyName = eventGrammarDef[i].fieldName;
     }
@@ -164,6 +174,16 @@ export const createSingleDatasetGrammarsFromEG = async (
           type: 'number',
         },
       },
+      fk:
+        dimensionMapping.map((d: DimensionMapping) => {
+          return {
+            column: d.key,
+            reference: {
+              table: d.dimension.name.name,
+              column: d.dimension.name.storage.primaryId,
+            },
+          };
+        }) ?? [],
     },
   };
   return datasetGrammar;
@@ -204,9 +224,8 @@ export const createCompoundDatasetGrammars = async (
     } = await getEGDefFromFile(eventGrammarFile);
     const dimensionMapping: DimensionMapping[] = [];
     const properties: Record<string, Record<string, string>> = {};
-    const prefix = `${namespace}_${
-      eventGrammarFile.split('/').pop().split('.')[0].split('-')[0]
-    }`;
+    const prefix = `${namespace}_${eventGrammarFile.split('/').pop().split('.')[0].split('-')[0]
+      }`;
     const name = `${prefix}_${defaultTimeDimension}_${compoundDimension.join(
       '0',
     )}`;
@@ -280,6 +299,15 @@ export const createCompoundDatasetGrammars = async (
         properties: {
           ...properties,
         },
+        fk: dimensionMapping.map((d: DimensionMapping) => {
+          return {
+            column: d.key,
+            reference: {
+              table: d.dimension.name.name,
+              column: d.dimension.name.storage.primaryId,
+            },
+          };
+        }),
       },
     };
     datasetGrammars.push(dataserGrammar);
@@ -304,9 +332,8 @@ export const createCompoundDatasetGrammarsWithoutTimeDimensions = async (
     } = await getEGDefFromFile(eventGrammarFile);
     const dimensionMapping: DimensionMapping[] = [];
     const properties: Record<string, Record<string, string>> = {};
-    const prefix = `${namespace}_${
-      eventGrammarFile.split('/').pop().split('.')[0].split('-')[0]
-    }`;
+    const prefix = `${namespace}_${eventGrammarFile.split('/').pop().split('.')[0].split('-')[0]
+      }`;
     const name = `${prefix}_${compoundDimension.join('0')}`;
     for (const dimension of compoundDimension) {
       for (const egd of eventGrammarDef) {
@@ -334,6 +361,7 @@ export const createCompoundDatasetGrammarsWithoutTimeDimensions = async (
         }
       }
     }
+
     const datasetGrammar: DatasetGrammar = {
       // content_subject_daily_total_interactions
       name,
@@ -350,6 +378,16 @@ export const createCompoundDatasetGrammarsWithoutTimeDimensions = async (
         properties: {
           ...properties,
         },
+        fk:
+          dimensionMapping.map((d: DimensionMapping) => {
+            return {
+              column: d.key,
+              reference: {
+                table: d.dimension.name.name,
+                column: d.dimension.name.storage.primaryId,
+              },
+            };
+          }) ?? [],
       },
     };
     datasetGrammars.push(datasetGrammar);

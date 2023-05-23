@@ -7,7 +7,9 @@ import { DatasetService } from '../dataset/dataset.service';
 import { EventService } from '../event/event.service';
 import { DataFrame } from 'nodejs-polars';
 import * as csv from 'csv-parser';
-
+import { DimensionGrammarService } from './parser/dimension-grammar/dimension-grammar.service';
+import { Pool } from 'pg';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs').promises;
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -23,9 +25,19 @@ const retry = require('retry');
 
 describe('CsvAdapterService', () => {
   let service: CsvAdapterService;
+  const databasePoolFactory = async (configService: ConfigService) => {
+    return new Pool({
+      user: configService.get('DB_USERNAME'),
+      host: configService.get('DB_HOST'),
+      database: configService.get('DB_NAME'),
+      password: configService.get('DB_PASSWORD'),
+      port: configService.get<number>('DB_PORT'),
+    });
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [ConfigModule],
       providers: [
         CsvAdapterService,
         EventService,
@@ -33,6 +45,12 @@ describe('CsvAdapterService', () => {
         PrismaService,
         DimensionService,
         DatasetService,
+        DimensionGrammarService,
+        {
+          provide: 'DATABASE_POOL',
+          inject: [ConfigService],
+          useFactory: databasePoolFactory,
+        },
       ],
     }).compile();
 
@@ -74,7 +92,6 @@ describe('CsvAdapterService', () => {
           readStream.close();
           writeStream.end();
           writeStream.on('finish', async () => {
-            console.log('onfinish');
             // await fs1.renameSync(output, input);
             resolve(output);
           });
@@ -87,7 +104,6 @@ describe('CsvAdapterService', () => {
 
     try {
       await processCSV(inputFile, outputFile);
-      console.log(`CSV file successfully processed and saved as ${outputFile}`);
     } catch (error) {
       console.error('Error processing CSV file:', error);
     }
@@ -97,7 +113,7 @@ describe('CsvAdapterService', () => {
     const df: DataFrame = pl.readCSV('fixtures/dimension-with-comma.csv', {
       quoteChar: "'",
     });
-    console.log(df);
+    // console.log(df);
   });
 
   it('should parse dataframe with comma', async () => {
