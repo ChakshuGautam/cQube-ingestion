@@ -1,13 +1,16 @@
+/* eslint-disable prettier/prettier */
 import { parse, format as formatDate } from 'date-fns';
 import { zonedTimeToUtc } from 'date-fns-tz';
 
 export class DateParser {
   private format: string;
   private timezone?: string;
+  private cache: Map<string, Date>;
 
   constructor(format: string, timezone?: string) {
     this.format = format;
     this.timezone = timezone;
+    this.cache = new Map<string, Date>();
   }
 
   toUtc(date: Date) {
@@ -17,6 +20,10 @@ export class DateParser {
 
   parseDate(date: string): Date {
     // This assumes date is in the format 'dd-mm-yyyy'
+    if (this.cache.has(date)) {
+      return this.cache.get(date); // Return the cached value if available
+    }
+
     if (this.format === 'dd-mm-yyyy' || this.format === 'dd-MM-yyyy') {
       const parts = date.split('-');
       const parsedDate = new Date(
@@ -24,6 +31,7 @@ export class DateParser {
         Number(parts[1]) - 1, // JavaScript months are 0-indexed
         Number(parts[0]),
       );
+      this.cache.set(date, parsedDate);
       return this.toUtc(parsedDate);
     } else if (this.format === 'dd/MM/yy') {
       const parts = date.split('/');
@@ -34,6 +42,7 @@ export class DateParser {
         Number(parts[1]) - 1, // JavaScript months are 0-indexed
         Number(parts[0]),
       );
+      this.cache.set(date, parsedDate);
       return this.toUtc(parsedDate);
     }
   }
