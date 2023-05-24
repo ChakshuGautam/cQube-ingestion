@@ -11,6 +11,9 @@ import { QueryBuilderService } from './../../../src/services/query-builder/query
 import { DimensionGrammarService } from './../../../src/services/csv-adapter/parser/dimension-grammar/dimension-grammar.service';
 import { Pool } from 'pg';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import * as eventGrammarJSON from '../../fixtures/outputDatasets/specData/eventGrammar.json';
+import * as dimensionGrammarJSON from '../../fixtures/outputDatasets/specData/dimensionGrammar.json';
+import * as datasetGrammarJSON from '../../fixtures/outputDatasets/specData/datasetGrammar.json';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -119,5 +122,53 @@ describe('AppController (e2e)', () => {
 
     expect(data).toBeDefined();
     expect(data).toEqual([]);
+  });
+
+  it('add test for spec', async () => {
+    await csvAdapterService.ingest();
+    const datasetGrammar =
+      await csvAdapterService.prisma.datasetGrammar.findMany({
+        select: {
+          // id: true,
+          name: true,
+          dimensions: true,
+          schema: true,
+          timeDimension: true,
+          program: true,
+          isCompound: true,
+          tableName: true,
+          tableNameExpanded: true,
+        },
+      });
+
+    const dimensionGrammar =
+      await csvAdapterService.prisma.dimensionGrammar.findMany({
+        select: {
+          // id: true,
+          name: true,
+          type: true,
+          schema: true,
+          storage: true,
+        },
+      });
+
+    const eventGrammar = await csvAdapterService.prisma.eventGrammar.findMany({
+      select: {
+        // id: true,
+        name: true,
+        instrumentField: true,
+        schema: true,
+        instrumentType: true,
+        // dimensionMapping: true,
+        program: true,
+        eventType: true,
+      },
+    });
+
+    expect(eventGrammar).toEqual(eventGrammarJSON);
+    expect(dimensionGrammar).toEqual(
+      expect.arrayContaining(dimensionGrammarJSON),
+    );
+    expect(datasetGrammar).toEqual(expect.arrayContaining(datasetGrammarJSON));
   });
 });

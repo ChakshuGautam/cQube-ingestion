@@ -1,0 +1,3025 @@
+[
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "avg_play_time_in_mins_on_app_and_portal": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "avg_play_time_in_mins_on_app_and_portal",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_avgplaytime_state_state_id",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "grade_diksha": {
+          "type": "string",
+          "unique": true
+        },
+        "avg_play_time_in_mins_on_app_and_portal": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "avg_play_time_in_mins_on_app_and_portal",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_avgplaytime_grade_grade_diksha",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "subject_diksha": {
+          "type": "string",
+          "unique": true
+        },
+        "avg_play_time_in_mins_on_app_and_portal": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "avg_play_time_in_mins_on_app_and_portal",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_avgplaytime_subject_subject_diksha",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "textbook_id": {
+          "type": "string",
+          "unique": true
+        },
+        "qr_codes_linked_to_content": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "qr_codes_linked_to_content",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_contentqrcode_textbookdiksha_textbook_id",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "grade_diksha": {
+          "type": "string",
+          "unique": true
+        },
+        "qr_codes_linked_to_content": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "qr_codes_linked_to_content",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_contentqrcode_grade_grade_diksha",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "subject_diksha": {
+          "type": "string",
+          "unique": true
+        },
+        "qr_codes_linked_to_content": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "qr_codes_linked_to_content",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_contentqrcode_subject_subject_diksha",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "medium": {
+          "type": "string",
+          "unique": true
+        },
+        "qr_codes_linked_to_content": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "qr_codes_linked_to_content",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_contentqrcode_medium_medium",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "textbook_id": {
+          "type": "string",
+          "unique": true
+        },
+        "linked_qr_count": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "linked_qr_count",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_linkedqrcount_textbookdiksha_textbook_id",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "grade_diksha": {
+          "type": "string",
+          "unique": true
+        },
+        "linked_qr_count": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "linked_qr_count",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_linkedqrcount_grade_grade_diksha",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "subject_diksha": {
+          "type": "string",
+          "unique": true
+        },
+        "linked_qr_count": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "linked_qr_count",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_linkedqrcount_subject_subject_diksha",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "medium": {
+          "type": "string",
+          "unique": true
+        },
+        "linked_qr_count": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "linked_qr_count",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_linkedqrcount_medium_medium",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "plays_per_capita": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "plays_per_capita",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_playspercapita_state_state_id",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "qr_coverage": {
+          "type": "integer",
+          "unique": true
+        },
+        "textbook_id": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "qr_coverage",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_qrcoverage_textbookdiksha_textbook_id",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "qr_coverage": {
+          "type": "integer",
+          "unique": true
+        },
+        "grade_diksha": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "qr_coverage",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_qrcoverage_grade_grade_diksha",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "qr_coverage": {
+          "type": "integer",
+          "unique": true
+        },
+        "subject_diksha": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "qr_coverage",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_qrcoverage_subject_subject_diksha",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "medium": {
+          "type": "string",
+          "unique": true
+        },
+        "qr_coverage": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "qr_coverage",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_qrcoverage_medium_medium",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "textbook_id": {
+          "type": "string",
+          "unique": true
+        },
+        "resource_count": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "resource_count",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_resourcecount_textbookdiksha_textbook_id",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "grade_diksha": {
+          "type": "string",
+          "unique": true
+        },
+        "resource_count": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "resource_count",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_resourcecount_grade_grade_diksha",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "resource_count": {
+          "type": "integer",
+          "unique": true
+        },
+        "subject_diksha": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "resource_count",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_resourcecount_subject_subject_diksha",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "medium": {
+          "type": "string",
+          "unique": true
+        },
+        "resource_count": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "resource_count",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_resourcecount_medium_medium",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_no_of_plays_app_and_portal": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_no_of_plays_app_and_portal",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_totalpalys_state_state_id",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "grade_diksha": {
+          "type": "string",
+          "unique": true
+        },
+        "total_no_of_plays_app_and_portal": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_no_of_plays_app_and_portal",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_totalpalys_grade_grade_diksha",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "subject_diksha": {
+          "type": "string",
+          "unique": true
+        },
+        "total_no_of_plays_app_and_portal": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_no_of_plays_app_and_portal",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_totalpalys_subject_subject_diksha",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "medium": {
+          "type": "string",
+          "unique": true
+        },
+        "total_no_of_plays_app_and_portal": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_no_of_plays_app_and_portal",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_totalpalys_medium_medium",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "textbook_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_qr_codes": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_qr_codes",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_totalqrcodes_textbookdiksha_textbook_id",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "grade_diksha": {
+          "type": "string",
+          "unique": true
+        },
+        "total_qr_codes": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_qr_codes",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_totalqrcodes_grade_grade_diksha",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "subject_diksha": {
+          "type": "string",
+          "unique": true
+        },
+        "total_qr_codes": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_qr_codes",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_totalqrcodes_subject_subject_diksha",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "medium": {
+          "type": "string",
+          "unique": true
+        },
+        "total_qr_codes": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_qr_codes",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "diksha_totalqrcodes_medium_medium",
+    "program": "diksha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "district_id": {
+          "type": "string",
+          "unique": true
+        },
+        "students_attendance_marked": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "students_attendance_marked",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_studentsmarked_district_district_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "block_id": {
+          "type": "string",
+          "unique": true
+        },
+        "students_attendance_marked": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "students_attendance_marked",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_studentsmarked_block_block_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "cluster_id": {
+          "type": "string",
+          "unique": true
+        },
+        "students_attendance_marked": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "students_attendance_marked",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_studentsmarked_cluster_cluster_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "school_id": {
+          "type": "string",
+          "unique": true
+        },
+        "students_attendance_marked": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "students_attendance_marked",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_studentsmarked_school_school_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "grade_state": {
+          "type": "string",
+          "unique": true
+        },
+        "students_attendance_marked": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "students_attendance_marked",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_studentsmarked_grade_grade_state",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "category_value": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "category_value",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "udise_category_state_state_id",
+    "program": "udise"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "schoolcategory_id": {
+          "type": "string",
+          "unique": true
+        },
+        "students_attendance_marked": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "students_attendance_marked",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_studentsmarked_schoolcategory_schoolcategory_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "gender": {
+          "type": "string",
+          "unique": true
+        },
+        "students_attendance_marked": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "students_attendance_marked",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_studentsmarked_gender_gender",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "district_id": {
+          "type": "string",
+          "unique": true
+        },
+        "students_marked_present": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "students_marked_present",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_studentspresent_district_district_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "block_id": {
+          "type": "string",
+          "unique": true
+        },
+        "students_marked_present": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "students_marked_present",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_studentspresent_block_block_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "cluster_id": {
+          "type": "string",
+          "unique": true
+        },
+        "students_marked_present": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "students_marked_present",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_studentspresent_cluster_cluster_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "school_id": {
+          "type": "string",
+          "unique": true
+        },
+        "students_marked_present": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "students_marked_present",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_studentspresent_school_school_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "grade_state": {
+          "type": "string",
+          "unique": true
+        },
+        "students_marked_present": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "students_marked_present",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_studentspresent_grade_grade_state",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "schoolcategory_id": {
+          "type": "string",
+          "unique": true
+        },
+        "students_marked_present": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "students_marked_present",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_studentspresent_schoolcategory_schoolcategory_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "gender": {
+          "type": "string",
+          "unique": true
+        },
+        "students_marked_present": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "students_marked_present",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_studentspresent_gender_gender",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "district_id": {
+          "type": "string",
+          "unique": true
+        },
+        "teachers_marked": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "teachers_marked",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_teachersmarked_district_district_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "block_id": {
+          "type": "string",
+          "unique": true
+        },
+        "teachers_marked": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "teachers_marked",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_teachersmarked_block_block_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "cluster_id": {
+          "type": "string",
+          "unique": true
+        },
+        "teachers_marked": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "teachers_marked",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_teachersmarked_cluster_cluster_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "school_id": {
+          "type": "string",
+          "unique": true
+        },
+        "teachers_marked": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "teachers_marked",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_teachersmarked_school_school_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "teachers_marked": {
+          "type": "integer",
+          "unique": true
+        },
+        "schoolcategory_id": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "teachers_marked",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_teachersmarked_schoolcategory_schoolcategory_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "grade_state": {
+          "type": "string",
+          "unique": true
+        },
+        "teachers_marked": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "teachers_marked",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_teachersmarked_grade_grade_state",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "district_id": {
+          "type": "string",
+          "unique": true
+        },
+        "teachers_marked_present": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "teachers_marked_present",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_teacherspresent_district_district_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "block_id": {
+          "type": "string",
+          "unique": true
+        },
+        "teachers_marked_present": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "teachers_marked_present",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_teacherspresent_block_block_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "cluster_id": {
+          "type": "string",
+          "unique": true
+        },
+        "teachers_marked_present": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "teachers_marked_present",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_teacherspresent_cluster_cluster_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "school_id": {
+          "type": "string",
+          "unique": true
+        },
+        "teachers_marked_present": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "teachers_marked_present",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_teacherspresent_school_school_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "schoolcategory_id": {
+          "type": "string",
+          "unique": true
+        },
+        "teachers_marked_present": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "teachers_marked_present",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_teacherspresent_schoolcategory_schoolcategory_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "grade_state": {
+          "type": "string",
+          "unique": true
+        },
+        "teachers_marked_present": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "teachers_marked_present",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_teacherspresent_grade_grade_state",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "district_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_students": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_students",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_totalstudent_district_district_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "block_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_students": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_students",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_totalstudent_block_block_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "cluster_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_students": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_students",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_totalstudent_cluster_cluster_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "school_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_students": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_students",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_totalstudent_school_school_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "grade_state": {
+          "type": "string",
+          "unique": true
+        },
+        "total_students": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_students",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_totalstudent_grade_grade_state",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "total_students": {
+          "type": "integer",
+          "unique": true
+        },
+        "schoolcategory_id": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_students",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_totalstudent_schoolcategory_schoolcategory_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "gender": {
+          "type": "string",
+          "unique": true
+        },
+        "total_students": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_students",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_totalstudent_gender_gender",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "district_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_teachers": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_teachers",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_totalteacher_district_district_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "block_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_teachers": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_teachers",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_totalteacher_block_block_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "cluster_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_teachers": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_teachers",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_totalteacher_cluster_cluster_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "school_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_teachers": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_teachers",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_totalteacher_school_school_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "total_teachers": {
+          "type": "integer",
+          "unique": true
+        },
+        "schoolcategory_id": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_teachers",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_totalteacher_schoolcategory_schoolcategory_id",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "grade_state": {
+          "type": "string",
+          "unique": true
+        },
+        "total_teachers": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_teachers",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "sch_att_totalteacher_grade_grade_state",
+    "program": "sch_att"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "district_id": {
+          "type": "string",
+          "unique": true
+        },
+        "category_value": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "category_value",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "pm_poshan_category_district_district_id",
+    "program": "pm_poshan"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "category_name": {
+          "type": "string",
+          "unique": true
+        },
+        "category_value": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "category_value",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "pm_poshan_category_categorypm_category_name",
+    "program": "pm_poshan"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "district_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_meals_served": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_meals_served",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "pm_poshan_mealserved_district_district_id",
+    "program": "pm_poshan"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "performance": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "performance",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nas_performance_state_state_id",
+    "program": "nas"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "district_id": {
+          "type": "string",
+          "unique": true
+        },
+        "performance": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "performance",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nas_performance_district_district_id",
+    "program": "nas"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "lo_code": {
+          "type": "string",
+          "unique": true
+        },
+        "performance": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "performance",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nas_performance_lo_lo_code",
+    "program": "nas"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "grade_nas": {
+          "type": "string",
+          "unique": true
+        },
+        "performance": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "performance",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nas_performance_grade_grade_nas",
+    "program": "nas"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "performance": {
+          "type": "integer",
+          "unique": true
+        },
+        "subject_nas": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "performance",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nas_performance_subject_subject_nas",
+    "program": "nas"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "no_of_schools": {
+          "type": "number",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "no_of_schools",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nas_schools_state_state_id",
+    "program": "nas"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "district_id": {
+          "type": "string",
+          "unique": true
+        },
+        "no_of_schools": {
+          "type": "number",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "no_of_schools",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nas_schools_district_district_id",
+    "program": "nas"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "students_surveyed": {
+          "type": "number",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "students_surveyed",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nas_studentssurveyed_state_state_id",
+    "program": "nas"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "district_id": {
+          "type": "string",
+          "unique": true
+        },
+        "students_surveyed": {
+          "type": "number",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "students_surveyed",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nas_studentssurveyed_district_district_id",
+    "program": "nas"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "no_of_teachers": {
+          "type": "number",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "no_of_teachers",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nas_teachers_state_state_id",
+    "program": "nas"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "district_id": {
+          "type": "string",
+          "unique": true
+        },
+        "no_of_teachers": {
+          "type": "number",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "no_of_teachers",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nas_teachers_district_district_id",
+    "program": "nas"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "district_id": {
+          "type": "string",
+          "unique": true
+        },
+        "category_value": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "category_value",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "udise_category_district_district_id",
+    "program": "udise"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "category_name": {
+          "type": "string",
+          "unique": true
+        },
+        "category_value": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "category_value",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "udise_category_categoryudise_category_name",
+    "program": "udise"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "no_of_students": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "no_of_students",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "udise_noofstudents_state_state_id",
+    "program": "udise"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "district_id": {
+          "type": "string",
+          "unique": true
+        },
+        "no_of_students": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "no_of_students",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "udise_noofstudents_district_district_id",
+    "program": "udise"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "block_id": {
+          "type": "string",
+          "unique": true
+        },
+        "meeting_conducted": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "meeting_conducted",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "rev_and_monitoring_block_block_block_id",
+    "program": "rev_and_monitoring"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "district_id": {
+          "type": "string",
+          "unique": true
+        },
+        "meeting_conducted": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "meeting_conducted",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "rev_and_monitoring_block_district_district_id",
+    "program": "rev_and_monitoring"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "academicyear_id": {
+          "type": "string",
+          "unique": true
+        },
+        "meeting_conducted": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "meeting_conducted",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "rev_and_monitoring_block_academicyear_academicyear_id",
+    "program": "rev_and_monitoring"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "cluster_id": {
+          "type": "string",
+          "unique": true
+        },
+        "meeting_conducted": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "meeting_conducted",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "rev_and_monitoring_cluster_cluster_cluster_id",
+    "program": "rev_and_monitoring"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "block_id": {
+          "type": "string",
+          "unique": true
+        },
+        "meeting_conducted": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "meeting_conducted",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "rev_and_monitoring_cluster_block_block_id",
+    "program": "rev_and_monitoring"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "district_id": {
+          "type": "string",
+          "unique": true
+        },
+        "meeting_conducted": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "meeting_conducted",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "rev_and_monitoring_cluster_district_district_id",
+    "program": "rev_and_monitoring"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "academicyear_id": {
+          "type": "string",
+          "unique": true
+        },
+        "meeting_conducted": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "meeting_conducted",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "rev_and_monitoring_cluster_academicyear_academicyear_id",
+    "program": "rev_and_monitoring"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "district_id": {
+          "type": "string",
+          "unique": true
+        },
+        "meeting_conducted": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "meeting_conducted",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "rev_and_monitoring_district_district_district_id",
+    "program": "rev_and_monitoring"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "academicyear_id": {
+          "type": "string",
+          "unique": true
+        },
+        "meeting_conducted": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "meeting_conducted",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "rev_and_monitoring_district_academicyear_academicyear_id",
+    "program": "rev_and_monitoring"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "category_value": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "category_value",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "pgi_category_state_state_id",
+    "program": "pgi"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "district_id": {
+          "type": "string",
+          "unique": true
+        },
+        "category_value": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "category_value",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "pgi_category_district_district_id",
+    "program": "pgi"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "category_id": {
+          "type": "string",
+          "unique": true
+        },
+        "category_value": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "category_value",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "pgi_category_categorypgi_category_id",
+    "program": "pgi"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "perc_target_achieved_certificates": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "perc_target_achieved_certificates",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_achievedcertificates_state_state_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "program_name": {
+          "type": "string",
+          "unique": true
+        },
+        "perc_target_achieved_certificates": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "perc_target_achieved_certificates",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_achievedcertificates_programnishtha_program_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "perc_target_achieved_enrolment": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "perc_target_achieved_enrolment",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_achievedenrolment_state_state_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "program_name": {
+          "type": "string",
+          "unique": true
+        },
+        "perc_target_achieved_enrolment": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "perc_target_achieved_enrolment",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_achievedenrolment_programnishtha_program_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_certification": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_certification",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_consumptioncertification_state_state_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "district_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_certification": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_certification",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_consumptioncertification_district_district_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "program_name": {
+          "type": "string",
+          "unique": true
+        },
+        "total_certification": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_certification",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_consumptioncertification_programnishtha_program_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_completion": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_completion",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_consumptioncompletion_state_state_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "district_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_completion": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_completion",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_consumptioncompletion_district_district_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "program_name": {
+          "type": "string",
+          "unique": true
+        },
+        "total_completion": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_completion",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_consumptioncompletion_programnishtha_program_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_enrolment": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_enrolment",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_consumptionenrolment_state_state_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "district_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_enrolment": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_enrolment",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_consumptionenrolment_district_district_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "program_name": {
+          "type": "string",
+          "unique": true
+        },
+        "total_enrolment": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_enrolment",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_consumptionenrolment_programnishtha_program_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "perc_certification": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "perc_certification",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_consumptionperccertification_state_state_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "district_id": {
+          "type": "string",
+          "unique": true
+        },
+        "perc_certification": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "perc_certification",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_consumptionperccertification_district_district_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "program_name": {
+          "type": "string",
+          "unique": true
+        },
+        "perc_certification": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "perc_certification",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_consumptionperccertification_programnishtha_program_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_certification": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_certification",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_coursecertification_state_state_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "program_name": {
+          "type": "string",
+          "unique": true
+        },
+        "total_certification": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_certification",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_coursecertification_programnishtha_program_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "course_name": {
+          "type": "string",
+          "unique": true
+        },
+        "total_certification": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_certification",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_coursecertification_coursenishtha_course_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_completion": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_completion",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_coursecompletion_state_state_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "program_name": {
+          "type": "string",
+          "unique": true
+        },
+        "total_completion": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_completion",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_coursecompletion_programnishtha_program_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "course_name": {
+          "type": "string",
+          "unique": true
+        },
+        "total_completion": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_completion",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_coursecompletion_coursenishtha_course_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_enrolment": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_enrolment",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_courseenrolment_state_state_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "program_name": {
+          "type": "string",
+          "unique": true
+        },
+        "total_enrolment": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_enrolment",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_courseenrolment_programnishtha_program_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "course_name": {
+          "type": "string",
+          "unique": true
+        },
+        "total_enrolment": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_enrolment",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_courseenrolment_coursenishtha_course_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "doe": {
+          "type": "integer",
+          "unique": true
+        },
+        "state_id": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "doe",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_doe_state_state_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "doe": {
+          "type": "integer",
+          "unique": true
+        },
+        "program_name": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "doe",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_doe_programnishtha_program_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_expected_certification": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_expected_certification",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_expectedcertification_state_state_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "program_name": {
+          "type": "string",
+          "unique": true
+        },
+        "total_expected_certification": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_expected_certification",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_expectedcertification_programnishtha_program_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_expected_enrolment": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_expected_enrolment",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_expectedenrolment_state_state_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "program_name": {
+          "type": "string",
+          "unique": true
+        },
+        "total_expected_enrolment": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_expected_enrolment",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_expectedenrolment_programnishtha_program_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "local_body": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "local_body",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_localbody_state_state_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "local_body": {
+          "type": "integer",
+          "unique": true
+        },
+        "program_name": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "local_body",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_localbody_programnishtha_program_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_courses": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_courses",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_mediumtotalcourses_state_state_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "program_name": {
+          "type": "string",
+          "unique": true
+        },
+        "total_courses": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_courses",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_mediumtotalcourses_programnishtha_program_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "started": {
+          "type": "string",
+          "unique": true
+        },
+        "state_id": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "started",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_programstarted_state_state_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "started": {
+          "type": "string",
+          "unique": true
+        },
+        "program_name": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "started",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_programstarted_programnishtha_program_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "perc_target_remaining_certificates": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "perc_target_remaining_certificates",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_targetremainingcertificates_state_state_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "program_name": {
+          "type": "string",
+          "unique": true
+        },
+        "perc_target_remaining_certificates": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "perc_target_remaining_certificates",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_targetremainingcertificates_programnishtha_program_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "perc_target_remaining_enrolment": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "perc_target_remaining_enrolment",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_targetremainingenrolment_state_state_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "program_name": {
+          "type": "string",
+          "unique": true
+        },
+        "perc_target_remaining_enrolment": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "perc_target_remaining_enrolment",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_targetremainingenrolment_programnishtha_program_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_certificates_issued": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_certificates_issued",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_totalcertificatesissued_state_state_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "program_name": {
+          "type": "string",
+          "unique": true
+        },
+        "total_certificates_issued": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_certificates_issued",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_totalcertificatesissued_programnishtha_program_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_completion": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_completion",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_totalcompletion_state_state_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "program_name": {
+          "type": "string",
+          "unique": true
+        },
+        "total_completion": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_completion",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_totalcompletion_programnishtha_program_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_courses": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_courses",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_totalcourses_state_state_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "program_name": {
+          "type": "string",
+          "unique": true
+        },
+        "total_courses": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_courses",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_totalcourses_programnishtha_program_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_enrolment": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_enrolment",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_totalenrolment_state_state_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "program_name": {
+          "type": "string",
+          "unique": true
+        },
+        "total_enrolment": {
+          "type": "integer",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_enrolment",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_totalenrolment_programnishtha_program_name",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "total_medium": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_medium",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_totalmedium_state_state_id",
+    "program": "nishtha"
+  },
+  {
+    "eventType": "INTERNAL",
+    "schema": {
+      "properties": {
+        "program_name": {
+          "type": "string",
+          "unique": true
+        },
+        "total_medium": {
+          "type": "string",
+          "unique": true
+        }
+      }
+    },
+    "instrumentField": "total_medium",
+    "instrumentType": "clhmc25xe0000izv8m6labaeg",
+    "name": "nishtha_totalmedium_programnishtha_program_name",
+    "program": "nishtha"
+  }
+]

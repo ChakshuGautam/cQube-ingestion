@@ -1,0 +1,634 @@
+[
+  {
+    "schema": {
+      "title": "academicyear",
+      "indexes": [
+        {
+          "columns": [["academicyear"]]
+        }
+      ],
+      "properties": {
+        "academicyear": {
+          "type": "string",
+          "unique": true
+        },
+        "academicyear_id": {
+          "type": "string",
+          "unique": true
+        }
+      },
+      "psql_schema": "dimensions"
+    },
+    "storage": "{\"indexes\":[\"name\"],\"primaryId\":\"academicyear_id\",\"retention\":null,\"bucket_size\":null}",
+    "name": "academicyear",
+    "type": "dynamic"
+  },
+  {
+    "schema": {
+      "title": "block",
+      "indexes": [
+        {
+          "columns": [["block_name"]]
+        }
+      ],
+      "properties": {
+        "block_id": {
+          "type": "string",
+          "unique": true
+        },
+        "latitude": {
+          "type": "string",
+          "unique": false
+        },
+        "longitude": {
+          "type": "string",
+          "unique": false
+        },
+        "block_name": {
+          "type": "string",
+          "unique": true
+        },
+        "district_id": {
+          "type": "string",
+          "unique": false
+        },
+        "district_name": {
+          "type": "string",
+          "unique": false
+        }
+      },
+      "psql_schema": "dimensions"
+    },
+    "storage": "{\"indexes\":[\"name\"],\"primaryId\":\"block_id\",\"retention\":null,\"bucket_size\":null}",
+    "name": "block",
+    "type": "dynamic"
+  },
+  {
+    "schema": {
+      "title": "categorypgi",
+      "indexes": [
+        {
+          "columns": [["category_name"]]
+        }
+      ],
+      "properties": {
+        "category_id": {
+          "type": "string",
+          "unique": true
+        },
+        "category_name": {
+          "type": "string",
+          "unique": true
+        }
+      },
+      "psql_schema": "dimensions"
+    },
+    "storage": "{\"indexes\":[\"name\"],\"primaryId\":\"category_id\",\"retention\":null,\"bucket_size\":null}",
+    "name": "categorypgi",
+    "type": "dynamic"
+  },
+  {
+    "schema": {
+      "title": "categorypm",
+      "indexes": [
+        {
+          "columns": [["category_name"]]
+        }
+      ],
+      "properties": {
+        "category_id": {
+          "type": "string",
+          "unique": true
+        },
+        "category_name": {
+          "type": "string",
+          "unique": true
+        }
+      },
+      "psql_schema": "dimensions"
+    },
+    "storage": "{\"indexes\":[\"name\"],\"primaryId\":\"category_id\",\"retention\":null,\"bucket_size\":null}",
+    "name": "categorypm",
+    "type": "dynamic"
+  },
+  {
+    "schema": {
+      "title": "categoryudise",
+      "indexes": [
+        {
+          "columns": [["category_name"]]
+        }
+      ],
+      "properties": {
+        "category_id": {
+          "type": "string",
+          "unique": true
+        },
+        "category_name": {
+          "type": "string",
+          "unique": true
+        }
+      },
+      "psql_schema": "dimensions"
+    },
+    "storage": "{\"indexes\":[\"name\"],\"primaryId\":\"category_id\",\"retention\":null,\"bucket_size\":null}",
+    "name": "categoryudise",
+    "type": "dynamic"
+  },
+  {
+    "schema": {
+      "title": "cluster",
+      "indexes": [
+        {
+          "columns": [["cluster_name"]]
+        }
+      ],
+      "properties": {
+        "block_id": {
+          "type": "string",
+          "unique": false
+        },
+        "latitude": {
+          "type": "string",
+          "unique": false
+        },
+        "longitude": {
+          "type": "string",
+          "unique": false
+        },
+        "block_name": {
+          "type": "string",
+          "unique": false
+        },
+        "cluster_id": {
+          "type": "string",
+          "unique": true
+        },
+        "district_id": {
+          "type": "string",
+          "unique": false
+        },
+        "cluster_name": {
+          "type": "string",
+          "unique": true
+        },
+        "district_name": {
+          "type": "string",
+          "unique": false
+        }
+      },
+      "psql_schema": "dimensions"
+    },
+    "storage": "{\"indexes\":[\"name\"],\"primaryId\":\"cluster_id\",\"retention\":null,\"bucket_size\":null}",
+    "name": "cluster",
+    "type": "dynamic"
+  },
+  {
+    "schema": {
+      "title": "coursenishtha",
+      "indexes": [
+        {
+          "columns": [["course_name"]]
+        }
+      ],
+      "properties": {
+        "course_id": {
+          "type": "string",
+          "unique": true
+        },
+        "course_name": {
+          "type": "string",
+          "unique": true
+        }
+      },
+      "psql_schema": "dimensions"
+    },
+    "storage": "{\"indexes\":[\"name\"],\"primaryId\":\"course_id\",\"retention\":null,\"bucket_size\":null}",
+    "name": "coursenishtha",
+    "type": "dynamic"
+  },
+  {
+    "schema": {
+      "title": "cwsn",
+      "indexes": [
+        {
+          "columns": [["cwsn"]]
+        }
+      ],
+      "properties": {
+        "cwsn": {
+          "type": "string",
+          "unique": true
+        },
+        "cwsn_id": {
+          "type": "string",
+          "unique": true
+        }
+      },
+      "psql_schema": "dimensions"
+    },
+    "storage": "{\"indexes\":[\"name\"],\"primaryId\":\"cwsn_id\",\"retention\":null,\"bucket_size\":null}",
+    "name": "cwsn",
+    "type": "dynamic"
+  },
+  {
+    "schema": {
+      "title": "district",
+      "indexes": [
+        {
+          "columns": [["district_name"]]
+        }
+      ],
+      "properties": {
+        "latitude": {
+          "type": "string",
+          "unique": false
+        },
+        "state_id": {
+          "type": "string",
+          "unique": false
+        },
+        "longitude": {
+          "type": "string",
+          "unique": false
+        },
+        "state_name": {
+          "type": "string",
+          "unique": false
+        },
+        "district_id": {
+          "type": "string",
+          "unique": true
+        },
+        "district_name": {
+          "type": "string",
+          "unique": true
+        }
+      },
+      "psql_schema": "dimensions"
+    },
+    "storage": "{\"indexes\":[\"name\"],\"primaryId\":\"district_id\",\"retention\":null,\"bucket_size\":null}",
+    "name": "district",
+    "type": "dynamic"
+  },
+  {
+    "schema": {
+      "title": "gender",
+      "indexes": [
+        {
+          "columns": [["gender"]]
+        }
+      ],
+      "properties": {
+        "gender": {
+          "type": "string",
+          "unique": true
+        },
+        "gender_id": {
+          "type": "string",
+          "unique": true
+        }
+      },
+      "psql_schema": "dimensions"
+    },
+    "storage": "{\"indexes\":[\"name\"],\"primaryId\":\"gender_id\",\"retention\":null,\"bucket_size\":null}",
+    "name": "gender",
+    "type": "dynamic"
+  },
+  {
+    "schema": {
+      "title": "grade",
+      "indexes": [
+        {
+          "columns": [["grade_nas", "grade_diksha", "grade_state"]]
+        }
+      ],
+      "properties": {
+        "grade_id": {
+          "type": "string",
+          "unique": true
+        },
+        "grade_nas": {
+          "type": "string",
+          "unique": true
+        },
+        "grade_state": {
+          "type": "string",
+          "unique": true
+        },
+        "grade_diksha": {
+          "type": "string",
+          "unique": true
+        }
+      },
+      "psql_schema": "dimensions"
+    },
+    "storage": "{\"indexes\":[\"name\"],\"primaryId\":\"grade_id\",\"retention\":null,\"bucket_size\":null}",
+    "name": "grade",
+    "type": "dynamic"
+  },
+  {
+    "schema": {
+      "title": "lo",
+      "indexes": [
+        {
+          "columns": [["lo_code"]]
+        }
+      ],
+      "properties": {
+        "lo_id": {
+          "type": "string",
+          "unique": true
+        },
+        "lo_code": {
+          "type": "string",
+          "unique": true
+        },
+        "lo_name": {
+          "type": "string",
+          "unique": false
+        }
+      },
+      "psql_schema": "dimensions"
+    },
+    "storage": "{\"indexes\":[\"name\"],\"primaryId\":\"lo_id\",\"retention\":null,\"bucket_size\":null}",
+    "name": "lo",
+    "type": "dynamic"
+  },
+  {
+    "schema": {
+      "title": "medium",
+      "indexes": [
+        {
+          "columns": [["medium"]]
+        }
+      ],
+      "properties": {
+        "medium": {
+          "type": "string",
+          "unique": true
+        },
+        "medium_id": {
+          "type": "string",
+          "unique": true
+        }
+      },
+      "psql_schema": "dimensions"
+    },
+    "storage": "{\"indexes\":[\"name\"],\"primaryId\":\"medium_id\",\"retention\":null,\"bucket_size\":null}",
+    "name": "medium",
+    "type": "dynamic"
+  },
+  {
+    "schema": {
+      "title": "programnishtha",
+      "indexes": [
+        {
+          "columns": [["program_name"]]
+        }
+      ],
+      "properties": {
+        "program_id": {
+          "type": "string",
+          "unique": true
+        },
+        "program_name": {
+          "type": "string",
+          "unique": true
+        }
+      },
+      "psql_schema": "dimensions"
+    },
+    "storage": "{\"indexes\":[\"name\"],\"primaryId\":\"program_id\",\"retention\":null,\"bucket_size\":null}",
+    "name": "programnishtha",
+    "type": "dynamic"
+  },
+  {
+    "schema": {
+      "title": "school",
+      "indexes": [
+        {
+          "columns": [["school_name"]]
+        }
+      ],
+      "properties": {
+        "block_id": {
+          "type": "string",
+          "unique": false
+        },
+        "grade_id": {
+          "type": "integer",
+          "unique": false
+        },
+        "latitude": {
+          "type": "string",
+          "unique": false
+        },
+        "longitude": {
+          "type": "string",
+          "unique": false
+        },
+        "school_id": {
+          "type": "string",
+          "unique": true
+        },
+        "block_name": {
+          "type": "string",
+          "unique": false
+        },
+        "cluster_id": {
+          "type": "string",
+          "unique": false
+        },
+        "district_id": {
+          "type": "string",
+          "unique": false
+        },
+        "school_name": {
+          "type": "string",
+          "unique": true
+        },
+        "cluster_name": {
+          "type": "string",
+          "unique": false
+        },
+        "district_name": {
+          "type": "string",
+          "unique": false
+        },
+        "schoolcategory_id": {
+          "type": "string",
+          "unique": false
+        }
+      },
+      "psql_schema": "dimensions"
+    },
+    "storage": "{\"indexes\":[\"name\"],\"primaryId\":\"school_id\",\"retention\":null,\"bucket_size\":null}",
+    "name": "school",
+    "type": "dynamic"
+  },
+  {
+    "schema": {
+      "title": "schoolcategory",
+      "indexes": [
+        {
+          "columns": [["schoolcategory_name"]]
+        }
+      ],
+      "properties": {
+        "grades": {
+          "type": "string",
+          "unique": false
+        },
+        "schoolcategory_id": {
+          "type": "string",
+          "unique": true
+        },
+        "schoolcategory_name": {
+          "type": "string",
+          "unique": true
+        }
+      },
+      "psql_schema": "dimensions"
+    },
+    "storage": "{\"indexes\":[\"name\"],\"primaryId\":\"schoolcategory_id\",\"retention\":null,\"bucket_size\":null}",
+    "name": "schoolcategory",
+    "type": "dynamic"
+  },
+  {
+    "schema": {
+      "title": "subject",
+      "indexes": [
+        {
+          "columns": [["subject_nas", "subject_diksha", "subject_state"]]
+        }
+      ],
+      "properties": {
+        "subject_id": {
+          "type": "string",
+          "unique": true
+        },
+        "subject_nas": {
+          "type": "string",
+          "unique": true
+        },
+        "subject_state": {
+          "type": "string",
+          "unique": true
+        },
+        "subject_diksha": {
+          "type": "string",
+          "unique": true
+        }
+      },
+      "psql_schema": "dimensions"
+    },
+    "storage": "{\"indexes\":[\"name\"],\"primaryId\":\"subject_id\",\"retention\":null,\"bucket_size\":null}",
+    "name": "subject",
+    "type": "dynamic"
+  },
+  {
+    "schema": {
+      "title": "textbookdiksha",
+      "indexes": [
+        {
+          "columns": [["textbook_name"]]
+        }
+      ],
+      "properties": {
+        "textbook_id": {
+          "type": "string",
+          "unique": true
+        },
+        "textbook_name": {
+          "type": "string",
+          "unique": true
+        }
+      },
+      "psql_schema": "dimensions"
+    },
+    "storage": "{\"indexes\":[\"name\"],\"primaryId\":\"textbook_id\",\"retention\":null,\"bucket_size\":null}",
+    "name": "textbookdiksha",
+    "type": "dynamic"
+  },
+  {
+    "schema": {
+      "title": "state",
+      "indexes": [
+        {
+          "columns": [["state_name"]]
+        }
+      ],
+      "properties": {
+        "latitude": {
+          "type": "string",
+          "unique": false
+        },
+        "state_id": {
+          "type": "string",
+          "unique": true
+        },
+        "longitude": {
+          "type": "string",
+          "unique": false
+        },
+        "state_name": {
+          "type": "string",
+          "unique": true
+        }
+      },
+      "psql_schema": "dimensions"
+    },
+    "storage": "{\"indexes\":[\"name\"],\"primaryId\":\"state_id\",\"retention\":null,\"bucket_size\":null}",
+    "name": "state",
+    "type": "dynamic"
+  },
+  {
+    "schema": {
+      "title": "studentcategory",
+      "indexes": [
+        {
+          "columns": [["student_category"]]
+        }
+      ],
+      "properties": {
+        "student_category": {
+          "type": "string",
+          "unique": true
+        },
+        "student_category_id": {
+          "type": "string",
+          "unique": true
+        }
+      },
+      "psql_schema": "dimensions"
+    },
+    "storage": "{\"indexes\":[\"name\"],\"primaryId\":\"student_category_id\",\"retention\":null,\"bucket_size\":null}",
+    "name": "studentcategory",
+    "type": "dynamic"
+  },
+  {
+    "schema": {
+      "title": "subjectdiksha",
+      "indexes": [
+        {
+          "columns": [["subject"]]
+        }
+      ],
+      "properties": {
+        "subject": {
+          "type": "string",
+          "unique": true
+        },
+        "subject_id": {
+          "type": "string",
+          "unique": true
+        }
+      },
+      "psql_schema": "dimensions"
+    },
+    "storage": "{\"indexes\":[\"name\"],\"primaryId\":\"subject_id\",\"retention\":null,\"bucket_size\":null}",
+    "name": "subjectdiksha",
+    "type": "dynamic"
+  }
+]
