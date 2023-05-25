@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { DatasetGrammar, DimensionMapping } from '../../../../types/dataset';
 import { DateParser } from '../utils/dateparser';
 import { EventGrammar, Event as cQubeEvent } from 'src/types/event';
@@ -58,13 +59,13 @@ export const createDatasetDataToBeInserted = async (
         if (timeDimension === 'Daily') {
           rowObject['date'] = date;
         } else if (timeDimension === 'Weekly') {
-          rowObject['week'] = DateParser.getWeek(date);
-          rowObject['year'] = DateParser.getYear(date);
+          rowObject['week'] = DateParser.getWeek(await date);
+          rowObject['year'] = DateParser.getYear(await date);
         } else if (timeDimension === 'Monthly') {
-          rowObject['month'] = DateParser.getMonth(date);
-          rowObject['year'] = DateParser.getYear(date);
+          rowObject['month'] = DateParser.getMonth(await date);
+          rowObject['year'] = DateParser.getYear(await date);
         } else if (timeDimension === 'Yearly') {
-          rowObject['year'] = DateParser.getYear(date);
+          rowObject['year'] = DateParser.getYear(await date);
         }
       }
       datasetEvents.push({ data: rowObject, spec: eventGrammar });
@@ -138,13 +139,13 @@ export const createCompoundDatasetDataToBeInserted = async (
         if (datasetGrammar.timeDimension.type === 'Daily') {
           rowObject['date'] = date;
         } else if (datasetGrammar.timeDimension.type === 'Weekly') {
-          rowObject['week'] = DateParser.getWeek(date);
-          rowObject['year'] = DateParser.getYear(date);
+          rowObject['week'] = DateParser.getWeek(await date);
+          rowObject['year'] = DateParser.getYear(await date);
         } else if (datasetGrammar.timeDimension.type === 'Monthly') {
-          rowObject['month'] = DateParser.getMonth(date);
-          rowObject['year'] = DateParser.getYear(date);
+          rowObject['month'] = DateParser.getMonth(await date);
+          rowObject['year'] = DateParser.getYear(await date);
         } else if (datasetGrammar.timeDimension.type === 'Yearly') {
-          rowObject['year'] = DateParser.getYear(date);
+          rowObject['year'] = DateParser.getYear(await date);
         }
       }
       datasetEvents.push({ data: rowObject, spec: eventGrammar });

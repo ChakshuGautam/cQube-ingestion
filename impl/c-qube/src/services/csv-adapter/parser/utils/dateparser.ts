@@ -1,16 +1,24 @@
 /* eslint-disable prettier/prettier */
+import { CACHE_MANAGER, Inject, Injectable, Module } from '@nestjs/common';
 import { parse, format as formatDate } from 'date-fns';
 import { zonedTimeToUtc } from 'date-fns-tz';
+import { Cache } from 'cache-manager';
+import { CacheModule } from '@nestjs/cache-manager';
 
+@Module({
+  imports: [CacheModule.register({ ttl: 60 * 60 })],
+})
+@Injectable()
 export class DateParser {
   private format: string;
   private timezone?: string;
-  private cache: Map<string, Date>;
-
-  constructor(format: string, timezone?: string) {
+  constructor(
+    format: string,
+    timezone?: string,
+    @Inject(CACHE_MANAGER) private cacheService?: Cache,
+  ) {
     this.format = format;
     this.timezone = timezone;
-    this.cache = new Map<string, Date>();
   }
 
   toUtc(date: Date) {
@@ -18,10 +26,11 @@ export class DateParser {
     return new Date(date.getTime() + offsetMillis);
   }
 
-  parseDate(date: string): Date {
+  async parseDate(date: string): Promise<Date> {
     // This assumes date is in the format 'dd-mm-yyyy'
-    if (this.cache.has(date)) {
-      return this.cache.get(date); // Return the cached value if available
+    const cachedDate = await this.cacheService.get(date);
+    if (cachedDate instanceof Date) {
+      return cachedDate;
     }
 
     if (this.format === 'dd-mm-yyyy' || this.format === 'dd-MM-yyyy') {
@@ -31,7 +40,7 @@ export class DateParser {
         Number(parts[1]) - 1, // JavaScript months are 0-indexed
         Number(parts[0]),
       );
-      this.cache.set(date, parsedDate);
+      await this.cacheService.set(date, this.toUtc(parsedDate), 10000);
       return this.toUtc(parsedDate);
     } else if (this.format === 'dd/MM/yy') {
       const parts = date.split('/');
@@ -42,7 +51,7 @@ export class DateParser {
         Number(parts[1]) - 1, // JavaScript months are 0-indexed
         Number(parts[0]),
       );
-      this.cache.set(date, parsedDate);
+      await this.cacheService.set(date, this.toUtc(parsedDate), 10000);
       return this.toUtc(parsedDate);
     }
   }
