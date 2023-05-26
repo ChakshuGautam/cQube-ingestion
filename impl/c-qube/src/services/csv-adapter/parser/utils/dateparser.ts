@@ -28,7 +28,7 @@ export class DateParser {
 
   async parseDate(date: string): Promise<Date> {
     // This assumes date is in the format 'dd-mm-yyyy'
-    const cachedDate = await this.cacheService.get(date);
+    const cachedDate = await this.cacheService?.get(date);
     if (cachedDate instanceof Date) {
       return cachedDate;
     }
@@ -40,7 +40,7 @@ export class DateParser {
         Number(parts[1]) - 1, // JavaScript months are 0-indexed
         Number(parts[0]),
       );
-      await this.cacheService.set(date, this.toUtc(parsedDate), 10000);
+      await this.cacheService?.set(date, this.toUtc(parsedDate), 10000);
       return this.toUtc(parsedDate);
     } else if (this.format === 'dd/MM/yy') {
       const parts = date.split('/');
@@ -51,7 +51,7 @@ export class DateParser {
         Number(parts[1]) - 1, // JavaScript months are 0-indexed
         Number(parts[0]),
       );
-      await this.cacheService.set(date, this.toUtc(parsedDate), 10000);
+      await this.cacheService?.set(date, this.toUtc(parsedDate), 10000);
       return this.toUtc(parsedDate);
     }
   }
