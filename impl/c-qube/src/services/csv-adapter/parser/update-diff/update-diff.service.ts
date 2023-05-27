@@ -32,9 +32,6 @@ export const getDataDifference = (
         toBeDeleted.push(row);
       }
     });
-    console.log('oldContent: ', oldContent);
-    console.log('toBeDeleted: ', toBeDeleted);
-    console.log('newContent: ', newContent);
 
     toBeInserted.push(...newContent);
 

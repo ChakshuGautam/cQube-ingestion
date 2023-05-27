@@ -106,6 +106,7 @@ export class CsvAdapterService {
           'grammar',
           'data',
         );
+        // console.log('dimensionGrammar: ', dimensionGrammar);
         const df: DataFrame = pl.readCSV(dimensionDataFileName, {
           quoteChar: "'",
           ignoreErrors: true,
@@ -186,6 +187,7 @@ export class CsvAdapterService {
     const eventGrammarsGlobal: EventGrammar[] = [];
     for (let j = 0; j < config?.programs.length; j++) {
       const inputFiles = readdirSync(config?.programs[j].input?.files);
+      const blacklistedSingleDimensions = config?.programs[j].blacklist;
       // For 1TimeDimension + 1EventCounter + 1Dimension
       for (let i = 0; i < inputFiles?.length; i++) {
         if (regexEventGrammar.test(inputFiles[i])) {
@@ -200,7 +202,9 @@ export class CsvAdapterService {
             eventGrammarFileName,
             dimensionGrammarFolder,
             config?.programs[j].namespace,
+            config?.programs[j]?.dimensions?.blacklisted,
           );
+          // console.log('eventGrammar: ', eventGrammar);
           eventGrammarsGlobal.push(...eventGrammar);
           for (let i = 0; i < eventGrammar.length; i++) {
             eventGrammar[i].program = config.programs[j].namespace;
