@@ -1,8 +1,12 @@
+import { readCSVFile } from '../utils/csvreader';
+
 const fs = require('fs');
 
-export const getDataDifference = (
+export const getDataDifference = async (
   prevFilePath: string,
   newFilePath: string,
+  grammarFilePath?: string,
+  updateFileLocation?: string,
 ) => {
   // TODO: Move to readCSV util fn
   const oldContent: string[] = fs
@@ -35,6 +39,42 @@ export const getDataDifference = (
 
     toBeInserted.push(...newContent);
 
-    return { toBeDeleted, toBeInserted };
+    // create updated CSV to ingest
+
+    // find out metric from grammar
+    const metricIdxs = [];
+    if (grammarFilePath) {
+      const grammarContent: string[] = await readCSVFile(grammarFilePath);
+      const lastRow = grammarContent[4].split(',');
+      // console.log('lastROw: ', lastRow);
+      lastRow.forEach((cell: string, idx: number) => {
+        if (cell.trim() === 'metric') metricIdxs.push(idx);
+      });
+    }
+    // console.log(metricIdxs);
+    const splitRows = toBeDeleted.map((row: string) => row.split(','));
+    const finalContent = [oldContent[0], ...toBeInserted]; // TODO: add header row here
+    splitRows.forEach((row: string[], idx: number) => {
+      const newRow = [];
+      row.forEach((item: string, rowIdx: number) => {
+        if (metricIdxs.includes(rowIdx)) {
+          newRow.push('-' + item);
+        } else {
+          newRow.push(item);
+        }
+      });
+      finalContent.push(newRow.join(','));
+    });
+
+    // write to file
+    const fileName =
+      newFilePath.split('/').pop()?.split('.').slice(0, -1).join('.') +
+      `updated-${Date.now()}.csv`;
+    fs.writeFileSync(
+      updateFileLocation ? updateFileLocation + '/' + fileName : fileName,
+      finalContent.join('\n'),
+    );
+
+    return finalContent;
   }
 };

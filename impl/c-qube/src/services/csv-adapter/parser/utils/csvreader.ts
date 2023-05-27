@@ -24,7 +24,7 @@ export async function readCSV(filePath: string): Promise<string[][]> {
 
 export async function readCSVFile(filePath: string): Promise<string[]> {
   const fileContent = await fs.readFile(filePath, 'utf-8');
-  console.log('fileContent', fileContent);
+  // console.log('fileContent', fileContent);
   return fileContent
     .split('\n')
     .map((row: string) => row.trim())

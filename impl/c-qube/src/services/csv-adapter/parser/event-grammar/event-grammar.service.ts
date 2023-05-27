@@ -25,13 +25,13 @@ export async function getEGDefFromFile(csvFilePath: string) {
     fieldType,
   ] = await readCSVFile(csvFilePath);
 
-  console.log([
-    dimensionName,
-    dimensionGrammarKey,
-    fieldDataType,
-    fieldName,
-    fieldType,
-  ]);
+  // console.log([
+  //   dimensionName,
+  //   dimensionGrammarKey,
+  //   fieldDataType,
+  //   fieldName,
+  //   fieldType,
+  // ]);
 
   const eventGrammarDef: EventGrammarCSVFormat[] =
     processCSVtoEventGrammarDefJSON(
