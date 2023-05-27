@@ -46,7 +46,7 @@ describe('EventGrammarService', () => {
 
   it('tests for blaklist implementation: ', async () => {
     const data = await createEventGrammarFromCSVDefinition(
-      './test/fixtures/ingestionConfigs/programs/test-complete-ingestion/testcompleteingestion-event.grammar.csv',
+      './ingest/programs/rev-and-monitor/block-event.grammar.csv',
       './ingest/dimensions',
       'test_complete_ingestion',
       ['block'],
@@ -54,8 +54,8 @@ describe('EventGrammarService', () => {
 
     expect(data).toEqual([
       {
-        file: './test/fixtures/ingestionConfigs/programs/test-complete-ingestion/testcompleteingestion-event.grammar.csv',
-        name: 'test_complete_ingestion_testcompleteingestion_district_district_id',
+        file: './ingest/programs/rev-and-monitor/block-event.grammar.csv',
+        name: 'test_complete_ingestion_block_district_district_id',
         instrument: { type: 0, name: 'counter' },
         description: '',
         instrument_field: 'meeting_conducted',
@@ -101,8 +101,8 @@ describe('EventGrammarService', () => {
         },
       },
       {
-        file: './test/fixtures/ingestionConfigs/programs/test-complete-ingestion/testcompleteingestion-event.grammar.csv',
-        name: 'test_complete_ingestion_testcompleteingestion_academicyear_academicyear_id',
+        file: './ingest/programs/rev-and-monitor/block-event.grammar.csv',
+        name: 'test_complete_ingestion_block_academicyear_academicyear_id',
         instrument: { type: 0, name: 'counter' },
         description: '',
         instrument_field: 'meeting_conducted',
