@@ -1,6 +1,21 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { AppController } from '../../../../app.controller';
+import { AppService } from '../../../../app.service';
+
 import { getDataDifference } from './update-diff.service';
 
 describe('tests the file diff generator', () => {
+  let appController: AppController;
+
+  beforeEach(async () => {
+    const app: TestingModule = await Test.createTestingModule({
+      controllers: [AppController],
+      providers: [AppService],
+    }).compile();
+
+    appController = app.get<AppController>(AppController);
+  });
+
   it('should generate two arrays', async () => {
     const oldFilePath =
       './test/fixtures/test-csvs/update-diff/mealserved-ingested.data.csv';
