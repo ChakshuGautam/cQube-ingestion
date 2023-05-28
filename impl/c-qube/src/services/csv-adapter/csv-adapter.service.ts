@@ -457,7 +457,7 @@ export class CsvAdapterService {
             };
 
             try {
-              if (events.length > 0) {
+              if (events && events.length > 0) {
                 const datasetUpdateRequest: DatasetUpdateRequest[] =
                   pipe.transformer.transformSync(
                     callback,

@@ -8,7 +8,6 @@ import {
 import {
   DatasetGrammar as DatasetGrammarModel,
   EventGrammar as EventGrammarModel,
-  PrismaClient,
 } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
 import { QueryBuilderService } from '../query-builder/query-builder.service';

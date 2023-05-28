@@ -19,6 +19,7 @@ export const createDatasetDataToBeInserted = async (
   const filePath = eventGrammar.file.replace('grammar', 'data');
 
   const df = await readCSV(filePath);
+  // console.log('df: ', df);
   if (!df || !df[0]) return;
 
   const getIndexForHeader = (headers: string[], header: string): number => {
@@ -43,7 +44,8 @@ export const createDatasetDataToBeInserted = async (
   const dateParser = new DateParser('dd/MM/yy');
 
   const datasetEvents: cQubeEvent[] = [];
-  for (let row = 1; row < df.length - 1; row++) {
+  // console.log('df[df.length - 1]: ', df[df.length - 1]);
+  for (let row = 1; row < df.length; row++) {
     const rowData = df[row];
     try {
       const rowObject = {};
@@ -72,6 +74,7 @@ export const createDatasetDataToBeInserted = async (
       console.error('Wrong datapoint', rowData, filePath);
     }
   }
+  // console.log('datasetEvents: ', datasetEvents);
   return datasetEvents;
 
   // remove all columns except propertyName, timeDimension, and dimension.
@@ -121,7 +124,7 @@ export const createCompoundDatasetDataToBeInserted = async (
   const datasetEvents: cQubeEvent[] = [];
   const dateParser = new DateParser('dd/MM/yy');
 
-  for (let row = 1; row < df.length - 1; row++) {
+  for (let row = 1; row < df.length; row++) {
     const rowData = df[row];
     try {
       const rowObject = {};
