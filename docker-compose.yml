@@ -10,8 +10,8 @@ services:
       - '5432:5432'
     volumes:
       - ./pgdata:/var/lib/postgresql/data
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
     environment:
       POSTGRES_USER: timescaledb
       POSTGRES_PASSWORD: postgresspassword
@@ -26,8 +26,8 @@ services:
     depends_on:
       - 'timescaledb'
     restart: always
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
     environment:
       HASURA_GRAPHQL_DATABASE_URL: postgres://timescaledb:postgresspassword@timescaledb:5432/postgres?sslmode=disable
       ## enable the console served by server
@@ -46,8 +46,8 @@ services:
       - 5433:5432
     volumes:
       - ./configs/pgpool-extra.conf:/config/myconf.conf
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
     environment:
       # https://github.com/bitnami/bitnami-docker-pgpool#configuration
       - PGPOOL_BACKEND_NODES=0:timescaledb:5432
