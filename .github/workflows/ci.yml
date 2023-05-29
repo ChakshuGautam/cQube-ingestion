@@ -1,6 +1,8 @@
 name: Node.js CI
 
 on:
+  workflow_dispatch:
+    branches: [master]
   push:
     branches: [master]
   pull_request:
@@ -49,12 +51,12 @@ jobs:
         run: |
           yarn test
           yarn test:cov
-      
+
       - name: Stop DBs
         working-directory: .
         run: |
           docker-compose down
-      
+
       - name: e2e Tests
         working-directory: impl/c-qube
         run: |
