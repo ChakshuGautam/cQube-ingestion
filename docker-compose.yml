@@ -10,11 +10,11 @@ services:
       - '5432:5432'
     volumes:
       - ./pgdata:/var/lib/postgresql/data
-    # env_file:
-    #   - .env
+    env_file:
+      - .env
     environment:
       POSTGRES_USER: timescaledb
-      POSTGRES_PASSWORD: postgresspassword
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
   graphql-engine:
     image: hasura/graphql-engine:latest
@@ -26,10 +26,10 @@ services:
     depends_on:
       - 'timescaledb'
     restart: always
-    # env_file:
-    #   - .env
+    env_file:
+      - .env
     environment:
-      HASURA_GRAPHQL_DATABASE_URL: postgres://timescaledb:postgresspassword@timescaledb:5432/postgres?sslmode=disable
+      HASURA_GRAPHQL_DATABASE_URL: postgres://timescaledb:${POSTGRES_PASSWORD}@timescaledb:5432/postgres?sslmode=disable
       ## enable the console served by server
       HASURA_GRAPHQL_ENABLE_CONSOLE: 'true' # set to "false" to disable console
       ## enable debugging mode. It is recommended to disable this in production
@@ -46,15 +46,15 @@ services:
       - 5433:5432
     volumes:
       - ./configs/pgpool-extra.conf:/config/myconf.conf
-    # env_file:
-    #   - .env
+    env_file:
+      - .env
     environment:
       # https://github.com/bitnami/bitnami-docker-pgpool#configuration
       - PGPOOL_BACKEND_NODES=0:timescaledb:5432
       - PGPOOL_SR_CHECK_USER=timescaledb
-      - PGPOOL_SR_CHECK_PASSWORD=postgresspassword
+      - PGPOOL_SR_CHECK_PASSWORD=${POSTGRES_PASSWORD}
       - PGPOOL_POSTGRES_USERNAME=timescaledb
-      - PGPOOL_POSTGRES_PASSWORD=postgresspassword
+      - PGPOOL_POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - PGPOOL_ADMIN_USERNAME=timescaledb
-      - PGPOOL_ADMIN_PASSWORD=postgresspassword
+      - PGPOOL_ADMIN_PASSWORD=${POSTGRES_PASSWORD}
       - PGPOOL_USER_CONF_FILE=/config/myconf.conf
