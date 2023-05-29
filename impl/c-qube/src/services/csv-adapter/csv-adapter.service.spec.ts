@@ -19,7 +19,7 @@ import { DataFrame } from 'nodejs-polars';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const csvParser = require('csv-parser');
 
-import csvtojson from 'csvtojson';
+// import csvtojson from 'csvtojson';
 import { createObjectCsvWriter as createCsvWriter } from 'csv-writer';
 import { promisify } from 'util';
 import stream from 'stream';
