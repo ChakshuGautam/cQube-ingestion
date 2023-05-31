@@ -31,3 +31,4 @@ function logToFile({ filePath, logLevel = 'info' }: LogOptions, message: string)
     }
   });
 }
+export { logToFile };
