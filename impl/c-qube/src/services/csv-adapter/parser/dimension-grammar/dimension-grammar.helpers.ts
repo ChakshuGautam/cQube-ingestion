@@ -1,5 +1,5 @@
-import { DimensionGrammar } from 'src/types/dimension';
-import { Column, ColumnType } from '../../types/parser';
+import { DimensionGrammar } from 'impl/c-qube/src/types/dimension';
+import { Column, ColumnType } from 'impl/c-qube/src/services/csv-adapter/types/parser';
 const fs = require('fs').promises;
 
 export const createDimensionGrammarFromCSVDefinition = async (
