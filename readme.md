@@ -1,40 +1,26 @@
-[![Node.js CI](https://github.com/ChakshuGautam/cQube-POCs/actions/workflows/ci.yml/badge.svg)](https://github.com/ChakshuGautam/cQube-POCs/actions/workflows/ci.yml)
+## Ingestion Process
 
-### Documentation
+![cQube-LLD-Parser drawio](https://github.com/ChakshuGautam/cQube-POCs/assets/67280631/7e2a95e9-29d7-4187-b101-74c2a785105a)
 
-[Find Docs in docs folder](docs/)
+The above diagram shows the low level diagram of the data ingestion process in cQube. 
+cQube accepts data in the form of CSVs, these CSVs are required to follow set and strict rules of naming conventions. These CSVs are then processed to create the processable JSON schemas out of the CSV data. These JSONs are then processed to generate the various datasets insert data into those datasets.
+If we go flow wise as shown in the diagram, we get the CSV files which are presently stored in the `/ingest` folder. There are two types of data files:
+1. **Dimension files**: These define the dimensions that act as the atomic building blocks for the actual dataset files. For example: District ids, school ids, etc.
+2. **Event files**: These contain the actual data that is aggregated and stored into the tables.
 
-### TOODs on Speeding of Datasets
+Both of these types of files further have two types:
+1. **Grammar files**: These file define the schema of the table to be created when ingesting the data present in the corresponding data file.
+2. **Data files**: These files contain the actual data that needs to be ingested.
 
-- [x] Fix the script to generate data in sequence => older timestamps to newer timestamps. Impacts the [speed of insertion](https://docs.timescale.com/timescaledb/latest/how-to-guides/continuous-aggregates/)
-  - 10 mins for for 10M records
-- [ ] Add pgpool to the server to server as a cache
-- [ ] Add a Express Server to read queries using an API
-- [ ] Add Varnish in front on it to verify the queries
-- [ ] TimescaleDB to be configured with a [data retention policy](https://docs.timescale.com/timescaledb/latest/how-to-guides/data-retention/)
-- [ ] Setup [continuous aggregates](https://docs.timescale.com/timescaledb/latest/how-to-guides/continuous-aggregates/)
-- [ ] Queries to be modified based on [this doc](https://docs.timescale.com/timescaledb/latest/how-to-guides/query-data/advanced-analytic-queries/)
+Below diagram shows the correlation between the types of CSVs and the final table that is created.
+Each event file has data that combines various dimensions and time dimensions together, these files are read and processed and accordingly different datasets are created for a single event file based on the number of time dimensions and dimensions and their combinations, we have the option to define which compound datasets (combinations of more than one dimensions) to be created and also to specify which dimension to not be converted to a data, via the `whitelisted` and `blacklisted` options in the config file. 
 
-### TOODs on Speeding up Ingestions
+![cQube-CSV-Ingestion drawio](https://github.com/ChakshuGautam/cQube-POCs/assets/67280631/badf95b8-c1c6-4485-bdf9-74ce0c550e74)
 
-- [ ] Implement 7Zip as the compression algorithm @htvenkatesh
-- [ ] POC on Insertion of 30M records from a CSV file (from 7Zip file) @htvenkatesh
-- [ ] Log Management - Log Rotation; Log Compression; Log Forwarding; @htvenkatesh
-- [ ] NVSK - Cloudflare
-- [ ] Throttle based on IP - Nest applications
-- [ ] Add a cache on the fronted (etags)
 
-### TOODs on cQube Implementation
 
-- [ ] Can be tracked [here](./impl/c-qube/src/app.service.ts).
-- [ ] Adapter Implemenation with the following use case
-  - [ ] [Dataset1](https://ntpproductionall.blob.core.windows.net/public-reports/public/diksha-data-exhaust/2023-01-11.csv)
-  - [ ] [Dataset2]()
-  - [ ] [Dataset3]()
-  - [ ] [Dataset4]()
-  - [ ] [Dataset5]()
-- [ ] [Implement Dashlet Specification](https://project-sunbird.atlassian.net/wiki/spaces/SBDES/pages/2312110137/Dashlets+Design+Doc)
-- [ ] [Auto Dashboard and Chart Creation using Metabase API and making it public](https://www.metabase.com/learn/administration/metabase-api)
-- [ ] A UI to import data and define configs
-- [ ] Aggregation of Events
-- [ ] Tranformers for Bulk Events management - Use [Polars](https://github.com/pola-rs/polars) to do it in native JS/TS.
+## References
+To learn more about cQube you can refer to the following links:
+- [cQube microsite](https://cqube.sunbird.org)
+- [cQube Design Doc](https://docs.google.com/document/d/1BWyabCuqHYFxG0RuV3wi9kfkEL-9VlsCvdKtZgTiqks/edit?usp=sharing)
+- [Code walkthrough and sample demo video link]()
