@@ -58,6 +58,15 @@ Now that we have our yarn dependencies installed we can go ahead and run migrati
 ```bash
 npx prisma migrate dev
 ```
+## Adding csvtojson dependency
+
+Run yarn add csvtojson to install the module.
+Reinstall dependencies using yarn install.
+
+```bash
+yarn add csvtojson
+yarn install
+```
 
 ## Testing and Coverage
 
