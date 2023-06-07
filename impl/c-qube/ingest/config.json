@@ -1,6 +1,7 @@
 {
   "globals": {
-    "onlyCreateWhitelisted": true
+    "onlyCreateWhitelisted": true,
+    "quoteChar": "/"
   },
   "dimensions": {
     "namespace": "dimensions",
@@ -18,7 +19,7 @@
       "input": {
         "files": "./ingest/programs/diksha"
       },
-      "./output": {
+      "output": {
         "location": "./output/programs/diksha"
       },
       "dimensions": {
@@ -28,7 +29,8 @@
           "textbookdiksha,grade,subject,medium"
         ],
         "blacklisted": []
-      }
+      },
+      "quoteChar": "/"
     },
     {
       "name": "School Attendance",
@@ -38,8 +40,8 @@
       "input": {
         "files": "./ingest/programs/school-attendance"
       },
-      "./output": {
-        "location": "././output/programs/school-attendance"
+      "output": {
+        "location": "./output/programs/school-attendance"
       },
       "dimensions": {
         "whitelisted": [
@@ -54,7 +56,8 @@
           "schoolcategory,cluster"
         ],
         "blacklisted": []
-      }
+      },
+      "quoteChar": "/"
     },
     {
       "name": "PM Poshan",
@@ -64,7 +67,7 @@
       "input": {
         "files": "./ingest/programs/pm-poshan"
       },
-      "./output": {
+      "output": {
         "location": "./output/programs/pm-poshan"
       },
       "dimensions": {
@@ -72,7 +75,8 @@
           "district,categorypm"
         ],
         "blacklisted": []
-      }
+      },
+      "quoteChar": "/"
     },
     {
       "name": "NAS",
@@ -82,7 +86,7 @@
       "input": {
         "files": "./ingest/programs/nas"
       },
-      "./output": {
+      "output": {
         "location": "./output/programs/nas"
       },
       "dimensions": {
@@ -91,7 +95,8 @@
           "state,lo,subject,grade"
         ],
         "blacklisted": []
-      }
+      },
+      "quoteChar": "/"
     },
     {
       "name": "UDISE",
@@ -101,7 +106,7 @@
       "input": {
         "files": "./ingest/programs/udise"
       },
-      "./output": {
+      "output": {
         "location": "./output/programs/udise"
       },
       "dimensions": {
@@ -110,7 +115,8 @@
           "state,categoryudise"
         ],
         "blacklisted": []
-      }
+      },
+      "quoteChar": "/"
     },
     {
       "name": "Review and Monitoring",
@@ -120,7 +126,7 @@
       "input": {
         "files": "./ingest/programs/rev-and-monitor"
       },
-      "./output": {
+      "output": {
         "location": "./output/programs/rev-and-monitor"
       },
       "dimensions": {
@@ -130,7 +136,8 @@
           "academicyear,cluster"
         ],
         "blacklisted": []
-      }
+      },
+      "quoteChar": "/"
     },
     {
       "name": "PGI",
@@ -140,7 +147,7 @@
       "input": {
         "files": "./ingest/programs/pgi"
       },
-      "./output": {
+      "output": {
         "location": "./output/programs/pgi"
       },
       "dimensions": {
@@ -149,7 +156,8 @@
           "state,categorypgi"
         ],
         "blacklisted": []
-      }
+      },
+      "quoteChar": "/"
     },
     {
       "name": "NISHTHA",
@@ -159,7 +167,7 @@
       "input": {
         "files": "./ingest/programs/nishtha"
       },
-      "./output": {
+      "output": {
         "location": "./output/programs/nishtha"
       },
       "dimensions": {
@@ -170,7 +178,8 @@
           "district,programnishtha"
         ],
         "blacklisted": []
-      }
+      },
+      "quoteChar": "/"
     }
   ]
 }

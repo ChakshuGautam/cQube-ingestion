@@ -1,15 +1,13 @@
-const fs1 = require('fs');
-const fs = require('fs').promises;
-
+import * as fs from 'fs';
 import * as csv from 'csv-parser';
+import * as path from 'path';
 
-export async function readCSV(filePath: string): Promise<string[][]> {
+export async function readCSV(filePath: string, quoteChar: string): Promise<string[][]> {
   return new Promise((resolve, reject) => {
     const rows: string[][] = [];
-    // TODO: Add checking here
-    fs1
-      .createReadStream(filePath)
-      .pipe(csv({ separator: ',', headers: false, quote: "'" }))
+
+    fs.createReadStream(path.resolve(filePath))
+      .pipe(csv({ separator: ',', headers: false, quote: quoteChar }))
       .on('data', (data) => {
         rows.push(Object.values(data));
       })
@@ -23,7 +21,7 @@ export async function readCSV(filePath: string): Promise<string[][]> {
 }
 
 export async function readCSVFile(filePath: string): Promise<string[]> {
-  const fileContent = await fs.readFile(filePath, 'utf-8');
+  const fileContent = await fs.promises.readFile(filePath, 'utf-8');
 
   return fileContent
     .split('\n')

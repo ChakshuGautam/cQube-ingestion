@@ -18,7 +18,7 @@ export const createDatasetDataToBeInserted = async (
 
   const filePath = eventGrammar.file.replace('grammar', 'data');
 
-  const df = await readCSV(filePath);
+  const df = await readCSV(filePath,"'");
   if (!df || !df[0]) return;
 
   const getIndexForHeader = (headers: string[], header: string): number => {
@@ -100,7 +100,7 @@ export const createCompoundDatasetDataToBeInserted = async (
     return;
   }
 
-  const df = await readCSV(eventFilePath);
+  const df = await readCSV(eventFilePath,"'");
   if (!df || !df[0]) return;
   const getIndexForHeader = (headers: string[], header: string): number => {
     return headers.indexOf(header);
