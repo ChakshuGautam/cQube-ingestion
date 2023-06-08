@@ -32,6 +32,7 @@
     "chalk": "4.1.2",
     "csv-parser": "^3.0.0",
     "csv-writer": "^1.6.0",
+    "fs": "^0.0.1-security",
     "lodash": "^4.17.21",
     "nodejs-polars": "^0.7.2",
     "nodejs-polars-linux-x64-gnu": "^0.7.2",
@@ -39,6 +40,7 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
     "to-json-schema": "^0.2.5",
+    "winston": "^3.9.0",
     "yargs": "^17.7.1"
   },
   "devDependencies": {
@@ -49,6 +51,7 @@
     "@types/jest": "29.2.4",
     "@types/node": "18.11.18",
     "@types/supertest": "^2.0.11",
+    "@types/winston": "^2.4.4",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "eslint": "^8.0.1",
