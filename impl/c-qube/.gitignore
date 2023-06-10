@@ -40,3 +40,8 @@ lerna-debug.log*
 
 .env
 debug
+logs
+
+ingest
+ingest-bak
+ingest-new

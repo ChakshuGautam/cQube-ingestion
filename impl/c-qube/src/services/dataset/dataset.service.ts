@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   DatasetGrammar,
   DatasetUpdateRequest,
@@ -8,22 +8,39 @@ import {
 import {
   DatasetGrammar as DatasetGrammarModel,
   EventGrammar as EventGrammarModel,
+  PrismaClient,
 } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
 import { QueryBuilderService } from '../query-builder/query-builder.service';
 import { logToFile } from '../../utils/debug';
 import { EventService } from '../event/event.service';
 import { EventGrammar } from 'src/types/event';
+import { readCSV } from '../csv-adapter/parser/utils/csvreader';
+import { table } from 'console';
+const pLimit = require('p-limit');
+const limit = pLimit(10);
 
+import { Pool, QueryResult } from 'pg';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs');
 
+type InsertionError = {
+  error: string;
+  data: any;
+};
+
+export type DatasetGrammarFilter = {
+  wildcard?: string;
+};
+
 @Injectable()
 export class DatasetService {
+  private readonly logger: Logger = new Logger(DatasetService.name);
   constructor(
     public prisma: PrismaService,
     private qbService: QueryBuilderService,
     private eventGrammarService: EventService,
+    @Inject('DATABASE_POOL') private pool: Pool,
   ) {}
 
   counterAggregates(): any {
@@ -76,6 +93,8 @@ export class DatasetService {
     }
     return {
       name: model.name,
+      tableName: model.tableName,
+      tableNameExpanded: model.tableNameExpanded,
       description: model.description,
       timeDimension: JSON.parse(model.timeDimension as string) as TimeDimension,
       dimensions: JSON.parse(model.dimensions as string) as DimensionMapping[],
@@ -107,6 +126,8 @@ export class DatasetService {
     return this.prisma.datasetGrammar
       .create({
         data: {
+          tableName: datasetGrammar.tableName,
+          tableNameExpanded: datasetGrammar.tableNameExpanded,
           name: datasetGrammar.name,
           description: datasetGrammar.description,
           schema: datasetGrammar.schema,
@@ -162,12 +183,18 @@ export class DatasetService {
       );
   }
 
-  async getCompoundDatasetGrammars(): Promise<DatasetGrammar[]> {
+  async getCompoundDatasetGrammars(filter: any): Promise<DatasetGrammar[]> {
+    const prismaFilters = {
+      isCompound: true,
+    };
+    if (filter?.name !== undefined) {
+      prismaFilters['name'] = {
+        contains: filter.name,
+      };
+    }
     return this.prisma.datasetGrammar
       .findMany({
-        where: {
-          isCompound: true,
-        },
+        where: prismaFilters,
       })
       .then(
         async (models: DatasetGrammarModel[]): Promise<DatasetGrammar[]> => {
@@ -179,12 +206,18 @@ export class DatasetService {
       );
   }
 
-  async getNonCompoundDatasetGrammars(): Promise<DatasetGrammar[]> {
+  async getNonCompoundDatasetGrammars(filter: any): Promise<DatasetGrammar[]> {
+    const prismaFilters = {
+      isCompound: false,
+    };
+    if (filter?.name !== undefined) {
+      prismaFilters['name'] = {
+        contains: filter.name,
+      };
+    }
     return this.prisma.datasetGrammar
       .findMany({
-        where: {
-          isCompound: false,
-        },
+        where: prismaFilters,
       })
       .then(
         async (models: DatasetGrammarModel[]): Promise<DatasetGrammar[]> => {
@@ -229,6 +262,8 @@ export class DatasetService {
         ...this.counterAggregates(),
       };
     }
+
+    datasetGrammar.schema.title = datasetGrammar.tableName;
 
     const createQuery = this.qbService.generateCreateStatement(
       datasetGrammar.schema,
@@ -276,17 +311,56 @@ export class DatasetService {
     await this.prisma.$queryRawUnsafe(insertQuery);
   }
 
+  async insertBulkDatasetDataOld(
+    datasetGrammar: DatasetGrammar,
+    data: any[],
+  ): Promise<void> {
+    const insertQueries = this.qbService.generateBulkInsertStatementOld(
+      datasetGrammar.schema,
+      data,
+    );
+    this.logger.debug(`Executing query: ${insertQueries}`);
+    return await this.prisma.$queryRawUnsafe(insertQueries);
+  }
+
   async insertBulkDatasetData(
     datasetGrammar: DatasetGrammar,
     data: any[],
   ): Promise<void> {
-    const insertQuery = this.qbService.generateBulkInsertStatement(
+    const insertQueries = this.qbService.generateBulkInsertStatement(
       datasetGrammar.schema,
       data,
     );
-    await this.prisma.$queryRawUnsafe(insertQuery).catch((error) => {
-      console.error('ERROR', insertQuery, error);
+
+    return this.pool.query(insertQueries).then((res: QueryResult) => {
+      return res.rows;
     });
+
+    // try {
+    //   await this.prisma
+    //     .$transaction(
+    //       insertQueries.map((q: string) => {
+    //         this.logger.debug(`Executing query: ${q}`);
+    //         return this.prisma.$queryRawUnsafe(q);
+    //       }),
+    //     )
+    //     .catch((err) => {
+    //       console.log(err);
+    //     });
+    //   insertQueries.forEach(async (q: string) => {
+    //     await this.prisma
+    //       .$queryRawUnsafe(q)
+    //       .then((res) => {
+    //         this.logger.log('query successful');
+    //       })
+    //       .catch((err) => {
+    //         this.logger.error(`err in query raw unsafe: `, err);
+    //       });
+    //   });
+    // } catch (err) {
+    //   console.error(err);
+    //   throw err;
+    // }
   }
 
   async processDatasetUpdateRequest(
@@ -305,13 +379,49 @@ export class DatasetService {
     for (const dur of durs) {
       data.push({ ...dur.updateParams, ...dur.filterParams });
     }
-    await this.insertBulkDatasetData(durs[0].dataset, data).catch((error) => {
-      console.error();
-      console.error(error);
-      console.error('ERROR Inserting Data in Bulk: ', durs[0].dataset.name);
-      console.error(data[0]);
-      console.error(durs[0].dataset.schema.properties);
-    });
+    // TODO check for FK constraints before insert
+    // const startTime = performance.now();
+    // const sanitisedInput = await this.removeFKErrors(durs[0], data);
+    // const endTime = performance.now();
+    // this.logger.log(
+    //   `Time taken: ${(endTime - startTime).toFixed(4)} ms for ${durs[0].dataset.name
+    //   }`,
+    // );
+    durs[0].dataset.schema.title = durs[0].dataset.tableName;
+    const startTime = performance.now();
+    await this.insertBulkDatasetData(durs[0].dataset, data)
+      .then((res) => {
+        this.logger.verbose('Bulk insertion successful');
+        const endTime = performance.now();
+        this.logger.log(
+          `Time taken: ${(endTime - startTime).toFixed(4)} ms for ${durs[0].dataset.name
+          }`,
+        );
+      })
+      .catch(async (error) => {
+        console.log('error: ', error);
+        this.logger.error(
+          `ERROR Inserting Data in Bulk: ${durs[0].dataset.name}. Trying them 1 by 1`,
+        );
+        // start ingesting one by one and print row if cannot be ingested
+        let rowsIngested = 0;
+        const errors: InsertionError[] = [];
+        const promises = data.map((row) => {
+          return limit(() => this.insertDatasetData(durs[0].dataset, row))
+            .then((s) => {
+              rowsIngested += 1;
+            })
+            .catch((e) => {
+              this.logger.error(e);
+              errors.push({
+                error: e.message,
+                data: row,
+              });
+            });
+        });
+        const result = await Promise.all(promises);
+        this.logger.error(`${rowsIngested} /${data.length}, rows inserted`);
+      });
   }
   addNonTimeDimension(dimension: DimensionMapping): {
     [k: string]: any;

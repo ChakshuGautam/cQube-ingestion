@@ -25,6 +25,8 @@ export interface DatasetGrammar {
   program?: string;
   eventGrammarFile?: string;
   eventGrammar?: EventGrammar;
+  tableName?: string;
+  tableNameExpanded?: string;
 }
 
 export interface Dataset {

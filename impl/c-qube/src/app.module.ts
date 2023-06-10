@@ -11,15 +11,31 @@ import { CsvAdapterService } from './services/csv-adapter/csv-adapter.service';
 import { EventService } from './services/event/event.service';
 import { InstrumenttypeService } from './services/instrumenttype/instrumenttype.service';
 import { VizService } from './services/viz/viz.service';
-
+import { DimensionGrammarService } from './services/csv-adapter/parser/dimension-grammar/dimension-grammar.service';
+import { Pool } from 'pg';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+const databasePoolFactory = async (configService: ConfigService) => {
+  return new Pool({
+    user: configService.get('DB_USERNAME'),
+    host: configService.get('DB_HOST'),
+    database: configService.get('DB_NAME'),
+    password: configService.get('DB_PASSWORD'),
+    port: configService.get<number>('DB_PORT'),
+  });
+};
 @Module({
-  imports: [],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+  ],
   controllers: [AppController],
   providers: [
     AppService,
     PrismaService,
     QueryBuilderService,
     DimensionService,
+    DimensionGrammarService,
     DatasetService,
     PipeService,
     TransformerService,
@@ -27,6 +43,11 @@ import { VizService } from './services/viz/viz.service';
     EventService,
     InstrumenttypeService,
     VizService,
+    {
+      provide: 'DATABASE_POOL',
+      inject: [ConfigService],
+      useFactory: databasePoolFactory,
+    },
   ],
 })
 export class AppModule {}

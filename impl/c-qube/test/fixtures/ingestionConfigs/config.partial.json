@@ -1,0 +1,34 @@
+{
+  "globals": {
+    "onlyCreateWhitelisted": true
+  },
+  "dimensions": {
+    "namespace": "dimensions",
+    "fileNameFormat": "${dimensionName}.${index}.dimensions.data.csv",
+    "input": {
+      "files": "./ingest/dimensions"
+    }
+  },
+  "programs": [
+    {
+      "name": "Test partial Ingestion",
+      "namespace": "test_partial_ingestion",
+      "description": "Test partial Ingestion",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./test/fixtures/ingestionConfigs/programs/test-partial-ingestion"
+      },
+      "./output": {
+        "location": "./output/programs/test-partial-ingestion"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "academicyear,district",
+          "academicyear,block",
+          "academicyear,cluster"
+        ],
+        "blacklisted": []
+      }
+    }
+  ]
+}
