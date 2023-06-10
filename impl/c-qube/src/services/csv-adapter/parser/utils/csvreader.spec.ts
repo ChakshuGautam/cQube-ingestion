@@ -1,9 +1,12 @@
+import fs from 'fs';
+import path from 'path';
 import { readCSV, readCSVFile } from './csvreader';
+
 
 describe('CSVReader', () => {
   test('parse the file fine', async () => {
     const res = await readCSV(
-      './test/fixtures/test-csvs/csvreader/valid.reader.csv',
+      './test/fixtures/test-csvs/csvreader/valid.reader.csv',"'"
     );
     expect(res).toBeDefined();
   });
@@ -11,7 +14,7 @@ describe('CSVReader', () => {
   test('throw error', async () => {
     try {
       const res = await readCSV(
-        './test/fixtures/test-csvs/csvreader/invalid.reader.csv',
+        './test/fixtures/test-csvs/csvreader/invalid.reader.csv',"'"
       );
     } catch (err) {
       expect(err).toBeDefined();
@@ -27,7 +30,7 @@ describe('CSVReader', () => {
   it('should throw because of no file found', async () => {
     try {
       await readCSVFile(
-        './test/fixtures/test-csvs/csvreader/invalid.reader1.csv',
+        './test/fixtures/test-csvs/csvreader/invalid.reader1.csv'
       );
     } catch (err) {
       expect(err).toBeDefined();
