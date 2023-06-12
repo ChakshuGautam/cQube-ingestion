@@ -1,6 +1,7 @@
 {
   "globals": {
-    "onlyCreateWhitelisted": true
+    "onlyCreateWhitelisted": true,
+    "caseSensitiveFKSearch": false
   },
   "dimensions": {
     "namespace": "dimensions",
