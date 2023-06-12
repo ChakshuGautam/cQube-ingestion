@@ -9,7 +9,7 @@ export async function readCSV(filePath: string): Promise<string[][]> {
     // TODO: Add checking here
     fs1
       .createReadStream(filePath)
-      .pipe(csv({ separator: ',', headers: false, quote: "'" }))
+      .pipe(csv({ separator: ',', headers: false, quote: "/" }))
       .on('data', (data) => {
         rows.push(Object.values(data));
       })
