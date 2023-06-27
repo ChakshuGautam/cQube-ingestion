@@ -6,7 +6,6 @@ export interface Store {
   retention?: number | null;
   bucket_size?: number | null;
 }
-
 export interface DimensionGrammar {
   name: string;
   description?: string;

@@ -1,31 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { QueryBuilderService } from '../query-builder/query-builder.service';
-import { CsvAdapterService, Column } from './csv-adapter.service';
+import { CsvAdapterService } from './csv-adapter.service';
 import { PrismaService } from '../../prisma.service';
 import { DimensionService } from '../dimension/dimension.service';
 import { DatasetService } from '../dataset/dataset.service';
-import { DimensionGrammar } from 'src/types/dimension';
-import {
-  createDatasetGrammarsFromEG,
-  createDimensionGrammarFromCSVDefinition,
-  createEventGrammar,
-  createEventGrammarFromCSVDefinition,
-  EventDimensionMapping,
-} from './csv-adapter.utils';
-import { DatasetGrammar } from 'src/types/dataset';
-import { EventGrammar } from 'src/types/event';
 import { EventService } from '../event/event.service';
 import { DataFrame } from 'nodejs-polars';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const csvParser = require('csv-parser');
-
-import csvtojson from 'csvtojson';
-import { createObjectCsvWriter as createCsvWriter } from 'csv-writer';
-import { promisify } from 'util';
-import stream from 'stream';
-import { createReadStream } from 'fs';
 import * as csv from 'csv-parser';
-
+import { DimensionGrammarService } from './parser/dimension-grammar/dimension-grammar.service';
+import { Pool } from 'pg';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs').promises;
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -36,11 +20,24 @@ const pl = require('nodejs-polars');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const readline = require('readline');
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const retry = require('retry');
+
 describe('CsvAdapterService', () => {
   let service: CsvAdapterService;
+  const databasePoolFactory = async (configService: ConfigService) => {
+    return new Pool({
+      user: configService.get('DB_USERNAME'),
+      host: configService.get('DB_HOST'),
+      database: configService.get('DB_NAME'),
+      password: configService.get('DB_PASSWORD'),
+      port: configService.get<number>('DB_PORT'),
+    });
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [ConfigModule],
       providers: [
         CsvAdapterService,
         EventService,
@@ -48,6 +45,12 @@ describe('CsvAdapterService', () => {
         PrismaService,
         DimensionService,
         DatasetService,
+        DimensionGrammarService,
+        {
+          provide: 'DATABASE_POOL',
+          inject: [ConfigService],
+          useFactory: databasePoolFactory,
+        },
       ],
     }).compile();
 
@@ -86,13 +89,9 @@ describe('CsvAdapterService', () => {
           writeStream.write(newline + '\r\n');
         });
         file.on('close', async () => {
-          console.log('onclose');
-          // await fs1.unlinkSync(input);
-          // await this.processSleep(200);
           readStream.close();
           writeStream.end();
           writeStream.on('finish', async () => {
-            console.log('onfinish');
             // await fs1.renameSync(output, input);
             resolve(output);
           });
@@ -105,7 +104,6 @@ describe('CsvAdapterService', () => {
 
     try {
       await processCSV(inputFile, outputFile);
-      console.log(`CSV file successfully processed and saved as ${outputFile}`);
     } catch (error) {
       console.error('Error processing CSV file:', error);
     }
@@ -115,7 +113,7 @@ describe('CsvAdapterService', () => {
     const df: DataFrame = pl.readCSV('fixtures/dimension-with-comma.csv', {
       quoteChar: "'",
     });
-    console.log(df);
+    // console.log(df);
   });
 
   it('should parse dataframe with comma', async () => {
@@ -141,6 +139,46 @@ describe('CsvAdapterService', () => {
     const filePath = 'fixtures/dimension-with-comma.csv';
     const df = await readCSV(filePath);
     df.shift(); // Remove the header row
+  });
+
+  it('should retry an async await method', async () => {
+    function waitFor(millSeconds) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve('');
+        }, millSeconds);
+      });
+    }
+    async function retryPromiseWithDelay(promise, nthTry, delayTime) {
+      try {
+        const res = await promise;
+        return res;
+      } catch (e) {
+        if (nthTry === 1) {
+          return Promise.reject(e);
+        }
+        // console.log('retrying', nthTry, 'time');
+        // wait for delayTime amount of time before calling this method again
+        await waitFor(delayTime);
+        return retryPromiseWithDelay(promise, nthTry - 1, delayTime);
+      }
+    }
+    async function test(shouldSucceed: boolean): Promise<string> {
+      return new Promise((resolve, reject) => {
+        if (shouldSucceed) resolve('success');
+        else throw 'error from test';
+      });
+    }
+
+    const response = await retryPromiseWithDelay(test(true), 3, 1000);
+    const responseWithError = await retryPromiseWithDelay(test(false), 3, 1000)
+      .then((res) => {
+        console.log('Done with error', res);
+      })
+      .catch((e) => e);
+
+    expect(response).toBe('success');
+    expect(responseWithError).toBe('error from test');
   });
 
   // it('should create dimensions out of CSV', async () => {

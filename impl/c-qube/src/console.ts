@@ -2,58 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { CsvAdapterService } from './services/csv-adapter/csv-adapter.service';
 import { resetLogs } from './utils/debug';
-import {
-  intro,
-  outro,
-  confirm,
-  select,
-  spinner,
-  isCancel,
-  cancel,
-  text,
-} from '@clack/prompts';
+import { intro, outro } from '@clack/prompts';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const fs = require('fs');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const path = require('path');
 
 async function bootstrap() {
   const application = await NestFactory.createApplicationContext(AppModule);
   const csvAdapterService = application.get(CsvAdapterService);
   resetLogs();
-
-  // const command = process.argv[2];
-  // // only if third argument is passed
-  // let debugFlag = false;
-  // if (process.argv[3]) {
-  //   debugFlag = process.argv[3].split('=')[1] === 'true';
-  // }
-  // process.env['DEBUG'] = debugFlag.toString();
-
-  // switch (command) {
-  //   case 'ingest':
-  //     intro(`Starting Ingestion Process`);
-  //     await csvAdapterService.ingest();
-  //     outro(`You're all set!`);
-  //     break;
-  //   case 'ingest-data':
-  //     intro(`Starting Data Ingestion Process`);
-  //     await csvAdapterService.ingestData();
-  //     outro(`You're all set!`);
-  //     break;
-  //   case 'nuke-db':
-  //     await csvAdapterService.nuke();
-  //     break;
-  //   default:
-  //     console.log('Command not found');
-  //     process.exit(1);
-  // }
-
-  // await application.close();
-  // process.exit(0);
 
   yargs(hideBin(process.argv))
     .option('debug', {
@@ -73,12 +29,27 @@ async function bootstrap() {
     .command(
       'ingest-data',
       'Starting Data Ingestion Process',
-      {},
+      (yargs) => {
+        yargs.option('filter', {
+          alias: 'f',
+          type: 'string',
+          default: 'none',
+          describe: 'Filter datasets to ingest',
+        });
+      },
       async (argv) => {
         process.env['DEBUG'] = argv.debug.toString();
-        intro(`Starting Data Ingestion Process`);
-        await csvAdapterService.ingestData();
-        outro(`You're all set!`);
+        // intro(`Starting Data Ingestion Process`);
+        const filter = argv.filter;
+
+        if (filter === 'none') {
+          await csvAdapterService.ingestData({});
+        } else {
+          await csvAdapterService.ingestData({
+            name: filter,
+          });
+        }
+        // outro(`You're all set!`);
         await application.close();
         process.exit(0);
       },
@@ -89,6 +60,32 @@ async function bootstrap() {
       await application.close();
       process.exit(0);
     })
+    .command(
+      'nuke-datasets',
+      'Nuke the datasets',
+      (yargs) => {
+        yargs.option('filter', {
+          alias: 'f',
+          type: 'string',
+          default: 'none',
+          describe: 'Filter datasets to ingest',
+        });
+      },
+      async (argv) => {
+        process.env['DEBUG'] = argv.debug.toString();
+        const filter = argv.filter;
+
+        if (filter === 'none') {
+          await csvAdapterService.nukeDatasets({});
+        } else {
+          await csvAdapterService.nukeDatasets({
+            name: filter,
+          });
+        }
+        await application.close();
+        process.exit(0);
+      },
+    )
     .demandCommand(1, 'Please provide a valid command')
     .help()
     .version()

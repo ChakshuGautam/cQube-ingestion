@@ -33,21 +33,23 @@ model DimensionGrammar {
 }
 
 model DatasetGrammar {
-  id               Int           @id @default(autoincrement())
-  name             String        @unique
-  description      String?
-  dimensions       Json
-  timeDimension    Json?
-  schema           Json
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-  deletedAt        DateTime?
-  Pipe             Pipe[]
-  program          String?
-  isCompound       Boolean       @default(false)
-  eventGrammarFile String?
-  eventGrammar     EventGrammar? @relation(fields: [eventGrammarId], references: [id])
-  eventGrammarId   Int?
+  id                Int           @id @default(autoincrement())
+  name              String        @unique
+  description       String?
+  dimensions        Json
+  timeDimension     Json?
+  schema            Json
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  deletedAt         DateTime?
+  Pipe              Pipe[]
+  program           String?
+  isCompound        Boolean       @default(false)
+  eventGrammarFile  String?
+  eventGrammar      EventGrammar? @relation(fields: [eventGrammarId], references: [id])
+  eventGrammarId    Int?
+  tableName         String?
+  tableNameExpanded String?
 
   @@schema("spec")
 }
