@@ -43,6 +43,8 @@ const pl = require('nodejs-polars');
 const _ = require('lodash');
 const pLimit = require('p-limit');
 const limit = pLimit(10);
+const { Worker } = require('worker_threads');
+const path = require('path');
 
 @Injectable()
 export class CsvAdapterService {
@@ -391,6 +393,26 @@ export class CsvAdapterService {
     // Insert events into the datasets
   }
 
+ 
+
+public async processCsvParallel(file: string) {
+  return new Promise((resolve, reject) => {
+    const workerScript = path.join(__dirname, 'processCsvWorker.js');
+    const worker = new Worker(workerScript, {
+      workerData: file,
+      poolSize: require('os').cpus().length, // Set poolSize to maximum available CPUs
+    });
+
+    worker.on('message', resolve);
+    worker.on('error', reject);
+    worker.on('exit', (code) => {
+      if (code !== 0) {
+        reject(new Error(`Worker stopped with exit code ${code}`));
+      }
+    });
+  });
+}
+
   public async ingestData(filter: any, programDir = './ingest/programs') {
     // const s = spinner();
     // s.start('🚧 1. Deleting Old Data');
@@ -403,7 +425,7 @@ export class CsvAdapterService {
     let promises = [];
     for (let i = 0; i < files.length; i++) {
       promises.push(
-        processCsv(files[i], files[i].split('.csv')[0] + '_temp.csv'),
+        (this.processCsvParallel(files[i])),
       );
     }
     await Promise.all(promises);
