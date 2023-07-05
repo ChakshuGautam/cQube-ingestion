@@ -57,3 +57,39 @@ processCsv(input, output)
     // Send the error back to the parent thread
     parentPort.postMessage({ error: error.message });
   });
+
+
+async function removeEmptyLines(filePath){
+  const readFileAsync = promisify(fs1.readFile);
+  const writeFileAsync = promisify(fs1.writeFile);
+  try {
+    // Read the file contents
+    const data = await readFileAsync(filePath, 'utf-8');
+  
+    // Split the file contents into lines and filter out empty lines
+    const lines = data.split('\n');
+    const nonEmptyLines = lines.filter((line) => line.trim() !== '');
+  
+    // Join the non-empty lines back together
+    const filteredContents = nonEmptyLines.join('\n');
+  
+    // Write the filtered contents back to the file
+    await writeFileAsync(filePath, filteredContents);
+  } catch (err) {
+    console.error('Error processing file:', err);
+  }
+}
+
+// Extract the file data from the workerData
+const file = workerData;
+
+// Perform the removeEmptyLines operation
+removeEmptyLines(file)
+  .then((result) => {
+    // Send the result back to the parent thread
+    parentPort.postMessage(result);
+  })
+  .catch((error) => {
+    // Send the error back to the parent thread
+    parentPort.postMessage({ error: error.message });
+  });

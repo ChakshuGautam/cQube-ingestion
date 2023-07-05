@@ -395,23 +395,41 @@ export class CsvAdapterService {
 
  
 
-public async processCsvParallel(file: string) {
-  return new Promise((resolve, reject) => {
-    const workerScript = path.join(__dirname, 'processCsvWorker.js');
-    const worker = new Worker(workerScript, {
-      workerData: file,
-      poolSize: require('os').cpus().length, // Set poolSize to maximum available CPUs
-    });
+  public async processCsvParallel(file: string) {
+    return new Promise((resolve, reject) => {
+      const workerScript = path.join(__dirname, 'Worker.js');
+      const worker = new Worker(workerScript, {
+        workerData: file,
+        poolSize: require('os').cpus().length, // Set poolSize to maximum available CPUs
+      });
 
-    worker.on('message', resolve);
-    worker.on('error', reject);
-    worker.on('exit', (code) => {
-      if (code !== 0) {
-        reject(new Error(`Worker stopped with exit code ${code}`));
-      }
+      worker.on('message', resolve);
+      worker.on('error', reject);
+      worker.on('exit', (code) => {
+        if (code !== 0) {
+          reject(new Error(`Worker stopped with exit code ${code}`));
+        }
+      });
     });
-  });
-}
+  }
+
+  public async removeEmptyLinesParallel(file: string) {
+    return new Promise((resolve, reject) => {
+      const workerScript = path.join(__dirname, 'Worker.js');
+      const worker = new Worker(workerScript, {
+        workerData: file,
+        poolSize: require('os').cpus().length, // Set poolSize to maximum available CPUs
+      });
+
+      worker.on('message', resolve);
+      worker.on('error', reject);
+      worker.on('exit', (code) => {
+        if (code !== 0) {
+          reject(new Error(`Worker stopped with exit code ${code}`));
+        }
+      });
+    });
+  }
 
   public async ingestData(filter: any, programDir = './ingest/programs') {
     // const s = spinner();
@@ -431,7 +449,7 @@ public async processCsvParallel(file: string) {
     await Promise.all(promises);
     promises = [];
     for (let i = 0; i < files.length; i++) {
-      promises.push(removeEmptyLines(files[i]));
+      promises.push(this.removeEmptyLinesParallel(files[i]));
     }
     await Promise.all(promises);
     this.logger.verbose(`Cleaned all files`);
