@@ -14,6 +14,7 @@ import { VizService } from './services/viz/viz.service';
 import { DimensionGrammarService } from './services/csv-adapter/parser/dimension-grammar/dimension-grammar.service';
 import { Pool } from 'pg';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { DeleteService } from './services/delete/delete.service';
 const databasePoolFactory = async (configService: ConfigService) => {
   return new Pool({
     user: configService.get('DB_USERNAME'),
@@ -48,6 +49,7 @@ const databasePoolFactory = async (configService: ConfigService) => {
       inject: [ConfigService],
       useFactory: databasePoolFactory,
     },
+    DeleteService,
   ],
 })
 export class AppModule {}

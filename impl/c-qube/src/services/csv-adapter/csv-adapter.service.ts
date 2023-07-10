@@ -403,6 +403,7 @@ export class CsvAdapterService {
 
     // iterate over all *.data.csv files inside programs folder
     const files = getFilesInDirectory(programDir);
+    console.log('files: ', files);
 
     let promises = [];
     for (let i = 0; i < files.length; i++) {
@@ -435,11 +436,21 @@ export class CsvAdapterService {
     for (let i = 0; i < datasetGrammars.length; i++) {
       // EventGrammar doesn't include anything other thatn the fields
       // that are actually required.
+
+      // Ask if this is required to be there
+      const eventGrammar: EventGrammar = datasetGrammars[i].eventGrammar;
+      const overridingFileName = `${programDir}/${eventGrammar.file
+        .replace('grammar', 'data')
+        .split('/')
+        .slice(3)
+        .join('/')}`;
+
       promises.push(
         limit(() =>
           createDatasetDataToBeInserted(
             datasetGrammars[i]?.timeDimension?.type,
             datasetGrammars[i],
+            overridingFileName,
           ).then(async (s) => {
             const events: Event[] = s;
             // Create Pipes

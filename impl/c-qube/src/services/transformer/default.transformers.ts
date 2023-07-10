@@ -73,22 +73,24 @@ export const defaultTransformers: Transformer[] = [
                 ...datasetGrammar.dimensions.map((x) => x.key),
               )
               .agg(
-                pl
-                  .col(instrumentField)
-                  .filter(pl.col(instrumentField).gtEq(0))
-                  .count()
-                  .alias('count'),
+                // pl
+                //   .col(instrumentField)
+                //   .sum()
+                //   .div(
+                //     pl
+                //       .col(instrumentField)
+                //       .filter(pl.col(instrumentField).gtEq(0))
+                //       .count(),
+                //   )
+                //   .alias('avg'),
+                // pl
+                //   .col(instrumentField)
+                //   .filter(pl.col(instrumentField).gtEq(0))
+                //   .count()
+                //   .alias('count'),
+                pl.avg(instrumentField).alias('avg'),
+                pl.count(instrumentField).alias('count'),
                 pl.col(instrumentField).sum().alias('sum'),
-                pl
-                  .col(instrumentField)
-                  .sum()
-                  .div(
-                    pl
-                      .col(instrumentField)
-                      .filter(pl.col(instrumentField).gtEq(0))
-                      .count(),
-                  )
-                  .alias('avg'),
               );
             // console.log('changedDF', changedDF);
             const datasetUpdateRequests: DatasetUpdateRequest[] = changedDF
