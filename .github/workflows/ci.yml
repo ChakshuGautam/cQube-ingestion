@@ -19,6 +19,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Copy .env.example to .env
+        run: cp .env.example .env
+
       - name: Run DBs
         # working-directory: .
         run: docker-compose up -d
@@ -35,7 +38,7 @@ jobs:
         working-directory: impl/c-qube
         run: |
           touch .env
-          echo "DATABASE_URL="postgres://timescaledb:postgrespassword@localhost:5432/postgres?sslmode=disable"" > .env
+          echo "DATABASE_URL"="postgres://timescaledb:postgrespassword@localhost:5432/postgres?sslmode=disable" >> .env
 
       - name: Install dependencies
         working-directory: impl/c-qube
