@@ -7,3 +7,5 @@ scratchpad.md
 .env
 random_data.csv
 coverage/
+
+**/ingest/

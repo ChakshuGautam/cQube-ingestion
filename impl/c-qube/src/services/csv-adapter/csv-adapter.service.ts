@@ -438,19 +438,19 @@ export class CsvAdapterService {
       // that are actually required.
 
       // Ask if this is required to be there
-      const eventGrammar: EventGrammar = datasetGrammars[i].eventGrammar;
-      const overridingFileName = `${programDir}/${eventGrammar.file
-        .replace('grammar', 'data')
-        .split('/')
-        .slice(3)
-        .join('/')}`;
+      // const eventGrammar: EventGrammar = datasetGrammars[i].eventGrammar;
+      // const overridingFileName = `${programDir}/${eventGrammar.file
+      //   .replace('grammar', 'data')
+      //   .split('/')
+      //   .slice(3)
+      //   .join('/')}`;
 
       promises.push(
         limit(() =>
           createDatasetDataToBeInserted(
             datasetGrammars[i]?.timeDimension?.type,
             datasetGrammars[i],
-            overridingFileName,
+            // overridingFileName,
           ).then(async (s) => {
             const events: Event[] = s;
             // Create Pipes

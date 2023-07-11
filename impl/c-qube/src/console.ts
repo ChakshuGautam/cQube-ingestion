@@ -119,7 +119,11 @@ async function bootstrap() {
       },
       async (argv) => {
         process.env['DEBUG'] = argv.debug.toString();
-        await deleteService.processUpdation();
+        await deleteService.deleteData(
+          './test/fixtures/test-csvs/update-diff/mealserved-update.data.csv',
+          './test/fixtures/test-csvs/update-diff/mealserved-ingested.data.csv',
+          './test/fixtures/test-csvs/update-diff/mealserved-event.grammar.csv'
+        );
         await application.close();
         process.exit(0);
       },

@@ -1,5 +1,4 @@
 import { readCSVFile } from '../utils/csvreader';
-
 const fs = require('fs');
 
 export const getDataDifference = async (
@@ -70,11 +69,12 @@ export const getDataDifference = async (
     const fileName =
       newFilePath.split('/').pop()?.split('.').slice(0, -1).join('.') +
       `updated-${Date.now()}.csv`;
-    fs.writeFileSync(
-      updateFileLocation ? updateFileLocation + '/' + fileName : fileName,
-      finalContent.join('\n'),
-    );
+    const filePath = updateFileLocation
+      ? updateFileLocation + '/' + fileName
+      : fileName;
 
-    return finalContent;
+    fs.writeFileSync(filePath, finalContent.join('\n'));
+
+    return { filePath, finalContent };
   }
 };

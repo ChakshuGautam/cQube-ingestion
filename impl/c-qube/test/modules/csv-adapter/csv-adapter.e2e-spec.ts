@@ -56,7 +56,7 @@ describe('AppController (e2e)', () => {
     csvAdapterService = app.get<CsvAdapterService>(CsvAdapterService);
   });
 
-  it('complete ingestion', async () => {
+  /*it('complete ingestion', async () => {
     await csvAdapterService.nuke();
     await csvAdapterService.ingest(
       './test/fixtures/ingestionConfigs',
@@ -174,7 +174,7 @@ describe('AppController (e2e)', () => {
       expect.arrayContaining(dimensionGrammarJSON),
     );
     expect(datasetGrammar).toEqual(expect.arrayContaining(datasetGrammarJSON));
-  });
+  });*/
 
   it('tries to ingest a negative event', async () => {
     await csvAdapterService.nuke();

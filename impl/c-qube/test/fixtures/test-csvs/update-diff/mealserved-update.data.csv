@@ -1,5 +1,17 @@
-district_id,total_meals_served
-202,1
-101,1
-102,0
-201,1
+state_id,grade_diksha,subject_diksha,avg_play_time_in_mins_on_app_and_portal
+12,Class 1,English,1.58
+12,Class 1,English,3.77
+12,Class 2,English,2.32
+12,Class 3,English,1.9
+12,Class 3,EVS,4.21
+12,Class 3,EVS,5.14
+12,Class 4,English,1.28
+12,Class 6,Geography,1.99
+12,Class 6,History,1.91
+12,Class 6,Social Science,3.54
+12,Class 6,Political Science,4.98
+12,Class 7,History,2.09
+12,Class 7,Political Science,1.2
+12,Class 8,Geography,3.34
+12,Class 8,History,3.24
+12,Class 7,English,2.09

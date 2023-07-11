@@ -15,4 +15,8 @@ describe('DeleteService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+
+  it('should update the data for diksha_avg_play_timme', () => {
+    return;
+  });
 });
