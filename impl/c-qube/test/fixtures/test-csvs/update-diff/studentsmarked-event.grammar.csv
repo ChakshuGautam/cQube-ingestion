@@ -1,0 +1,5 @@
+,district,block,cluster,school,grade,schoolcategory,gender,
+,district_id,block_id,cluster_id,school_id,grade_state,schoolcategory_id,gender,
+date,string,string,string,string,string,string,string,integer
+date,district_id,block_id,cluster_id,school_id,grade_state,schoolcategory_id,gender,students_attendance_marked
+timeDimension,dimension,dimension,dimension,dimension,dimension,dimension,dimension,metric

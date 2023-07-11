@@ -6,13 +6,17 @@ import { PrismaService } from '../../prisma.service';
 import { CsvAdapterService } from '../csv-adapter/csv-adapter.service';
 import { DatasetService } from '../dataset/dataset.service';
 import { DatasetGrammar, DatasetUpdateRequest } from 'src/types/dataset';
-import { createDatasetDataToBeInserted } from '../csv-adapter/parser/dataset/dataset-grammar.helper';
-import { Event } from 'src/types/event';
+import {
+  createCompoundDatasetDataToBeInserted,
+  createDatasetDataToBeInserted,
+} from '../csv-adapter/parser/dataset/dataset-grammar.helper';
+import { Event, EventGrammar, InstrumentType } from '../../types/event';
 import { Pipe } from 'src/types/pipe';
 import { defaultTransformers } from '../transformer/default.transformers';
 import { TransformerContext } from 'src/types/transformer';
 import { getDataDifference } from '../csv-adapter/parser/update-diff/update-diff.service';
-import { filter } from 'rxjs';
+import { getEGDefFromFile } from '../csv-adapter/parser/event-grammar/event-grammar.service';
+import { EventGrammarCSVFormat } from '../csv-adapter/types/parser';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const csv = require('csvtojson');
 
@@ -60,13 +64,14 @@ export class DeleteService {
       if (currentData.length > 1) {
         throw new Error('More than one row found for the given filter params');
       }
-
+      console.log('currentData[0].sum: ', currentData[0].sum);
+      console.log('data.sum: ', data.sum);
       const newSum = currentData[0].sum + data.sum;
       const newCount =
         currentData[0].count +
         data.count -
         2 * (data as unknown as any).negcount;
-      const newAvg = (newSum / newCount).toPrecision(2);
+      const newAvg = newCount !== 0 ? (newSum / newCount).toPrecision(2) : 0;
       console.log('newData', [
         {
           sum: newSum,
@@ -79,7 +84,8 @@ export class DeleteService {
       SET sum=${newSum}, count=${newCount}, avg=${newAvg}
       WHERE ${where}`);
     }
-    // console.log('updateQueries: ', updateQueries);
+    console.log('updateQueries: ', updateQueries);
+    fs.writeFileSync(`./sql/${Date.now()}.sql`, updateQueries.toString());
     return updateQueries;
   }
   async processDatasetUpdateRequest(
@@ -105,15 +111,16 @@ export class DeleteService {
     // but there will only be one row per dataset table, hence this should be
     // generating update queries and then running a prisma transaction for it
     const updateQueries = await this.updateDatasets(durs); //[0], data);
-
+    console.log('updateQueries: ', updateQueries);
     await this.prisma.$transaction(
       updateQueries.map((query) => this.prisma.$executeRawUnsafe(query)),
     );
   }
   async deleteData(
-    newDataFilePath?: string,
-    oldDataFilePath?: string,
-    eventGrammarFilePath?: string,
+    newDataFilePath: string,
+    oldDataFilePath: string,
+    eventGrammarFilePath: string,
+    filter: string,
   ) {
     const { filePath, finalContent } = await getDataDifference(
       oldDataFilePath,
@@ -139,7 +146,7 @@ export class DeleteService {
 
     const datasetGrammars: DatasetGrammar[] =
       await this.datasetService.getNonCompoundDatasetGrammars({
-        name: 'diksha_avg_',
+        name: filter,
       });
 
     // console.log(datasetGrammars);
@@ -206,6 +213,78 @@ export class DeleteService {
         .catch((err) => {
           Logger.log('Error while processing deletion', err);
         });
+    }
+
+    const compoundDatasetGrammars: DatasetGrammar[] =
+      await this.datasetService.getCompoundDatasetGrammars({
+        name: filter,
+      });
+
+    for (let i = 0; i < compoundDatasetGrammars.length; i++) {
+      await getEGDefFromFile(compoundDatasetGrammars[i].eventGrammarFile).then(
+        async (s) => {
+          const {
+            instrumentField,
+          }: {
+            eventGrammarDef: EventGrammarCSVFormat[];
+            instrumentField: string;
+          } = s;
+          const compoundEventGrammar: EventGrammar = {
+            name: '',
+            description: '',
+            dimension: [],
+            instrument_field: instrumentField,
+            is_active: true,
+            schema: {},
+            instrument: {
+              type: InstrumentType.COUNTER,
+              name: 'counter',
+            },
+          };
+          const events: Event[] = await createCompoundDatasetDataToBeInserted(
+            filePath,
+            compoundEventGrammar,
+            compoundDatasetGrammars[i],
+          );
+          // Create Pipes
+          const pipe: Pipe = {
+            event: compoundEventGrammar,
+            transformer: defaultTransformers[1],
+            dataset: compoundDatasetGrammars[i],
+          };
+          const transformContext: TransformerContext = {
+            dataset: compoundDatasetGrammars[i],
+            events: events,
+            isChainable: false,
+            pipeContext: {},
+          };
+
+          if (events && events.length > 0) {
+            const datasetUpdateRequest: DatasetUpdateRequest[] =
+              pipe.transformer.transformSync(
+                callback,
+                transformContext,
+                events,
+              ) as DatasetUpdateRequest[];
+
+            await this.processDatasetUpdateRequest(datasetUpdateRequest)
+              .then(() => {
+                Logger.verbose(
+                  `Ingested Compound Dataset without any error ${events.length} events for ${compoundDatasetGrammars[i].name}`,
+                );
+              })
+              .catch((e) => {
+                Logger.verbose(
+                  `Ingested Compound Dataset with error ${events.length} events for ${compoundDatasetGrammars[i].name}`,
+                );
+              });
+          } else {
+            Logger.verbose(
+              `No events found for ${compoundDatasetGrammars[i].name} dataset`,
+            );
+          }
+        },
+      );
     }
   }
 

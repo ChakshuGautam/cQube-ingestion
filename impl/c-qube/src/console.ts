@@ -120,9 +120,10 @@ async function bootstrap() {
       async (argv) => {
         process.env['DEBUG'] = argv.debug.toString();
         await deleteService.deleteData(
-          './test/fixtures/test-csvs/update-diff/mealserved-update.data.csv',
-          './test/fixtures/test-csvs/update-diff/mealserved-ingested.data.csv',
-          './test/fixtures/test-csvs/update-diff/mealserved-event.grammar.csv'
+          './test/fixtures/test-csvs/update-diff/studentsmarked-update.data.csv',
+          './test/fixtures/test-csvs/update-diff/studentsmarked-ingested.data.csv',
+          './test/fixtures/test-csvs/update-diff/studentsmarked-event.grammar.csv',
+          'sch_att_students_',
         );
         await application.close();
         process.exit(0);
