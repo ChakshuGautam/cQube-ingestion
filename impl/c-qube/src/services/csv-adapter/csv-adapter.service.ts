@@ -1,4 +1,4 @@
-import { Logger, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { DataFrame } from 'nodejs-polars';
 import { PrismaService } from '../../prisma.service';
 import { DimensionGrammar } from 'src/types/dimension';
@@ -59,6 +59,15 @@ export class CsvAdapterService {
     public dimensionGrammarService: DimensionGrammarService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService
   ) {}
+  public createProgressBar(barName, title) {
+    return new cliProgress.SingleBar({
+      format: `CLI Progress |${colors.cyan('{bar}')}| {percentage}% || {value}/{total} Chunks || Title: ${title}`,
+      barCompleteChar: '\u2588',
+      barIncompleteChar: '\u2591',
+      hideCursor: true,
+      clearOnComplete: true,
+    });
+  }
 
   public async ingest(
     ingestionFolder = './ingest',
@@ -73,13 +82,7 @@ export class CsvAdapterService {
 
     // Parse the config
     s.start('🚧 2. Reading your config');
-    
-    const b4 = new cliProgress.SingleBar({
-      format: 'CLI Progress |' + colors.cyan('{bar}') + '| {percentage}% || {value}/{total} Chunks || Title : Deleting old data ...',
-      barCompleteChar: '\u2588',
-      barIncompleteChar: '\u2591',
-      hideCursor: true
-    });
+    const b4 = this.createProgressBar('b1', 'Deleting old data ...');
     b4.start(100, 0);
 
     // const ingestionFolder = './ingest';
@@ -107,12 +110,7 @@ export class CsvAdapterService {
     const dimensionGrammarFolder = config?.dimensions.input?.files;
     const regexDimensionGrammar = /\-dimension\.grammar.csv$/i;
     const inputFilesForDimensions = readdirSync(dimensionGrammarFolder);
-    const b1 = new cliProgress.SingleBar({
-      format: 'CLI Progress |' + colors.cyan('{bar}') + '| {percentage}% || {value}/{total} Chunks || Title : INGESTING DIMENTIONS ...',
-      barCompleteChar: '\u2588',
-      barIncompleteChar: '\u2591',
-      hideCursor: true
-    });
+    const b1 = this.createProgressBar('b1', 'INGESTING DIMENTIONS ...');
     b1.start(inputFilesForDimensions?.length, 0);
 
     for (let i = 0; i < inputFilesForDimensions?.length; i++) {
@@ -209,12 +207,7 @@ export class CsvAdapterService {
     //   -- Read the CSV
     s.start('🚧 4. Processing Event Grammars');
     const eventGrammarsGlobal: EventGrammar[] = [];
-    const b2 = new cliProgress.SingleBar({
-      format: 'CLI Progress |' + colors.cyan('{bar}') + '| {percentage}% || {value}/{total} Chunks || Title : INGESTING EVENTS ...',
-      barCompleteChar: '\u2588',
-      barIncompleteChar: '\u2591',
-      hideCursor: true
-    });
+    const b2 = this.createProgressBar('b1', 'INGESTING EVENTS ...');
     b2.start(config?.programs.length, 0);
     for (let j = 0; j < config?.programs.length; j++) {
       const inputFiles = readdirSync(config?.programs[j].input?.files);
@@ -270,12 +263,7 @@ export class CsvAdapterService {
       dg: DatasetGrammar;
       egFile: string;
     }[] = [];
-    const b3 = new cliProgress.SingleBar({
-      format: 'CLI Progress |' + colors.cyan('{bar}') + '| {percentage}% || {value}/{total} Chunks || Title : INGESTING DATASETS ...',
-      barCompleteChar: '\u2588',
-      barIncompleteChar: '\u2591',
-      hideCursor: true
-    });
+    const b3 = this.createProgressBar('b1', 'INGESTING DATASETS ...');
     b3.start(config?.programs.length, 0);
     for (let j = 0; j < config?.programs.length; j++) {
       const inputFiles = readdirSync(config?.programs[j].input?.files);
@@ -472,13 +460,7 @@ export class CsvAdapterService {
       await this.datasetService.getNonCompoundDatasetGrammars(filter);
       const totalIterations_dg = datasetGrammars.length;
       let completedIterations_dg = 0;
-      const progressBar_dg = new cliProgress.SingleBar({
-        format: 'INGESTING DATASET GRAMMAR ... | ' + colors.cyan('{bar}') + ' | {percentage}% | ETA: {eta}s | {value}/{total} Iterations',
-        barCompleteChar: '\u2588',
-        barIncompleteChar: '\u2591',
-        hideCursor: true,
-        clearOnComplete: true,
-      });
+      const progressBar_dg = this.createProgressBar('progressBar_dg', 'IINGESTING DATASET GRAMMAR ...');
       progressBar_dg.start(totalIterations_dg, completedIterations_dg);
     for (let i = 0; i < datasetGrammars.length; i++) {
       
@@ -554,15 +536,7 @@ export class CsvAdapterService {
 
     const totalIterations = compoundDatasetGrammars.length;
     let completedIterations = 0;
-    
-    const progressBar = new cliProgress.SingleBar({
-      format: 'INGESTING COMPOUND DATASET GRAMMAR ... | ' + colors.cyan('{bar}') + ' | {percentage}% | ETA: {eta}s | {value}/{total} Iterations',
-      barCompleteChar: '\u2588',
-      barIncompleteChar: '\u2591',
-      hideCursor: true,
-      clearOnComplete: true,
-    });
-    
+    const progressBar = this.createProgressBar('progressBar', 'INGESTING COMPOUND DATASET GRAMMAR ...');
     progressBar.start(totalIterations, completedIterations);
     for (let m = 0; m < compoundDatasetGrammars.length; m++) {
       promises.push(
@@ -637,15 +611,8 @@ export class CsvAdapterService {
                 );
               }
               completedIterations++;
-
-          // Increment the progress bar
           progressBar.update(completedIterations);
-
-          // Your existing code goes here
-
-          // Check if all iterations are completed
           if (completedIterations === totalIterations) {
-            // Stop and clear the progress bar
             progressBar.stop();
           }
             },
@@ -675,8 +642,7 @@ export class CsvAdapterService {
       const dimensions: any[] = await this.prisma
         .$queryRaw`select 'drop table if exists "' || tablename || '" cascade;'
         from pg_tables where schemaname = 'dimensions';`;
-      
-        const datasets: any[] = await this.prisma
+      const datasets: any[] = await this.prisma
         .$queryRaw`select 'drop table if exists "' || tablename || '" cascade;'
         from pg_tables where schemaname = 'datasets';`;
         
@@ -697,9 +663,7 @@ export class CsvAdapterService {
         p1.increment();
       }
 
-      // const datasets: any[] = await this.prisma
-      //   .$queryRaw`select 'drop table if exists "' || tablename || '" cascade;'
-      //   from pg_tables where schemaname = 'datasets';`;
+      
       for (let i = 0; i < datasets.length; i++) {
         const parts = datasets[i]['?column?'].split('"');
         const query = parts[0] + '"datasets"."' + parts[1] + '"' + parts[2];
