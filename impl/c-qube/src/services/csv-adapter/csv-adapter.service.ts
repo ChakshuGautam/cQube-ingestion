@@ -59,9 +59,9 @@ export class CsvAdapterService {
     public dimensionGrammarService: DimensionGrammarService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService
   ) {}
-  public createProgressBar(barName, title) {
+  public createProgressBar(barName, title, fileName = '') {
     return new cliProgress.SingleBar({
-      format: `CLI Progress |${colors.cyan('{bar}')}| {percentage}% || {value}/{total} Chunks || Title: ${title}`,
+      format: `CLI Progress |${colors.cyan('{bar}')}| {percentage}% || {value}/{total} Chunks || Title: ${title} | File: ${fileName}`,
       barCompleteChar: '\u2588',
       barIncompleteChar: '\u2591',
       hideCursor: true,
@@ -459,11 +459,9 @@ export class CsvAdapterService {
     const datasetGrammars: DatasetGrammar[] =
       await this.datasetService.getNonCompoundDatasetGrammars(filter);
       const totalIterations_dg = datasetGrammars.length;
-      let completedIterations_dg = 0;
-      const progressBar_dg = this.createProgressBar('progressBar_dg', 'IINGESTING DATASET GRAMMAR ...');
-      progressBar_dg.start(totalIterations_dg, completedIterations_dg);
+      let completedIterations_dg = 0; 
     for (let i = 0; i < datasetGrammars.length; i++) {
-      
+      const fileName = datasetGrammars[i].name;
       // EventGrammar doesn't include anything other thatn the fields
       // that are actually required.
       promises.push(
@@ -472,6 +470,8 @@ export class CsvAdapterService {
             datasetGrammars[i]?.timeDimension?.type,
             datasetGrammars[i],
           ).then(async (s) => {
+            const progressBar_dg = this.createProgressBar('progressBar_dg', 'INGESTING DATASET GRAMMAR ...', fileName);
+            progressBar_dg.start(totalIterations_dg, completedIterations_dg);
             const events: Event[] = s;
             // Create Pipes
             // console.log(events[0].data, events.length);
@@ -520,7 +520,6 @@ export class CsvAdapterService {
             completedIterations_dg++;
 
           progressBar_dg.update(completedIterations_dg);
-
           // Check if all iterations are completed
           if (completedIterations_dg === totalIterations_dg) {
             progressBar_dg.stop();
@@ -536,13 +535,14 @@ export class CsvAdapterService {
 
     const totalIterations = compoundDatasetGrammars.length;
     let completedIterations = 0;
-    const progressBar = this.createProgressBar('progressBar', 'INGESTING COMPOUND DATASET GRAMMAR ...');
-    progressBar.start(totalIterations, completedIterations);
     for (let m = 0; m < compoundDatasetGrammars.length; m++) {
+      const fileName = compoundDatasetGrammars[m].name;
       promises.push(
         limit(() =>
           getEGDefFromFile(compoundDatasetGrammars[m].eventGrammarFile).then(
             async (s) => {
+              const progressBar = this.createProgressBar('progressBar', 'INGESTING COMPOUND DATASET GRAMMAR ...', fileName);
+              progressBar.start(totalIterations, completedIterations);
               const {
                 instrumentField,
               }: {
