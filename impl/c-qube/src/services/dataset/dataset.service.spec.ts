@@ -6,6 +6,7 @@ import { QueryBuilderService } from '../query-builder/query-builder.service';
 import { DatasetService } from './dataset.service';
 import { Pool } from 'pg';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { WinstonModule } from 'nest-winston';
 
 describe('DatasetService', () => {
   let service: DatasetService;
@@ -21,7 +22,7 @@ describe('DatasetService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [ConfigModule],
+      imports: [ConfigModule , WinstonModule.forRoot({})],
       providers: [
         DatasetService,
         PrismaService,

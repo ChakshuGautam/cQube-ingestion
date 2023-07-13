@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {
   DatasetGrammar,
   DatasetUpdateRequest,
@@ -17,6 +17,8 @@ import { EventService } from '../event/event.service';
 import { EventGrammar } from 'src/types/event';
 import { readCSV } from '../csv-adapter/parser/utils/csvreader';
 import { table } from 'console';
+import { Controller, Inject, LoggerService } from '@nestjs/common';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 const pLimit = require('p-limit');
 const limit = pLimit(10);
 
@@ -35,12 +37,13 @@ export type DatasetGrammarFilter = {
 
 @Injectable()
 export class DatasetService {
-  private readonly logger: Logger = new Logger(DatasetService.name);
+  
   constructor(
     public prisma: PrismaService,
     private qbService: QueryBuilderService,
     private eventGrammarService: EventService,
     @Inject('DATABASE_POOL') private pool: Pool,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService
   ) {}
 
   counterAggregates(): any {

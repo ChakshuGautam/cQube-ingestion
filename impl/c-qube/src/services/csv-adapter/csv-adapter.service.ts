@@ -1,4 +1,4 @@
-import { Logger, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { DataFrame } from 'nodejs-polars';
 import { PrismaService } from '../../prisma.service';
 import { DimensionGrammar } from 'src/types/dimension';
@@ -10,7 +10,7 @@ import { DatasetGrammar, DatasetUpdateRequest } from '../../types/dataset';
 import { defaultTransformers } from '../transformer/default.transformers';
 import { Pipe } from 'src/types/pipe';
 import { TransformerContext } from 'src/types/transformer';
-import { readFile } from 'fs/promises';
+import { readFile } from 'fs/promises'; 
 import { isTimeDimensionPresent } from './csv-adapter.utils';
 import { readdirSync } from 'fs';
 import { logToFile } from '../../utils/debug';
@@ -37,23 +37,46 @@ import {
 } from './parser/dataset/dataset-grammar.service';
 import { EventGrammarCSVFormat } from './types/parser';
 import { DimensionGrammarService } from './parser/dimension-grammar/dimension-grammar.service';
+import { Inject, LoggerService } from '@nestjs/common';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 const chalk = require('chalk');
 const fs = require('fs').promises;
 const pl = require('nodejs-polars');
 const _ = require('lodash');
 const pLimit = require('p-limit');
 const limit = pLimit(10);
+const cliProgress = require('cli-progress');
+const colors = require('ansi-colors');
 
 @Injectable()
 export class CsvAdapterService {
-  private readonly logger: Logger = new Logger(CsvAdapterService.name);
+  
   constructor(
     public dimensionService: DimensionService,
     public eventService: EventService,
     public datasetService: DatasetService,
     public prisma: PrismaService,
     public dimensionGrammarService: DimensionGrammarService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService
   ) {}
+  public createProgressBar_withFileName(barName, title, fileName = '') {
+    return new cliProgress.SingleBar({
+      format: `CLI Progress |${colors.cyan('{bar}')}| {percentage}% || {value}/{total} Chunks || Title: ${title} | File: ${fileName}`,
+      barCompleteChar: '\u2588',
+      barIncompleteChar: '\u2591',
+      hideCursor: true,
+      clearOnComplete: true,
+    });
+  }
+  public createProgressBar(barName, title) {
+    return new cliProgress.SingleBar({
+      format: `CLI Progress |${colors.cyan('{bar}')}| {percentage}% || {value}/{total} Chunks || Title: ${title}`,
+      barCompleteChar: '\u2588',
+      barIncompleteChar: '\u2591',
+      hideCursor: true,
+      clearOnComplete: true,
+    });
+  }
 
   public async ingest(
     ingestionFolder = './ingest',
@@ -68,12 +91,16 @@ export class CsvAdapterService {
 
     // Parse the config
     s.start('🚧 2. Reading your config');
+    const b4 = this.createProgressBar('b1', 'Deleting old data ...');
+    b4.start(100, 0);
+
     // const ingestionFolder = './ingest';
     const config = JSON.parse(
       await readFile(ingestionFolder + '/' + ingestionConfigFileName, 'utf8'),
     );
     const regexEventGrammar = /\-event\.grammar.csv$/i;
     const defaultTimeDimensions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
+    b4.stop();
     s.stop('✅ 2. Config parsing completed');
 
     // Verify all file names
@@ -92,6 +119,9 @@ export class CsvAdapterService {
     const dimensionGrammarFolder = config?.dimensions.input?.files;
     const regexDimensionGrammar = /\-dimension\.grammar.csv$/i;
     const inputFilesForDimensions = readdirSync(dimensionGrammarFolder);
+    const b1 = this.createProgressBar('b1', 'INGESTING DIMENTIONS ...');
+    b1.start(inputFilesForDimensions?.length, 0);
+
     for (let i = 0; i < inputFilesForDimensions?.length; i++) {
       // Create a function to get all files in the folder
       // Create a function to use regex to match the file
@@ -174,9 +204,11 @@ export class CsvAdapterService {
             }),
         );
       }
+      b1.increment();
     }
-
+    
     await Promise.all(insertDimensionDataPromises);
+    b1.stop();
     s.stop('✅ 3. Dimensions have been ingested');
 
     //   Ingest EventGrammar
@@ -184,6 +216,8 @@ export class CsvAdapterService {
     //   -- Read the CSV
     s.start('🚧 4. Processing Event Grammars');
     const eventGrammarsGlobal: EventGrammar[] = [];
+    const b2 = this.createProgressBar('b1', 'INGESTING EVENTS ...');
+    b2.start(config?.programs.length, 0);
     for (let j = 0; j < config?.programs.length; j++) {
       const inputFiles = readdirSync(config?.programs[j].input?.files);
       // For 1TimeDimension + 1EventCounter + 1Dimension
@@ -226,7 +260,9 @@ export class CsvAdapterService {
           }
         }
       }
+      b2.increment();
     }
+    b2.stop();
     s.stop('✅ 4. Event Grammars have been ingested');
 
     // Create EventGrammars for Whitelisted Compound Dimensions
@@ -236,6 +272,8 @@ export class CsvAdapterService {
       dg: DatasetGrammar;
       egFile: string;
     }[] = [];
+    const b3 = this.createProgressBar('b1', 'INGESTING DATASETS ...');
+    b3.start(config?.programs.length, 0);
     for (let j = 0; j < config?.programs.length; j++) {
       const inputFiles = readdirSync(config?.programs[j].input?.files);
       for (let i = 0; i < inputFiles?.length; i++) {
@@ -354,6 +392,7 @@ export class CsvAdapterService {
           }
         }
       }
+      b3.increment();
     }
     datasetGrammarsGlobal = _.uniqBy(datasetGrammarsGlobal, 'name');
 
@@ -386,7 +425,7 @@ export class CsvAdapterService {
     for (let i = 0; i < datasetGrammarsGlobal.length; i++) {
       await this.datasetService.createDataset(datasetGrammarsGlobal[i]);
     }
-
+    b3.stop();
     s.stop('✅ 5. Dataset Grammars have been ingested');
     // Insert events into the datasets
   }
@@ -414,6 +453,7 @@ export class CsvAdapterService {
     await Promise.all(promises);
     this.logger.verbose(`Cleaned all files`);
 
+
     // Insert events into the datasets
     const callback = (
       err: any,
@@ -427,8 +467,10 @@ export class CsvAdapterService {
     promises = [];
     const datasetGrammars: DatasetGrammar[] =
       await this.datasetService.getNonCompoundDatasetGrammars(filter);
-
+      const totalIterations_dg = datasetGrammars.length;
+      let completedIterations_dg = 0; 
     for (let i = 0; i < datasetGrammars.length; i++) {
+      const fileName = datasetGrammars[i].name;
       // EventGrammar doesn't include anything other thatn the fields
       // that are actually required.
       promises.push(
@@ -437,6 +479,8 @@ export class CsvAdapterService {
             datasetGrammars[i]?.timeDimension?.type,
             datasetGrammars[i],
           ).then(async (s) => {
+            const progressBar_dg = this.createProgressBar_withFileName('progressBar_dg', 'INGESTING DATASET GRAMMAR ...', fileName);
+            progressBar_dg.start(totalIterations_dg, completedIterations_dg);
             const events: Event[] = s;
             // Create Pipes
             // console.log(events[0].data, events.length);
@@ -482,6 +526,13 @@ export class CsvAdapterService {
             } catch (e) {
               console.error(e);
             }
+            completedIterations_dg++;
+
+          progressBar_dg.update(completedIterations_dg);
+          // Check if all iterations are completed
+          if (completedIterations_dg === totalIterations_dg) {
+            progressBar_dg.stop();
+          }
           }),
         ),
       );
@@ -490,12 +541,18 @@ export class CsvAdapterService {
     const compoundDatasetGrammars: DatasetGrammar[] =
       await this.datasetService.getCompoundDatasetGrammars(filter);
 
-    // Ingest Compound DatasetGrammar
+
+    const totalIterations = compoundDatasetGrammars.length;
+    let completedIterations = 0;
     for (let m = 0; m < compoundDatasetGrammars.length; m++) {
+      // const fileName = compoundDatasetGrammars[m].name;
       promises.push(
         limit(() =>
           getEGDefFromFile(compoundDatasetGrammars[m].eventGrammarFile).then(
             async (s) => {
+              const fileName = compoundDatasetGrammars[m].name;
+              const progressBar = this.createProgressBar_withFileName('progressBar', 'INGESTING COMPOUND DATASET GRAMMAR ...', fileName);
+              progressBar.start(totalIterations, completedIterations);
               const {
                 instrumentField,
               }: {
@@ -563,12 +620,19 @@ export class CsvAdapterService {
                   compoundDatasetGrammars[m].name,
                 );
               }
+              completedIterations++;
+          progressBar.update(completedIterations);
+          if (completedIterations === totalIterations) {
+            progressBar.stop();
+          }
             },
           ),
-        ),
-      );
+        ),  
+      ); 
+      
     }
     await Promise.all(promises);
+    
     // s.stop('🚧 4. Ingest Events');
   }
 
@@ -584,26 +648,42 @@ export class CsvAdapterService {
         `TRUNCATE table spec."EventGrammar" CASCADE;`,
       );
 
+
       const dimensions: any[] = await this.prisma
         .$queryRaw`select 'drop table if exists "' || tablename || '" cascade;'
         from pg_tables where schemaname = 'dimensions';`;
+      const datasets: any[] = await this.prisma
+        .$queryRaw`select 'drop table if exists "' || tablename || '" cascade;'
+        from pg_tables where schemaname = 'datasets';`;
+        
+        const totalIterations = dimensions.length + datasets.length ;
+
+        const p1 = new cliProgress.SingleBar({
+          format: 'CLI Progress |' + colors.cyan('{bar}') + '| {percentage}% || {value}/{total} Chunks || Title : Deleting old data ...',
+          barCompleteChar: '\u2588',
+          barIncompleteChar: '\u2591',
+          hideCursor: true,
+        });
+    
+        p1.start(totalIterations, 0);
       for (let i = 0; i < dimensions.length; i++) {
         const parts = dimensions[i]['?column?'].split('"');
         const query = parts[0] + '"dimensions"."' + parts[1] + '"' + parts[2];
         await this.prisma.$executeRawUnsafe(query);
+        p1.increment();
       }
 
-      const datasets: any[] = await this.prisma
-        .$queryRaw`select 'drop table if exists "' || tablename || '" cascade;'
-        from pg_tables where schemaname = 'datasets';`;
+      
       for (let i = 0; i < datasets.length; i++) {
         const parts = datasets[i]['?column?'].split('"');
         const query = parts[0] + '"datasets"."' + parts[1] + '"' + parts[2];
         await this.prisma.$executeRawUnsafe(query);
+        p1.increment();
       }
+      p1.stop();
     } catch (e) {
       console.error(e);
-    }
+    } 
   }
 
   public async nukeDatasets(filter: any) {
@@ -619,7 +699,7 @@ export class CsvAdapterService {
 
       const datasets: any[] = await this.prisma.$queryRawUnsafe(`${query}`);
       this.logger.log('step 1 done');
-      for (let i = 0; i < datasets.length; i++) {
+      for (let i = 0; i < datasets.length; i++) {  
         const parts = datasets[i]['?column?'].split('"');
         const query = parts[0] + '"datasets"."' + parts[1] + '"' + parts[2];
         promises.push(this.prisma.$executeRawUnsafe(query));
