@@ -59,9 +59,18 @@ export class CsvAdapterService {
     public dimensionGrammarService: DimensionGrammarService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService
   ) {}
-  public createProgressBar(barName, title, fileName = '') {
+  public createProgressBar_withFileName(barName, title, fileName = '') {
     return new cliProgress.SingleBar({
       format: `CLI Progress |${colors.cyan('{bar}')}| {percentage}% || {value}/{total} Chunks || Title: ${title} | File: ${fileName}`,
+      barCompleteChar: '\u2588',
+      barIncompleteChar: '\u2591',
+      hideCursor: true,
+      clearOnComplete: true,
+    });
+  }
+  public createProgressBar(barName, title) {
+    return new cliProgress.SingleBar({
+      format: `CLI Progress |${colors.cyan('{bar}')}| {percentage}% || {value}/{total} Chunks || Title: ${title}`,
       barCompleteChar: '\u2588',
       barIncompleteChar: '\u2591',
       hideCursor: true,
@@ -470,7 +479,7 @@ export class CsvAdapterService {
             datasetGrammars[i]?.timeDimension?.type,
             datasetGrammars[i],
           ).then(async (s) => {
-            const progressBar_dg = this.createProgressBar('progressBar_dg', 'INGESTING DATASET GRAMMAR ...', fileName);
+            const progressBar_dg = this.createProgressBar_withFileName('progressBar_dg', 'INGESTING DATASET GRAMMAR ...', fileName);
             progressBar_dg.start(totalIterations_dg, completedIterations_dg);
             const events: Event[] = s;
             // Create Pipes
@@ -541,7 +550,7 @@ export class CsvAdapterService {
         limit(() =>
           getEGDefFromFile(compoundDatasetGrammars[m].eventGrammarFile).then(
             async (s) => {
-              const progressBar = this.createProgressBar('progressBar', 'INGESTING COMPOUND DATASET GRAMMAR ...', fileName);
+              const progressBar = this.createProgressBar_withFileName('progressBar', 'INGESTING COMPOUND DATASET GRAMMAR ...', fileName);
               progressBar.start(totalIterations, completedIterations);
               const {
                 instrumentField,
@@ -647,14 +656,7 @@ export class CsvAdapterService {
         from pg_tables where schemaname = 'datasets';`;
         
         const totalIterations = dimensions.length + datasets.length ;
-
-        const p1 = new cliProgress.SingleBar({
-          format: 'CLI Progress |' + colors.cyan('{bar}') + '| {percentage}% || {value}/{total} Chunks || Title : Deleting old data ...',
-          barCompleteChar: '\u2588',
-          barIncompleteChar: '\u2591',
-          hideCursor: true,
-        });
-    
+        const p1 = this.createProgressBar('p1', 'Deleting old data ...');
         p1.start(totalIterations, 0);
       for (let i = 0; i < dimensions.length; i++) {
         const parts = dimensions[i]['?column?'].split('"');
