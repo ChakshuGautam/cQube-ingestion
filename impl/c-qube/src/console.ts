@@ -89,24 +89,6 @@ async function bootstrap() {
       },
     )
     .command(
-      'delete',
-      'Delete the datarows',
-      (yargs) => {
-        yargs.option('filter', {
-          alias: 'f',
-          type: 'string',
-          default: 'none',
-          describe: 'Filter datasets to ingest',
-        });
-      },
-      async (argv) => {
-        process.env['DEBUG'] = argv.debug.toString();
-        await deleteService.processDeletion();
-        await application.close();
-        process.exit(0);
-      },
-    )
-    .command(
       'update',
       'Update the datarows',
       (yargs) => {
