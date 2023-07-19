@@ -67,8 +67,8 @@ export const getDataDifference = async (
 
     // write to file
     const fileName =
-      newFilePath.split('/').pop()?.split('.').slice(0, -1).join('.') +
-      `updated-${Date.now()}.csv`;
+      newFilePath.split('/').pop()?.split('.').slice(0, -2).join('.') +
+      `-delta.csv`;
     const filePath = updateFileLocation
       ? updateFileLocation + '/' + fileName
       : fileName;

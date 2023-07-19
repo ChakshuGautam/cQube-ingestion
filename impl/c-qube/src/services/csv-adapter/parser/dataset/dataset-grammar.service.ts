@@ -136,7 +136,9 @@ export const createSingleDatasetGrammarsFromEG = async (
   // Get Property Name
   const propertyName = await getPropertyforDatasetGrammarFromEG(eventGrammar);
 
-  const name = `${folderName}_${eventGrammar.instrument_field}_${defaultTimeDimension}_${eventGrammar.dimension[0]?.dimension.name.name}`;
+  // const name = `${folderName}_${eventGrammar.instrument_field}_${defaultTimeDimension}_${eventGrammar.dimension[0]?.dimension.name.name}`;
+  const name = `${folderName}_${eventGrammarFile.split('/').pop().split('.')[0].split('-')[0]
+    }_${defaultTimeDimension}_${eventGrammar.dimension[0]?.dimension.name.name}`;
   // console.log(name);
   const timeDimensionKeySet = {
     Weekly: 'week',

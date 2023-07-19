@@ -256,7 +256,16 @@ export class QueryBuilderService {
     return this.cleanStatement(query);
   }
 
-  generateUpdateStatement(schema: JSONSchema4, data: any): string[] {
-    throw new Error('Method not implemented.');
+  generateUpdateStatement(
+    schema: JSONSchema4,
+    data: any,
+    where: string,
+  ): string {
+    // throw new Error('Method not implemented.');
+    return `UPDATE ${schema.schema.psql_schema}.${schema.tableName} 
+SET sum=sum+${data.sum}, 
+count=count+${data.count - 2 * data.negcount}, 
+avg=(sum+${data.sum})/(count+${data.count - 2 * data.negcount})
+WHERE ${where}`;
   }
 }

@@ -69,7 +69,6 @@ export async function removeEmptyLines(filePath: string): Promise<void> {
 
 export function getFilesInDirectory(directoryPath, fileList = []) {
   const files = fs1.readdirSync(directoryPath);
-  console.log('files in dir: ', files);
   for (const file of files) {
     const filePath = path.join(directoryPath, file);
     const stat = fs1.statSync(filePath);

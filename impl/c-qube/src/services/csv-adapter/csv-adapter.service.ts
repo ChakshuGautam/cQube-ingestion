@@ -403,7 +403,7 @@ export class CsvAdapterService {
 
     // iterate over all *.data.csv files inside programs folder
     const files = getFilesInDirectory(programDir);
-    console.log('files: ', files);
+    // console.log('files: ', files);
 
     let promises = [];
     for (let i = 0; i < files.length; i++) {
