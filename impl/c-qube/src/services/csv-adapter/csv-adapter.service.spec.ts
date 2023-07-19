@@ -10,6 +10,9 @@ import * as csv from 'csv-parser';
 import { DimensionGrammarService } from './parser/dimension-grammar/dimension-grammar.service';
 import { Pool } from 'pg';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { mockDatasetGrammar, mockDatasetService, mockDimensionGrammar, mockEvent, mockEventGrammar } from '../mocks/types.mocks';
+import { DimensionGrammar } from 'src/types/dimension';
+import { getFilesInDirectory } from './parser/utils/csvcleaner';
 const path = require('path');// eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs').promises;
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -23,8 +26,18 @@ const readline = require('readline');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const retry = require('retry');
 
+
+const getCompoundDatasetGrammarsMock = jest.fn().mockResolvedValue([
+  { tableName: 'program_name_hash1', tableNameExpanded: 'program_name_0X0Y0Z0T' },
+  { tableName: 'program_name_hash2', tableNameExpanded: 'program_name_1A1B1C1D' },
+]);
+DatasetService.prototype.getCompoundDatasetGrammars = getCompoundDatasetGrammarsMock;
+
 describe('CsvAdapterService', () => {
   let service: CsvAdapterService;
+  let dimensionService: DimensionService; 
+  let eventService: EventService;
+
   const databasePoolFactory = async (configService: ConfigService) => {
     return new Pool({
       user: configService.get('DB_USERNAME'),
@@ -52,9 +65,12 @@ describe('CsvAdapterService', () => {
           useFactory: databasePoolFactory,
         },
       ],
+      
     }).compile();
 
     service = module.get<CsvAdapterService>(CsvAdapterService);
+    dimensionService = module.get<DimensionService>(DimensionService);
+    eventService = module.get<EventService>(EventService);
   });
   // it('should be defined', () => {
   //   expect(service).toBeDefined();
@@ -180,103 +196,104 @@ describe('CsvAdapterService', () => {
     expect(responseWithError).toBe('error from test');
   });
 
-    // it('should ingest data and parse the config correctly', async () => {
-    //   const mockIngestionFolder = path.join(__dirname, 'impl/c-qube/test/fixtures/ingestionConfigs/programs/test-complete-ingestion');
-    //   const mockConfigFileName = 'test/fixtures/ingestionConfigs/config.complete.json';
+  it('should call the createEventGrammar method when ingesting event grammars', async () => {
+      const eventGrammarMock = mockEventGrammar(); 
+      const createEventGrammarMock = jest.spyOn(eventService, 'createEventGrammar').mockResolvedValue(eventGrammarMock);
+      await service.ingest();
+      expect(createEventGrammarMock).toHaveBeenCalled();
+    });
 
-    //   const mockNuke = jest.fn();
-    //   service.nuke = mockNuke;
-    //   expect(service.nuke).toHaveBeenCalled();
-    // });
-    // it('should handle invalid ingestionFolder path', async () => {
-    //   const invalidFolderPath = 'invalid/path';
-    //   const configFileName = 'config.json';
-    
-    //   try {
-    //     await service.ingest(invalidFolderPath, configFileName);
-    //   } catch (error) {
-    //     expect(error).toBeDefined();
+    it('should create a valid hashtable', async () => {
+      
+      await service.ingest();
+      expect(getCompoundDatasetGrammarsMock).toHaveBeenCalledTimes(950);
+      });
 
-    //   }
-    // });
+      it('should ingest data without any errors', async () => {
+        const mockDatasetService = {
+          getNonCompoundDatasetGrammars: () => Promise.resolve([]),
+          getCompoundDatasetGrammars: () => Promise.resolve([]),
+          processDatasetUpdateRequest: () => Promise.resolve(),
+        };    
+        const testProgramDir = './ingest/programs';    
+        await service.ingestData.call({
+          nukeDatasets: async () => {}, 
+          logger: {
+            verbose: jest.fn(),
+            warn: jest.fn(),
+          },
+          datasetService: mockDatasetService,
+        }, null, testProgramDir);        
+      });
   
-    // it('should handle invalid ingestionConfigFileName', async () => {
-    //   const validFolderPath = './ingest';
-    //   const invalidConfigFileName = 'invalid-config.json';
-  
-    //   await expect(service.ingest(validFolderPath, invalidConfigFileName)).rejects.toThrow();
-    // });
-    
-    
-  
-  // it('should create dimensions out of CSV', async () => {
-  //   const dimensionGrammar: DimensionGrammar =
-  //     await createDimensionGrammarFromCSVDefinition(
-  //       'fixtures/cluster-dimension.grammar.csv',
-  //     );
+  it('should create dimensions out of CSV', async () => {
+    const dimensionGrammar: DimensionGrammar =
+      await service.dimensionGrammarService.createDimensionGrammarFromCSVDefinition(
+        'fixtures/cluster-dimension.grammar.csv',
+      );
 
-  //   expect(dimensionGrammar).toBeDefined();
-  //   const expectedDimensionGrammar: DimensionGrammar = {
-  //     name: 'cluster',
-  //     description: '',
-  //     type: 'dynamic',
-  //     storage: {
-  //       indexes: ['name'],
-  //       primaryId: 'cluster_id',
-  //       retention: null,
-  //       bucket_size: null,
-  //     },
-  //     schema: {
-  //       title: 'cluster',
-  //       psql_schema: 'dimensions',
-  //       properties: {
-  //         cluster_id: {
-  //           type: 'string',
-  //           unique: true,
-  //         },
-  //         cluster_name: {
-  //           type: 'string',
-  //           unique: true,
-  //         },
-  //         block_id: {
-  //           type: 'string',
-  //           unique: false,
-  //         },
-  //         block_name: {
-  //           type: 'string',
-  //           unique: false,
-  //         },
-  //         district_id: {
-  //           type: 'string',
-  //           unique: false,
-  //         },
-  //         district_name: {
-  //           type: 'string',
-  //           unique: false,
-  //         },
-  //         latitude: {
-  //           type: 'string',
-  //           unique: false,
-  //         },
-  //         longitude: {
-  //           type: 'string',
-  //           unique: false,
-  //         },
-  //       },
-  //       indexes: [
-  //         {
-  //           columns: [['cluster_name']],
-  //         },
-  //       ],
-  //     },
-  //   };
-  //   expect(dimensionGrammar).toEqual(expectedDimensionGrammar);
+    expect(dimensionGrammar).toBeDefined();
+    const expectedDimensionGrammar: DimensionGrammar = {
+      name: 'cluster',
+      description: '',
+      type: 'dynamic',
+      storage: {
+        indexes: ['name'],
+        primaryId: 'cluster_id',
+        retention: null,
+        bucket_size: null,
+      },
+      schema: {
+        title: 'cluster',
+        psql_schema: 'dimensions',
+        properties: {
+          cluster_id: {
+            type: 'string',
+            unique: true,
+          },
+          cluster_name: {
+            type: 'string',
+            unique: true,
+          },
+          block_id: {
+            type: 'string',
+            unique: false,
+          },
+          block_name: {
+            type: 'string',
+            unique: false,
+          },
+          district_id: {
+            type: 'string',
+            unique: false,
+          },
+          district_name: {
+            type: 'string',
+            unique: false,
+          },
+          latitude: {
+            type: 'string',
+            unique: false,
+          },
+          longitude: {
+            type: 'string',
+            unique: false,
+          },
+        },
+        indexes: [
+          {
+            columns: [['cluster_name']],
+          },
+        ],
+      },
+    };
+    expect(dimensionGrammar).toEqual(expectedDimensionGrammar);
 
-  //   //Pretty print dimensionGrammar object
-  //   // console.log(JSON.stringify(dimensionGrammar, null, 2));
-  // });
+    // Pretty print dimensionGrammar object
+    console.log(JSON.stringify(dimensionGrammar, null, 2));
+  });
 
-  // Run first
+  // // Run first
   // describe('CSV Ingest', () => {
   //   it('should process a CSV', async () => {
   //     const csvPath = 'fixtures/2023-01-11.csv';
@@ -354,23 +371,23 @@ describe('CsvAdapterService', () => {
   // });
 
   // Run second
-  // describe('Nuke DB', () => {
-  //   it('should test nuke database', async () => {
-  //     await service.nuke();
-  //     const pendingDimensions: any[] = await service.prisma
-  //       .$queryRaw`select * from pg_tables where schemaname = 'dimension'`;
-  //     const pendingDatasets: any[] = await service.prisma
-  //       .$queryRaw`select * from pg_tables where schemaname = 'datasets'`;
-  //     const currentDatasetGrammars =
-  //       await service.prisma.datasetGrammar.findMany();
-  //     const currentDimensionGrammars =
-  //       await service.prisma.dimensionGrammar.findMany();
-  //     const currenEventGrammars = await service.prisma.eventGrammar.findMany();
-  //     expect(currenEventGrammars.length).toEqual(0);
-  //     expect(currentDimensionGrammars.length).toEqual(0);
-  //     expect(currentDatasetGrammars.length).toEqual(0);
-  //     expect(pendingDimensions.length).toEqual(0);
-  //     expect(pendingDatasets.length).toEqual(0);
-  //   });
-  // });
+   describe('Nuke DB', () => {
+   it('should test nuke database', async () => {
+       await service.nuke();
+      const pendingDimensions: any[] = await service.prisma
+         .$queryRaw`select * from pg_tables where schemaname = 'dimension'`;
+       const pendingDatasets: any[] = await service.prisma
+         .$queryRaw`select * from pg_tables where schemaname = 'datasets'`;
+       const currentDatasetGrammars =
+        await service.prisma.datasetGrammar.findMany();
+       const currentDimensionGrammars =
+         await service.prisma.dimensionGrammar.findMany();
+       const currenEventGrammars = await service.prisma.eventGrammar.findMany();
+       expect(currenEventGrammars.length).toEqual(0);
+       expect(currentDimensionGrammars.length).toEqual(0);
+       expect(currentDatasetGrammars.length).toEqual(0);
+       expect(pendingDimensions.length).toEqual(0);
+       expect(pendingDatasets.length).toEqual(0);
+     });
+   });
 });
