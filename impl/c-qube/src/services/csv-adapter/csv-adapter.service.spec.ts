@@ -10,7 +10,7 @@ import * as csv from 'csv-parser';
 import { DimensionGrammarService } from './parser/dimension-grammar/dimension-grammar.service';
 import { Pool } from 'pg';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+const path = require('path');// eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs').promises;
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs1 = require('fs');
@@ -56,7 +56,6 @@ describe('CsvAdapterService', () => {
 
     service = module.get<CsvAdapterService>(CsvAdapterService);
   });
-
   // it('should be defined', () => {
   //   expect(service).toBeDefined();
   // });
@@ -181,6 +180,35 @@ describe('CsvAdapterService', () => {
     expect(responseWithError).toBe('error from test');
   });
 
+    // it('should ingest data and parse the config correctly', async () => {
+    //   const mockIngestionFolder = path.join(__dirname, 'impl/c-qube/test/fixtures/ingestionConfigs/programs/test-complete-ingestion');
+    //   const mockConfigFileName = 'test/fixtures/ingestionConfigs/config.complete.json';
+
+    //   const mockNuke = jest.fn();
+    //   service.nuke = mockNuke;
+    //   expect(service.nuke).toHaveBeenCalled();
+    // });
+    // it('should handle invalid ingestionFolder path', async () => {
+    //   const invalidFolderPath = 'invalid/path';
+    //   const configFileName = 'config.json';
+    
+    //   try {
+    //     await service.ingest(invalidFolderPath, configFileName);
+    //   } catch (error) {
+    //     expect(error).toBeDefined();
+
+    //   }
+    // });
+  
+    // it('should handle invalid ingestionConfigFileName', async () => {
+    //   const validFolderPath = './ingest';
+    //   const invalidConfigFileName = 'invalid-config.json';
+  
+    //   await expect(service.ingest(validFolderPath, invalidConfigFileName)).rejects.toThrow();
+    // });
+    
+    
+  
   // it('should create dimensions out of CSV', async () => {
   //   const dimensionGrammar: DimensionGrammar =
   //     await createDimensionGrammarFromCSVDefinition(
