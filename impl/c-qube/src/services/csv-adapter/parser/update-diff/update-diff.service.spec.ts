@@ -18,11 +18,11 @@ describe('tests the file diff generator', () => {
 
   it('should generate two arrays', async () => {
     const oldFilePath =
-      './test/fixtures/test-csvs/update-diff/mealserved-ingested.data.csv';
+      './test/fixtures/test-csvs/update-diff/avgplaytime-ingested.data.csv';
     const newFilePath =
-      './test/fixtures/test-csvs/update-diff/mealserved-update.data.csv';
+      './test/fixtures/test-csvs/update-diff/avgplaytime-update.data.csv';
     const grammarFilePath =
-      './test/fixtures/test-csvs/update-diff/mealserved-event.grammar.csv';
+      './test/fixtures/test-csvs/update-diff/avgplaytime-event.grammar.csv';
     const { filePath, finalContent } = await getDataDifference(
       oldFilePath,
       newFilePath,
@@ -31,12 +31,17 @@ describe('tests the file diff generator', () => {
     );
     console.log(finalContent);
     expect(finalContent).toBeDefined(); //
-    const res = ['district_id,total_meals_served', '202,1', '202,-2'];
+    const res = [
+      'state_id,grade_diksha,subject_diksha,avg_play_time_in_mins_on_app_and_portal',
+      '12,Class 8,History,3.24',
+      '12,Class 8,History,-1.68',
+    ];
+    // const res = ['district_id,total_meals_served', '202,1', '202,-2'];
     // expect(data).toMatchObject(res);
     // expect(data).toEqual({
     //   toBeDeleted: ['202,2'],
     //   toBeInserted: ['202,1'],
     // });
-    // expect(data).toEqual(res);
+    expect(finalContent).toEqual(res);
   });
 });
