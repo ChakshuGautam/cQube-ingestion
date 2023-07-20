@@ -9,40 +9,40 @@ const fs1 = require('fs');
 const readline = require('readline');
 
 
-// Define the input and output file paths
-const inputFilePath = 'test-input.csv';
-const outputFilePath = 'test-output.csv';
+// // Define the input and output file paths
+// const inputFilePath = 'test-input.csv';
+// const outputFilePath = 'test-output.csv';
 
-// Create a sample input file
-fs1.writeFileSync(inputFilePath, 'Hello, "World"\n');
+// // Create a sample input file
+// fs1.writeFileSync(inputFilePath, 'Hello, "World"\n');
 
-// Call the processCsv function and wait for it to complete
-processCsv(inputFilePath, outputFilePath)
-  .then((result) => {
-    console.log('Process completed:', result);
+// // Call the processCsv function and wait for it to complete
+// processCsv(inputFilePath, outputFilePath)
+//   .then((result) => {
+//     console.log('Process completed:', result);
 
-    // Assert that the output file exists
-    if (fs1.existsSync(outputFilePath)) {
-      console.log('Output file exists.');
+//     // Assert that the output file exists
+//     if (fs1.existsSync(outputFilePath)) {
+//       console.log('Output file exists.');
 
-      // Read the contents of the output file and assert its value
-      const outputContent = fs1.readFileSync(outputFilePath, 'utf8');
-      if (outputContent === 'Hello, World\n') {
-        console.log('Output content is correct.');
-      } else {
-        console.log('Output content is incorrect.');
-      }
-    } else {
-      console.log('Output file does not exist.');
-    }
+//       // Read the contents of the output file and assert its value
+//       const outputContent = fs1.readFileSync(outputFilePath, 'utf8');
+//       if (outputContent === 'Hello, World\n') {
+//         console.log('Output content is correct.');
+//       } else {
+//         console.log('Output content is incorrect.');
+//       }
+//     } else {
+//       console.log('Output file does not exist.');
+//     }
 
-    // Clean up the files
-    fs1.unlinkSync(inputFilePath);
-    fs1.unlinkSync(outputFilePath);
-  })
-  .catch((error) => {
-    console.error('An error occurred:', error);
-  });
+//     // Clean up the files
+//     fs1.unlinkSync(inputFilePath);
+//     fs1.unlinkSync(outputFilePath);
+//   })
+//   .catch((error) => {
+//     console.error('An error occurred:', error);
+//   });
 
 describe('remove empty lines', () => {
   // TODO: Ask what the ReadCSV function does
