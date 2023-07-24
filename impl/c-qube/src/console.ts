@@ -5,12 +5,10 @@ import { resetLogs } from './utils/debug';
 import { intro, outro } from '@clack/prompts';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { DeleteService } from './services/delete/delete.service';
 
 async function bootstrap() {
   const application = await NestFactory.createApplicationContext(AppModule);
   const csvAdapterService = application.get(CsvAdapterService);
-  const deleteService = application.get(DeleteService);
   resetLogs();
 
   yargs(hideBin(process.argv))
@@ -84,29 +82,6 @@ async function bootstrap() {
             name: filter,
           });
         }
-        await application.close();
-        process.exit(0);
-      },
-    )
-    .command(
-      'update',
-      'Update the datarows',
-      (yargs) => {
-        yargs.option('filter', {
-          alias: 'f',
-          type: 'string',
-          default: 'none',
-          describe: 'Filter datasets to ingest',
-        });
-      },
-      async (argv) => {
-        process.env['DEBUG'] = argv.debug.toString();
-        await deleteService.deleteData(
-          './test/fixtures/test-csvs/update-diff/avgplaytime-update.data.csv',
-          './test/fixtures/test-csvs/update-diff/avgplaytime-ingested.data.csv',
-          './test/fixtures/test-csvs/update-diff/avgplaytime-event.grammar.csv',
-          'diksha_avg_',
-        );
         await application.close();
         process.exit(0);
       },
