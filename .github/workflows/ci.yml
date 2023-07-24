@@ -60,9 +60,7 @@ jobs:
       - name: Tests
         working-directory: impl/c-qube
         run: |
-          # yarn test
           yarn test:all
-          # yarn test:cov
 
       - name: Stop DBs
         working-directory: .
