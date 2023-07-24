@@ -3,6 +3,7 @@ const fs = require('fs').promises;
 
 import * as csv from 'csv-parser';
 
+const configPath = 'ingest/config.json';
 export async function readCSV(filePath: string): Promise<string[][]> {
   return new Promise((resolve, reject) => {
     const rows: string[][] = [];
@@ -11,7 +12,11 @@ export async function readCSV(filePath: string): Promise<string[][]> {
       .createReadStream(filePath)
       .pipe(csv({ separator: ',', headers: false, quote: "'" }))
       .on('data', (data) => {
-        rows.push(Object.values(data));
+        const rowValues: string[] = Object.values(data);
+        const processedRowValues = FKvalue(configPath)
+          ? rowValues
+          : rowValues.map((value) => value.toLowerCase());
+        rows.push(processedRowValues);
       })
       .on('end', () => {
         resolve(rows);
@@ -30,3 +35,9 @@ export async function readCSVFile(filePath: string): Promise<string[]> {
     .map((row: string) => row.trim())
     .filter((row: string) => row !== '');
 }
+
+export function FKvalue(configPath: string): boolean {
+  const configContent = fs1.readFileSync(configPath, 'utf-8');
+  const config = JSON.parse(configContent);
+  return config.globals.caseSensitiveFKSearch || false ;
+} 
