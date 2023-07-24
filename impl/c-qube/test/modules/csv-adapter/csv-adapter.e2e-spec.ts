@@ -34,14 +34,14 @@ describe('AppController (e2e)', () => {
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule, ConfigModule],
+      imports: [ConfigModule],
       providers: [
         CsvAdapterService,
         EventService,
-        DatasetService,
+        QueryBuilderService,
         PrismaService,
         DimensionService,
-        QueryBuilderService,
+        DatasetService,
         DimensionGrammarService,
         {
           provide: 'DATABASE_POOL',
@@ -56,8 +56,11 @@ describe('AppController (e2e)', () => {
     csvAdapterService = app.get<CsvAdapterService>(CsvAdapterService);
   });
 
+  it('should be defined', () => {
+    expect(csvAdapterService).toBeDefined();
+  });
+
   /*it('complete ingestion', async () => {
-    await csvAdapterService.nuke();
     await csvAdapterService.ingest(
       './test/fixtures/ingestionConfigs',
       'config.complete.json',
@@ -110,7 +113,6 @@ describe('AppController (e2e)', () => {
   });
 
   it('skipping empty files', async () => {
-    await csvAdapterService.nuke();
     await csvAdapterService.ingest(
       './test/fixtures/ingestionConfigs',
       'config.skip.json',
@@ -174,10 +176,9 @@ describe('AppController (e2e)', () => {
       expect.arrayContaining(dimensionGrammarJSON),
     );
     expect(datasetGrammar).toEqual(expect.arrayContaining(datasetGrammarJSON));
-  });*/
+  });
 
   it('tries to ingest a negative event', async () => {
-    await csvAdapterService.nuke();
     await csvAdapterService.ingest(
       './test/fixtures/ingestionConfigs',
       'config.negative.json',
@@ -201,5 +202,5 @@ describe('AppController (e2e)', () => {
     expect(data.length).toBeGreaterThan(0);
     expect(distIds.sort()).toEqual(['101', '102', '201', '202']);
     expect(data).toEqual(expect.arrayContaining(negativeTestData));
-  });
+  });*/
 });

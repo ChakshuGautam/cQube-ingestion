@@ -68,7 +68,8 @@ jobs:
         working-directory: impl/c-qube
         run: |
           # yarn test
-          yarn test:cov
+          yarn test:all
+          # yarn test:cov
 
       - name: Stop DBs
         working-directory: .
