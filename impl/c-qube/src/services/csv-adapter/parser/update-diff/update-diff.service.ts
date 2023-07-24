@@ -44,6 +44,7 @@ export const getDataDifference = async (
     const metricIdxs = [];
     if (grammarFilePath) {
       const grammarContent: string[] = await readCSVFile(grammarFilePath);
+      console.log('grammarContent: ', grammarContent);
       const lastRow = grammarContent[4].split(',');
       // console.log('lastROw: ', lastRow);
       lastRow.forEach((cell: string, idx: number) => {

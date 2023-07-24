@@ -2,4 +2,4 @@ state,
 state_id,
 string,integer
 state_id,plays_per_capita
-dimension,metric
+dimension,metric
