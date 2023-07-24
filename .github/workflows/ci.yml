@@ -55,14 +55,7 @@ jobs:
       # - name: build
       #   working-directory: impl/c-qube
       #   run: |
-      #     yarn install
       #     yarn build
-
-      - name: build
-        working-directory: impl/c-qube
-        run: |
-          yarn install
-          yarn build
 
       - name: Tests
         working-directory: impl/c-qube
