@@ -17,7 +17,7 @@
     "test:docker:down": "docker-compose -f docker-compose.test.yaml down",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
+    "test:cov": "jest --coverage --coverageDirectory='../../../coverage'",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "yarn prisma migrate deploy && jest --config ./test/jest-e2e.json",
     "test:all": "yarn test:cov && yarn test:e2e",
