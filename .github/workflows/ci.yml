@@ -36,6 +36,11 @@ jobs:
         run: |
           touch .env
           echo "DATABASE_URL="postgres://timescaledb:postgrespassword@localhost:5432/postgres?sslmode=disable"" > .env
+          echo "DB_USERNAME="timescaledb"" >> .env
+          echo "DB_HOST="localhost"" >> .env
+          echo "DB_NAME="postgres"" >> .env
+          echo "DB_PASSWORD="postgrespassword"" >> .env
+          echo "DB_PORT=5432" >> .env
 
       - name: Install dependencies
         working-directory: impl/c-qube
