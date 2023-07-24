@@ -55,12 +55,12 @@ export class DeleteService {
       });
 
       where = where.slice(0, -4);
-      console.log('where: ', where);
+      // console.log('where: ', where);
       updateQueries.push(
         this.qbService.generateUpdateStatement(dataset, data, where),
       );
     }
-    console.log('updateQueries: ', updateQueries);
+    // console.log('updateQueries: ', updateQueries);
     fs.writeFileSync(`./sql/${Date.now()}.sql`, updateQueries.join(';\n'));
     return updateQueries;
   }
@@ -87,7 +87,7 @@ export class DeleteService {
     // but there will only be one row per dataset table, hence this should be
     // generating update queries and then running a prisma transaction for it
     const updateQueries = await this.updateDatasets(durs); //[0], data);
-    console.log('updateQueries: ', updateQueries);
+    // console.log('updateQueries: ', updateQueries);
     await this.prisma.$transaction(
       updateQueries.map((query) => this.prisma.$executeRawUnsafe(query)),
     );
@@ -135,7 +135,7 @@ export class DeleteService {
         filePath,
       )
         .then(async (s) => {
-          console.log(s);
+          // console.log(s);
           const events: Event[] = s;
 
           const pipe: Pipe = {

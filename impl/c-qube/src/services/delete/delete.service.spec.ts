@@ -59,6 +59,12 @@ describe('DeleteService', () => {
     deleteService = module.get<DeleteService>(DeleteService);
     csvAdapterService = module.get<CsvAdapterService>(CsvAdapterService);
     prismaService = module.get<PrismaService>(PrismaService);
+
+    // ingest the dimension
+    await csvAdapterService.ingest();
+
+    // ingest the data
+    await csvAdapterService.ingestData({});
   });
 
   it('should be defined', () => {
@@ -66,8 +72,8 @@ describe('DeleteService', () => {
   });
 
   it('should update a single row for an event with only single dimensions (diksha_avg_playtime)', async () => {
-    await csvAdapterService.ingest();
-    await csvAdapterService.ingestData({});
+    // await csvAdapterService.ingest();
+    // await csvAdapterService.ingestData({});
     const tables = [
       'diksha_avg_play_time_in_mins_on_app_and_portal_grade',
       'diksha_avg_play_time_in_mins_on_app_and_portal_state',
@@ -79,7 +85,7 @@ describe('DeleteService', () => {
       const data = await prismaService.$queryRawUnsafe(
         `SELECT sum, count, avg FROM datasets.${table}`,
       );
-      console.log(data);
+      // console.log(data);
       (data as any[]).forEach((item) => oldData.push(item));
     }
 
@@ -103,7 +109,7 @@ describe('DeleteService', () => {
       const data = await prismaService.$queryRawUnsafe(
         `SELECT sum, count, avg FROM datasets.${table}`,
       );
-      console.log(data);
+      // console.log(data);
       (data as any[]).forEach((item) => updatedData.push(item));
     }
 
@@ -118,8 +124,8 @@ describe('DeleteService', () => {
   });
 
   it('should update two rows for an event with only single dimensions (diksha_avg_playtime)', async () => {
-    await csvAdapterService.ingest();
-    await csvAdapterService.ingestData({});
+    // await csvAdapterService.ingest();
+    // await csvAdapterService.ingestData({});
     const tables = [
       'diksha_avg_play_time_in_mins_on_app_and_portal_grade',
       'diksha_avg_play_time_in_mins_on_app_and_portal_state',
@@ -131,7 +137,7 @@ describe('DeleteService', () => {
       const data = await prismaService.$queryRawUnsafe(
         `SELECT sum, count, avg FROM datasets.${table}`,
       );
-      console.log(data);
+      // console.log(data);
       (data as any[]).forEach((item) => oldData.push(item));
     }
 
@@ -155,7 +161,7 @@ describe('DeleteService', () => {
       const data = await prismaService.$queryRawUnsafe(
         `SELECT sum, count, avg FROM datasets.${table}`,
       );
-      console.log(data);
+      // console.log(data);
       (data as any[]).forEach((item) => updatedData.push(item));
     }
 
@@ -170,8 +176,8 @@ describe('DeleteService', () => {
   });
 
   it('should update the data for an event with single + compound dimensions (diksha_lined_qr)', async () => {
-    await csvAdapterService.ingest();
-    await csvAdapterService.ingestData({});
+    // await csvAdapterService.ingest();
+    // await csvAdapterService.ingestData({});
     const tables = [
       'diksha_linked_qr_count_grade',
       'diksha_linked_qr_count_textbookdiksha',
@@ -186,7 +192,7 @@ describe('DeleteService', () => {
       const data = await prismaService.$queryRawUnsafe(
         `SELECT sum, count, avg FROM datasets.${table}`,
       );
-      console.log(data);
+      // console.log(data);
       (data as any[]).forEach((item) => oldData.push(item));
     }
 
@@ -210,7 +216,7 @@ describe('DeleteService', () => {
       const data = await prismaService.$queryRawUnsafe(
         `SELECT sum, count, avg FROM datasets.${table}`,
       );
-      console.log(data);
+      // console.log(data);
       (data as any[]).forEach((item) => updatedData.push(item));
     }
 
@@ -292,15 +298,15 @@ describe('DeleteService', () => {
       'sch_att_studentsmarked_Yearly_gender',
     ];
 
-    await csvAdapterService.ingest();
-    await csvAdapterService.ingestData({});
+    // await csvAdapterService.ingest();
+    // await csvAdapterService.ingestData({});
     const oldData = [];
     for (let i = 0; i < tables.length; i++) {
       const table = tables[i];
       const data = await prismaService.$queryRawUnsafe(
         `SELECT sum, count, avg FROM datasets.${table}`,
       );
-      console.log(data);
+      // console.log(data);
       (data as any[]).forEach((item) => oldData.push(item));
     }
     // fs.writeFileSync(
@@ -323,7 +329,7 @@ describe('DeleteService', () => {
       const data = await prismaService.$queryRawUnsafe(
         `SELECT sum, count, avg FROM datasets.${table}`,
       );
-      console.log(data);
+      // console.log(data);
       (data as any[]).forEach((item) => updatedData.push(item));
     }
 
@@ -338,8 +344,8 @@ describe('DeleteService', () => {
   });
 
   it('should update try updating the file which has no changes from the ingested file', async () => {
-    await csvAdapterService.ingest();
-    await csvAdapterService.ingestData({});
+    // await csvAdapterService.ingest();
+    // await csvAdapterService.ingestData({});
     const tables = [
       'diksha_avg_play_time_in_mins_on_app_and_portal_grade',
       'diksha_avg_play_time_in_mins_on_app_and_portal_state',
@@ -351,7 +357,7 @@ describe('DeleteService', () => {
       const data = await prismaService.$queryRawUnsafe(
         `SELECT sum, count, avg FROM datasets.${table}`,
       );
-      console.log(data);
+      // console.log(data);
       (data as any[]).forEach((item) => oldData.push(item));
     }
 
@@ -370,7 +376,7 @@ describe('DeleteService', () => {
       const data = await prismaService.$queryRawUnsafe(
         `SELECT sum, count, avg FROM datasets.${table}`,
       );
-      console.log(data);
+      // console.log(data);
       (data as any[]).forEach((item) => updatedData.push(item));
     }
 
