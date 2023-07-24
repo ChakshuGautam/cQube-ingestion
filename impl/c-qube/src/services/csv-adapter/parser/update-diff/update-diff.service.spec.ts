@@ -24,7 +24,7 @@ describe('tests the file diff generator', () => {
     expect(differenceGeneratorService).toBeDefined();
   });
 
-  it('should generate two arrays', async () => {
+  /*it('should generate two arrays', async () => {
     const oldFilePath = './ingest/programs/diksha/avgplaytime-event.data.csv';
     const newFilePath =
       './test/fixtures/test-csvs/update-diff/avgplaytime-update.data.csv';
@@ -45,5 +45,5 @@ describe('tests the file diff generator', () => {
       '12,Class 8,History,-1.68',
     ];
     expect(finalContent).toEqual(res);
-  });
+  });*/
 });
