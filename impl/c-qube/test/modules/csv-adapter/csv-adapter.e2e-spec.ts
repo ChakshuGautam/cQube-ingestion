@@ -9,6 +9,7 @@ import { DatasetService } from './../../../src/services/dataset/dataset.service'
 import { DimensionService } from './../../../src/services/dimension/dimension.service';
 import { QueryBuilderService } from './../../../src/services/query-builder/query-builder.service';
 import { DimensionGrammarService } from './../../../src/services/csv-adapter/parser/dimension-grammar/dimension-grammar.service';
+import { DifferenceGeneratorService } from './../../../src/services/csv-adapter/parser/update-diff/update-diff.service';
 import { Pool } from 'pg';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
@@ -48,6 +49,7 @@ describe('AppController (e2e)', () => {
           inject: [ConfigService],
           useFactory: databasePoolFactory,
         },
+        DifferenceGeneratorService
       ],
     }).compile();
 

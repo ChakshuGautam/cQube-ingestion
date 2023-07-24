@@ -2,18 +2,26 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppController } from '../../../../app.controller';
 import { AppService } from '../../../../app.service';
 
-import { getDataDifference } from './update-diff.service';
+import { DifferenceGeneratorService } from './update-diff.service';
 
 describe('tests the file diff generator', () => {
   let appController: AppController;
+  let differenceGeneratorService: DifferenceGeneratorService;
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [AppController],
-      providers: [AppService],
+      providers: [AppService, DifferenceGeneratorService],
     }).compile();
 
     appController = app.get<AppController>(AppController);
+    differenceGeneratorService = app.get<DifferenceGeneratorService>(
+      DifferenceGeneratorService,
+    );
+  });
+
+  it('should be defined', () => {
+    expect(differenceGeneratorService).toBeDefined();
   });
 
   it('should generate two arrays', async () => {
@@ -22,12 +30,13 @@ describe('tests the file diff generator', () => {
       './test/fixtures/test-csvs/update-diff/avgplaytime-update.data.csv';
     const grammarFilePath =
       './ingest/programs/diksha/avgplaytime-event.grammar.csv';
-    const { filePath, finalContent } = await getDataDifference(
-      oldFilePath,
-      newFilePath,
-      grammarFilePath,
-      './test/fixtures/test-csvs/update-diff',
-    );
+    const { filePath, finalContent } =
+      await differenceGeneratorService.getDataDifference(
+        oldFilePath,
+        newFilePath,
+        grammarFilePath,
+        './test/fixtures/test-csvs/update-diff',
+      );
     console.log(finalContent);
     expect(finalContent).toBeDefined(); //
     const res = [
@@ -35,12 +44,6 @@ describe('tests the file diff generator', () => {
       '12,Class 8,History,3.24',
       '12,Class 8,History,-1.68',
     ];
-    // const res = ['district_id,total_meals_served', '202,1', '202,-2'];
-    // expect(data).toMatchObject(res);
-    // expect(data).toEqual({
-    //   toBeDeleted: ['202,2'],
-    //   toBeInserted: ['202,1'],
-    // });
     expect(finalContent).toEqual(res);
   });
 });

@@ -25,6 +25,7 @@ import * as compound_old from '../../../test/fixtures/outputDatasets/update/comp
 import * as compound_updated from '../../../test/fixtures/outputDatasets/update/compound_updated.json';
 import * as time_old from '../../../test/fixtures/outputDatasets/update/time_old.json';
 import * as time_updated from '../../../test/fixtures/outputDatasets/update/time_updated.json';
+import { DifferenceGeneratorService } from '../csv-adapter/parser/update-diff/update-diff.service';
 
 describe('DeleteService', () => {
   let deleteService: DeleteService;
@@ -53,6 +54,7 @@ describe('DeleteService', () => {
           useFactory: databasePoolFactory,
         },
         DeleteService,
+        DifferenceGeneratorService,
       ],
     }).compile();
 

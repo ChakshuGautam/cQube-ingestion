@@ -14,6 +14,7 @@ import { InstrumenttypeService } from '../../../src/services/instrumenttype/inst
 import { VizService } from '../../../src/services/viz/viz.service';
 import { ConfigService } from '@nestjs/config';
 import { databasePoolFactory } from '../../../src/app.module';
+import { DifferenceGeneratorService } from '../../../src/services/csv-adapter/parser/update-diff/update-diff.service';
 
 // output dataset JSONs
 
@@ -53,6 +54,7 @@ describe('DeleteService', () => {
           useFactory: databasePoolFactory,
         },
         DeleteService,
+        DifferenceGeneratorService,
       ],
     }).compile();
 

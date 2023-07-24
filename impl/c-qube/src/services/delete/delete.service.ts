@@ -14,7 +14,7 @@ import { Event, EventGrammar, InstrumentType } from '../../types/event';
 import { Pipe } from 'src/types/pipe';
 import { defaultTransformers } from '../transformer/default.transformers';
 import { TransformerContext } from 'src/types/transformer';
-import { getDataDifference } from '../csv-adapter/parser/update-diff/update-diff.service';
+import { DifferenceGeneratorService } from '../csv-adapter/parser/update-diff/update-diff.service';
 import { getEGDefFromFile } from '../csv-adapter/parser/event-grammar/event-grammar.service';
 import { EventGrammarCSVFormat } from '../csv-adapter/types/parser';
 import { QueryBuilderService } from '../query-builder/query-builder.service';
@@ -34,6 +34,7 @@ export class DeleteService {
     private readonly prisma: PrismaService,
     private readonly datasetService: DatasetService,
     private readonly qbService: QueryBuilderService,
+    private readonly differenceGeneratorService: DifferenceGeneratorService,
   ) {}
 
   async updateDatasets(durs: DatasetUpdateRequest[]) {
@@ -98,12 +99,13 @@ export class DeleteService {
     eventGrammarFilePath: string,
     filter: string,
   ) {
-    const { filePath, finalContent } = await getDataDifference(
-      oldDataFilePath,
-      newDataFilePath,
-      eventGrammarFilePath,
-      './test/fixtures/test-csvs/update-diff',
-    );
+    const { filePath, finalContent } =
+      await this.differenceGeneratorService.getDataDifference(
+        oldDataFilePath,
+        newDataFilePath,
+        eventGrammarFilePath,
+        './test/fixtures/test-csvs/update-diff',
+      );
 
     // console.log(filePath, finalContent);
     // figure out row wise metric difference
