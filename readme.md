@@ -1,6 +1,6 @@
 ## Ingestion Process
 
-[![Coverage Status](https://coveralls.io/repos/github/techsavvyash/cQube-POCs/badge.svg?branch=master)](https://coveralls.io/github/techsavvyash/cQube-POCs?branch=master)
+[![codecov](https://codecov.io/gh/techsavvyash/cQube-ingestion/branch/update/graph/badge.svg?token=B9NSK3JR4C)](https://codecov.io/gh/techsavvyash/cQube-ingestion)
 [![Node.js CI](https://github.com/ChakshuGautam/cqube-ingestion/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/ChakshuGautam/cqube-ingestion/actions/workflows/ci.yml)
 
 ### Documentation
