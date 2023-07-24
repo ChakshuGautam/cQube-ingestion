@@ -17,12 +17,11 @@ describe('tests the file diff generator', () => {
   });
 
   it('should generate two arrays', async () => {
-    const oldFilePath =
-      './test/fixtures/test-csvs/update-diff/avgplaytime-ingested.data.csv';
+    const oldFilePath = './ingest/programs/diksha/avgplaytime-event.data.csv';
     const newFilePath =
       './test/fixtures/test-csvs/update-diff/avgplaytime-update.data.csv';
     const grammarFilePath =
-      './test/fixtures/test-csvs/update-diff/avgplaytime-event.grammar.csv';
+      './ingest/programs/diksha/avgplaytime-event.grammar.csv';
     const { filePath, finalContent } = await getDataDifference(
       oldFilePath,
       newFilePath,
