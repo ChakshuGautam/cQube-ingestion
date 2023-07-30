@@ -17,19 +17,6 @@ export const defaultTransformers: Transformer[] = [
       if (context.isChainable) {
         return modifiedEvents;
       } else {
-        // Generate Dataframe from events using EventGrammar
-        // const eventData = events
-        //   .map((event: cQubeEvent) => event.data)
-        //   .map((x) => {
-        //     return {
-        //       counter: parseInt(x['counter']),
-        //       date: x['date'],
-        //       name: x['name'],
-        //     };
-        //   })
-        //   .filter((x) => !Number.isNaN(x['counter']))
-        //   .filter((x) => x['date'] === '11/01/23');
-
         if (events.length > 0) {
           const eventData = events.map((event: cQubeEvent) => event.data);
           const eventGrammar = events[0].spec;
@@ -73,24 +60,14 @@ export const defaultTransformers: Transformer[] = [
                 ...datasetGrammar.dimensions.map((x) => x.key),
               )
               .agg(
-                // pl
-                //   .col(instrumentField)
-                //   .sum()
-                //   .div(
-                //     pl
-                //       .col(instrumentField)
-                //       .filter(pl.col(instrumentField).gtEq(0))
-                //       .count(),
-                //   )
-                //   .alias('avg'),
-                // pl
-                //   .col(instrumentField)
-                //   .filter(pl.col(instrumentField).gtEq(0))
-                //   .count()
-                //   .alias('count'),
                 pl.col(instrumentField).sum().alias('sum'),
                 pl.avg(instrumentField).alias('avg'),
                 pl.count(instrumentField).alias('count'),
+                pl
+                  .col(instrumentField)
+                  .filter(pl.col(instrumentField).lt(0))
+                  .count()
+                  .alias('negcount'),
               );
             // console.log('changedDF', changedDF);
             const datasetUpdateRequests: DatasetUpdateRequest[] = changedDF
@@ -98,10 +75,144 @@ export const defaultTransformers: Transformer[] = [
                 'count',
                 'sum',
                 'avg',
+                'negcount',
                 ...timeDimensionKeys,
                 ...datasetGrammar.dimensions.map((x) => x.key),
               )
               .map((x) => {
+                // console.log('x', x);
+                let indexOfTimeDimensions = 4; //0, 1, 2, 3 are count, sum, avg, negcount
+                const filterParams: Record<string, string> = {};
+                for (let i = 0; i < timeDimensionKeys.length; i++) {
+                  filterParams[`${timeDimensionKeys[i]}`] =
+                    x[indexOfTimeDimensions];
+                  indexOfTimeDimensions += 1;
+                }
+                for (let i = 0; i < datasetGrammar.dimensions.length; i++) {
+                  filterParams[`${datasetGrammar.dimensions[i].key}`] =
+                    x[indexOfTimeDimensions];
+                  indexOfTimeDimensions += 1;
+                }
+                console.log('negcount', x[3]);
+                const finalCount = x[0] - 2 * x[3];
+                return {
+                  dataset: datasetGrammar,
+                  dimensionFilter: eventGrammar.name,
+                  updateParams: {
+                    count: finalCount,
+                    sum: x[1],
+                    avg: finalCount > 0 ? x[1] / finalCount : x[2],
+                  },
+                  filterParams,
+                };
+              });
+            return datasetUpdateRequests;
+          } catch (e) {
+            console.log(e);
+            console.log(eventData[0]);
+            console.log(timeDimensionKeys);
+            console.log(datasetGrammar.timeDimension);
+            console.log(datasetGrammar.dimensions.map((x) => x.key));
+            console.log(datasetGrammar.name);
+          }
+        } else {
+          console.error(
+            'No events for the following dataset',
+            context.dataset.name,
+          );
+          return [];
+        }
+      }
+    },
+  },
+  {
+    name: 'passThrough',
+    suggestiveEvent: [],
+    suggestiveDataset: [],
+    isChainable: true,
+    transformSync: (callback, context, events) => {
+      callback(null, context, events);
+      const modifiedEvents = events;
+      if (context.isChainable) {
+        return modifiedEvents;
+      } else {
+        // Generate Dataframe from events using EventGrammar
+        // const eventData = events
+        //   .map((event: cQubeEvent) => event.data)
+        //   .map((x) => {
+        //     return {
+        //       counter: parseInt(x['counter']),
+        //       date: x['date'],
+        //       name: x['name'],
+        //     };
+        //   })
+        //   .filter((x) => !Number.isNaN(x['counter']))
+        //   .filter((x) => x['date'] === '11/01/23');
+
+        if (events.length > 0) {
+          const eventData = events.map((event: cQubeEvent) => event.data);
+          // console.log('eventData', eventData);
+          const eventGrammar = events[0].spec;
+          const datasetGrammar = context.dataset;
+
+          const instrumentField = eventGrammar.instrument_field;
+          const timeDimensionKeys: string[] = [];
+
+          try {
+            if (datasetGrammar.timeDimension) {
+              if (datasetGrammar.timeDimension.key === 'date') {
+                timeDimensionKeys.push('date');
+              } else if (datasetGrammar.timeDimension.key === 'month') {
+                timeDimensionKeys.push('month');
+                timeDimensionKeys.push('year');
+              } else if (datasetGrammar.timeDimension.key === 'week') {
+                timeDimensionKeys.push('week');
+                timeDimensionKeys.push('year');
+              } else {
+                timeDimensionKeys.push('year');
+              }
+            }
+          } catch (e) {
+            console.log(e);
+            console.log(datasetGrammar.timeDimension.key);
+          }
+
+          // TODO: Change the above date string to regex
+          // console.log(
+          //   eventData[0],
+          //   datasetGrammar.dimensions.map((x) => x.key),
+          //   datasetGrammar.name,
+          // );
+          const newDF: DataFrame = pl.readRecords(eventData, {
+            inferSchemaLength: 10,
+          });
+          try {
+            const changedDF = newDF
+              .groupBy(
+                ...timeDimensionKeys,
+                ...datasetGrammar.dimensions.map((x) => x.key),
+              )
+              .agg(
+                pl
+                  .col(instrumentField)
+                  .filter(pl.col(instrumentField).lt(0))
+                  .count()
+                  .alias('negcount'),
+                pl.col(instrumentField).sum().alias('sum'),
+                // pl.avg(instrumentField).alias('avg'),
+                pl.count(instrumentField).alias('count'),
+              );
+            // console.log('changedDF', changedDF);
+            const datasetUpdateRequests: DatasetUpdateRequest[] = changedDF
+              .select(
+                'count',
+                'sum',
+                'negcount',
+                ...timeDimensionKeys,
+                ...datasetGrammar.dimensions.map((x) => x.key),
+              )
+              .map((x) => {
+                // console.log('x: ', x);
                 let indexOfTimeDimensions = 3; //0, 1, 2 are count, sum, avg
                 const filterParams: Record<string, string> = {};
                 for (let i = 0; i < timeDimensionKeys.length; i++) {
@@ -121,11 +232,15 @@ export const defaultTransformers: Transformer[] = [
                   updateParams: {
                     count: x[0],
                     sum: x[1],
-                    avg: x[2],
+                    negcount: x[2],
                   },
                   filterParams,
                 };
               });
+            // console.log(
+            //   'datasetUpdateRequests in transformer',
+            //   datasetUpdateRequests,
+            // );
             return datasetUpdateRequests;
           } catch (e) {
             console.log(e);

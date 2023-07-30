@@ -304,10 +304,25 @@ export class DatasetService {
   }
 
   async insertDatasetData(datasetGrammar: DatasetGrammar, data): Promise<void> {
-    const insertQuery = this.qbService.generateInsertStatement(
+    let insertQuery = this.qbService.generateInsertStatement(
       datasetGrammar.schema,
       data,
     );
+
+    // console.log('insertQuery: ', insertQuery);
+
+    insertQuery = this.qbService.addOnConflictStatement(
+      datasetGrammar.schema.title,
+      insertQuery,
+    );
+
+    fs.writeFileSync(
+      `./sql/single/${datasetGrammar.schema.title}-${Date.now()}.sql`,
+      insertQuery,
+    );
+
+    // console.log('insertQuery: ', insertQuery);
+
     await this.prisma.$queryRawUnsafe(insertQuery);
   }
 
@@ -332,35 +347,22 @@ export class DatasetService {
       data,
     );
 
+    fs.writeFileSync(
+      `./sql/bulk/${datasetGrammar.schema.title}.sql`,
+      insertQueries,
+    );
+    // console.log('insertQueries: ', insertQueries);
+
+    // insertQueries = this.qbService.addOnConflictStatement(
+    //   datasetGrammar.schema.title,
+    //   insertQueries,
+    // );
+
+    // console.log('insertQueries: ', insertQueries);
+    // TODO: Turn this below thing into a transaction which runs multiple queries
     return this.pool.query(insertQueries).then((res: QueryResult) => {
       return res.rows;
     });
-
-    // try {
-    //   await this.prisma
-    //     .$transaction(
-    //       insertQueries.map((q: string) => {
-    //         this.logger.debug(`Executing query: ${q}`);
-    //         return this.prisma.$queryRawUnsafe(q);
-    //       }),
-    //     )
-    //     .catch((err) => {
-    //       console.log(err);
-    //     });
-    //   insertQueries.forEach(async (q: string) => {
-    //     await this.prisma
-    //       .$queryRawUnsafe(q)
-    //       .then((res) => {
-    //         this.logger.log('query successful');
-    //       })
-    //       .catch((err) => {
-    //         this.logger.error(`err in query raw unsafe: `, err);
-    //       });
-    //   });
-    // } catch (err) {
-    //   console.error(err);
-    //   throw err;
-    // }
   }
 
   async processDatasetUpdateRequest(
@@ -401,7 +403,7 @@ export class DatasetService {
       .catch(async (error) => {
         console.log('error: ', error);
         this.logger.error(
-          `ERROR Inserting Data in Bulk: ${durs[0].dataset.name}. Trying them 1 by 1`,
+          `ERROR Inserting Data in Bulk: ${durs[0].dataset.name}. Table: ${durs[0].dataset.schema.title} Trying them 1 by 1`,
         );
         // start ingesting one by one and print row if cannot be ingested
         let rowsIngested = 0;

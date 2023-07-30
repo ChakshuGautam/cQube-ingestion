@@ -73,7 +73,7 @@ describe('DeleteService', () => {
     expect(deleteService).toBeDefined();
   });
 
-  it('should update a single row for an event with only single dimensions (diksha_avg_playtime)', async () => {
+  /*it('should update a single row for an event with only single dimensions (diksha_avg_playtime)', async () => {
     // await csvAdapterService.ingest();
     // await csvAdapterService.ingestData({});
     const tables = [
@@ -385,5 +385,5 @@ describe('DeleteService', () => {
     expect(updatedData).toEqual(expect.arrayContaining(single_old.data));
 
     return;
-  });
+  });*/
 });

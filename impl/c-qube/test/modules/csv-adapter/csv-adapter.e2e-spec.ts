@@ -12,16 +12,20 @@ import { DimensionGrammarService } from './../../../src/services/csv-adapter/par
 import { DifferenceGeneratorService } from './../../../src/services/csv-adapter/parser/update-diff/update-diff.service';
 import { Pool } from 'pg';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import * as fs from 'fs';
 
 import * as eventGrammarJSON from '../../fixtures/outputDatasets/specData/eventGrammar.json';
 import * as dimensionGrammarJSON from '../../fixtures/outputDatasets/specData/dimensionGrammar.json';
 import * as datasetGrammarJSON from '../../fixtures/outputDatasets/specData/datasetGrammar.json';
 import * as negativeTestData from '../../fixtures/outputDatasets/negative_e2e.json';
 import * as completeIngestionData from '../../fixtures/outputDatasets/complete_e2e.json';
+import * as allTables from '../../fixtures/table-list/alltables.json';
+import * as allTablesData from '../../fixtures/outputDatasets/allTables.json';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
   let csvAdapterService: CsvAdapterService;
+  let prismaService: PrismaService;
 
   const databasePoolFactory = async (configService: ConfigService) => {
     return new Pool({
@@ -49,18 +53,55 @@ describe('AppController (e2e)', () => {
           inject: [ConfigService],
           useFactory: databasePoolFactory,
         },
-        DifferenceGeneratorService
+        DifferenceGeneratorService,
       ],
     }).compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
     csvAdapterService = app.get<CsvAdapterService>(CsvAdapterService);
+    prismaService = app.get<PrismaService>(PrismaService);
   });
 
   it('should be defined', () => {
     expect(csvAdapterService).toBeDefined();
   });
+
+  /*it('should ingest the entire ingest folder correctly', async () => {
+    // ingest dimensions
+    await csvAdapterService.ingest();
+    // ingest data
+    await csvAdapterService.ingestData({});
+
+    // fetch the data from all tables
+
+    const tableData = [];
+
+    for (let i = 0; i < allTables.length; i++) {
+      const table = allTables[i];
+      const qData: any[] = await prismaService.$queryRawUnsafe(
+        `SELECT * FROM datasets.${table}`,
+      );
+      console.log(...qData);
+      tableData.push(...qData);
+    }
+
+    const newData = [];
+
+    tableData.forEach((data) => {
+      delete data.id;
+      newData.push(data);
+    });
+
+    fs.writeFileSync(
+      './test/fixtures/outputDatasets/Tables.json',
+      JSON.stringify(newData),
+      'utf8',
+    );
+
+    expect(tableData).toBeDefined();
+    expect(newData).toEqual(expect.arrayContaining(allTablesData));
+  });*/
 
   /*it('complete ingestion', async () => {
     await csvAdapterService.ingest(
@@ -74,20 +115,20 @@ describe('AppController (e2e)', () => {
     const data: string[] = await csvAdapterService.prisma.$queryRawUnsafe(
       'SELECT avg, count, sum, month, year, academicyear_id, district_id  FROM datasets.test_complete_ingestion_testcompleteingestion_qvxsaup1nxb__b2rg',
     );
-
+ 
     let distIds: any[] = await csvAdapterService.prisma.$queryRawUnsafe(
       'SELECT DISTINCT district_id from datasets.test_complete_ingestion_meeting_conducted_weekly_district',
     );
     distIds = distIds.map((item) => item['district_id']);
     distIds = distIds.filter((item, idx) => distIds.indexOf(item) === idx);
-
+ 
     expect(data).toBeDefined();
     expect(data.length).toBeDefined();
     expect(data.length).toBeGreaterThan(0);
     expect(distIds.sort()).toEqual(['101', '102', '201', '202']);
     expect(data).toEqual(expect.arrayContaining(completeIngestionData));
   });
-
+ 
   it('partial ingestion', async () => {
     await csvAdapterService.ingest(
       './test/fixtures/ingestionConfigs',
@@ -97,23 +138,23 @@ describe('AppController (e2e)', () => {
       {},
       './test/fixtures/ingestionConfigs/programs/test-partial-ingestion',
     );
-
+ 
     const data: string[] = await csvAdapterService.prisma.$queryRawUnsafe(
       'SELECT * FROM datasets.test_partial_ingestion_meeting_conducted_daily_academicyear',
     );
-
+ 
     let distIds: any[] = await csvAdapterService.prisma.$queryRawUnsafe(
       'SELECT DISTINCT district_id from datasets.test_partial_ingestion_meeting_conducted_weekly_district',
     );
     distIds = distIds.map((item) => item['district_id']);
     distIds = distIds.filter((item, idx) => distIds.indexOf(item) === idx);
-
+ 
     expect(data).toBeDefined();
     expect(data.length).toBeDefined();
     expect(data.length).toBeGreaterThan(0);
     expect(distIds.sort()).toEqual(['101', '102', '201', '202']);
   });
-
+ 
   it('skipping empty files', async () => {
     await csvAdapterService.ingest(
       './test/fixtures/ingestionConfigs',
@@ -123,15 +164,15 @@ describe('AppController (e2e)', () => {
       {},
       './test/fixtures/ingestionConfigs/programs/test-skipping-ingestion',
     );
-
+ 
     const data = await csvAdapterService.prisma.$queryRawUnsafe(
       'SELECT * FROM datasets.test_skipping_ingestion_meeting_conducted_daily_academicyear',
     );
-
+ 
     expect(data).toBeDefined();
     expect(data).toEqual([]);
   });
-
+ 
   it('add test for spec', async () => {
     await csvAdapterService.ingest();
     const datasetGrammar =
@@ -148,7 +189,7 @@ describe('AppController (e2e)', () => {
           tableNameExpanded: true,
         },
       });
-
+ 
     const dimensionGrammar =
       await csvAdapterService.prisma.dimensionGrammar.findMany({
         select: {
@@ -159,7 +200,7 @@ describe('AppController (e2e)', () => {
           storage: true,
         },
       });
-
+ 
     const eventGrammar = await csvAdapterService.prisma.eventGrammar.findMany({
       select: {
         // id: true,
@@ -172,14 +213,14 @@ describe('AppController (e2e)', () => {
         eventType: true,
       },
     });
-
+ 
     expect(eventGrammar).toEqual(eventGrammarJSON);
     expect(dimensionGrammar).toEqual(
       expect.arrayContaining(dimensionGrammarJSON),
     );
     expect(datasetGrammar).toEqual(expect.arrayContaining(datasetGrammarJSON));
   });
-
+ 
   it('tries to ingest a negative event', async () => {
     await csvAdapterService.ingest(
       './test/fixtures/ingestionConfigs',
@@ -192,13 +233,13 @@ describe('AppController (e2e)', () => {
     const data: string[] = await csvAdapterService.prisma.$queryRawUnsafe(
       'SELECT avg, count, sum, month, year, academicyear_id, district_id  FROM datasets.test_complete_ingestion_testcompleteingestion_qvxsaup1nxb__b2rg',
     );
-
+ 
     let distIds: any[] = await csvAdapterService.prisma.$queryRawUnsafe(
       'SELECT DISTINCT district_id from datasets.test_complete_ingestion_meeting_conducted_weekly_district',
     );
     distIds = distIds.map((item) => item['district_id']);
     distIds = distIds.filter((item, idx) => distIds.indexOf(item) === idx);
-
+ 
     expect(data).toBeDefined();
     expect(data.length).toBeDefined();
     expect(data.length).toBeGreaterThan(0);

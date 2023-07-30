@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppController } from '../../../../app.controller';
 import { AppService } from '../../../../app.service';
-
+import * as fs from 'fs';
 import { DifferenceGeneratorService } from './update-diff.service';
 
 describe('tests the file diff generator', () => {
@@ -22,6 +22,23 @@ describe('tests the file diff generator', () => {
 
   it('should be defined', () => {
     expect(differenceGeneratorService).toBeDefined();
+  });
+
+  it('should test the combineData function', async () => {
+    const folderPath = './mock-minio/12-07-2023/cdc';
+    const header = 'date,school_id,attendance';
+    const outputLocation = './ingest/programs/cdc';
+
+    const deltaFilePath = await differenceGeneratorService.combineDeltaFiles(
+      folderPath,
+      header,
+      outputLocation,
+    );
+
+    console.log('deltaFilePath: ', deltaFilePath);
+    const deltaData = fs.readFileSync(deltaFilePath, 'utf-8');
+    expect(deltaData).toBeDefined();
+    return;
   });
 
   /*it('should generate two arrays', async () => {
