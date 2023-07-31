@@ -7,6 +7,7 @@ import {
   processCSVtoEventGrammarDefJSON,
 } from './event-grammar.helpers';
 import { createCompositeDimensionGrammar } from '../dimension-grammar/dimension-grammar.helpers';
+import { createEventGrammarFromCSVDefinition } from './event-grammar.service';
 const fs = require('fs');
 
 describe('EventGrammarService', () => {
@@ -42,6 +43,108 @@ describe('EventGrammarService', () => {
   //     },
   //   });
   // });
+
+  it('tests for blaklist implementation: ', async () => {
+    const data = await createEventGrammarFromCSVDefinition(
+      './ingest/programs/rev-and-monitor/block-event.grammar.csv',
+      './ingest/dimensions',
+      'test_complete_ingestion',
+      ['block'],
+    );
+
+    expect(data).toEqual([
+      {
+        file: './ingest/programs/rev-and-monitor/block-event.grammar.csv',
+        name: 'test_complete_ingestion_block_district_district_id',
+        instrument: { type: 0, name: 'counter' },
+        description: '',
+        instrument_field: 'meeting_conducted',
+        dimension: [
+          {
+            key: 'district_id',
+            dimension: {
+              name: {
+                name: 'district',
+                description: '',
+                type: 'dynamic',
+                storage: {
+                  indexes: ['name'],
+                  primaryId: 'district_id',
+                  retention: null,
+                  bucket_size: null,
+                },
+                schema: {
+                  title: 'district',
+                  psql_schema: 'dimensions',
+                  properties: {
+                    district_id: { type: 'string', unique: true },
+                    district_name: { type: 'string', unique: true },
+                    state_id: { type: 'string', unique: false },
+                    state_name: { type: 'string', unique: false },
+                    latitude: { type: 'string', unique: false },
+                    longitude: { type: 'string', unique: false },
+                  },
+                  indexes: [{ columns: [['district_name']] }],
+                },
+              },
+              mapped_to: 'district_id',
+            },
+          },
+        ],
+        is_active: true,
+        schema: {
+          properties: {
+            date: { type: 'string', format: 'date' },
+            meeting_conducted: { type: 'string', unique: true },
+            district_id: { type: 'string', unique: true },
+          },
+        },
+      },
+      {
+        file: './ingest/programs/rev-and-monitor/block-event.grammar.csv',
+        name: 'test_complete_ingestion_block_academicyear_academicyear_id',
+        instrument: { type: 0, name: 'counter' },
+        description: '',
+        instrument_field: 'meeting_conducted',
+        dimension: [
+          {
+            key: 'academicyear_id',
+            dimension: {
+              name: {
+                name: 'academicyear',
+                description: '',
+                type: 'dynamic',
+                storage: {
+                  indexes: ['name'],
+                  primaryId: 'academicyear_id',
+                  retention: null,
+                  bucket_size: null,
+                },
+                schema: {
+                  title: 'academicyear',
+                  psql_schema: 'dimensions',
+                  properties: {
+                    academicyear_id: { type: 'string', unique: true },
+                    academicyear: { type: 'string', unique: true },
+                  },
+                  indexes: [{ columns: [['academicyear']] }],
+                },
+              },
+              mapped_to: 'academicyear_id',
+            },
+          },
+        ],
+        is_active: true,
+        schema: {
+          properties: {
+            date: { type: 'string', format: 'date' },
+            meeting_conducted: { type: 'string', unique: true },
+            academicyear_id: { type: 'string', unique: true },
+          },
+        },
+      },
+    ]);
+  });
 
   it('tests createCompositeDimensionGrammars', () => {
     const dimensionColumns: Column[] = [

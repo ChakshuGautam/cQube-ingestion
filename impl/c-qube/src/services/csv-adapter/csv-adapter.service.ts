@@ -37,6 +37,7 @@ import {
 } from './parser/dataset/dataset-grammar.service';
 import { EventGrammarCSVFormat } from './types/parser';
 import { DimensionGrammarService } from './parser/dimension-grammar/dimension-grammar.service';
+import path from 'path';
 const chalk = require('chalk');
 const fs = require('fs').promises;
 const pl = require('nodejs-polars');
@@ -106,6 +107,7 @@ export class CsvAdapterService {
           'grammar',
           'data',
         );
+        // console.log('dimensionGrammar: ', dimensionGrammar);
         const df: DataFrame = pl.readCSV(dimensionDataFileName, {
           quoteChar: "'",
           ignoreErrors: true,
@@ -186,6 +188,7 @@ export class CsvAdapterService {
     const eventGrammarsGlobal: EventGrammar[] = [];
     for (let j = 0; j < config?.programs.length; j++) {
       const inputFiles = readdirSync(config?.programs[j].input?.files);
+      const blacklistedSingleDimensions = config?.programs[j].blacklist;
       // For 1TimeDimension + 1EventCounter + 1Dimension
       for (let i = 0; i < inputFiles?.length; i++) {
         if (regexEventGrammar.test(inputFiles[i])) {
@@ -200,7 +203,9 @@ export class CsvAdapterService {
             eventGrammarFileName,
             dimensionGrammarFolder,
             config?.programs[j].namespace,
+            config?.programs[j]?.dimensions?.blacklisted,
           );
+          // console.log('eventGrammar: ', eventGrammar);
           eventGrammarsGlobal.push(...eventGrammar);
           for (let i = 0; i < eventGrammar.length; i++) {
             eventGrammar[i].program = config.programs[j].namespace;
@@ -399,6 +404,7 @@ export class CsvAdapterService {
 
     // iterate over all *.data.csv files inside programs folder
     const files = getFilesInDirectory(programDir);
+    // console.log('files: ', files);
 
     let promises = [];
     for (let i = 0; i < files.length; i++) {
@@ -431,11 +437,21 @@ export class CsvAdapterService {
     for (let i = 0; i < datasetGrammars.length; i++) {
       // EventGrammar doesn't include anything other thatn the fields
       // that are actually required.
+
+      // Ask if this is required to be there
+      // const eventGrammar: EventGrammar = datasetGrammars[i].eventGrammar;
+      // const overridingFileName = `${programDir}/${eventGrammar.file
+      //   .replace('grammar', 'data')
+      //   .split('/')
+      //   .slice(3)
+      //   .join('/')}`;
+
       promises.push(
         limit(() =>
           createDatasetDataToBeInserted(
             datasetGrammars[i]?.timeDimension?.type,
             datasetGrammars[i],
+            // overridingFileName,
           ).then(async (s) => {
             const events: Event[] = s;
             // Create Pipes
@@ -630,5 +646,26 @@ export class CsvAdapterService {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  public async processMinioCDCUpdates(minioFolderPath: string) {
+    let directories = [];
+
+    fs.readdir(minioFolderPath, (err, files) => {
+      if (err) {
+        console.error('Error reading directory:', err);
+        return;
+      }
+      // make this recursive
+      // Filter the list to include only directories
+      directories = files.filter((file) => {
+        const filePath = path.join(minioFolderPath, file);
+        return fs.statSync(filePath).isDirectory();
+      });
+    });
+
+
+    const dateRegex = /a/;
+
   }
 }

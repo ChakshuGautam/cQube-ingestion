@@ -1,0 +1,5 @@
+,school,
+,school_id,
+date,string,integer
+date,school_id,attendance
+timeDimension,dimension,metric

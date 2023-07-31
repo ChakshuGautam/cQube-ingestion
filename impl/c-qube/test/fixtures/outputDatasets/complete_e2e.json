@@ -1,0 +1,38 @@
+[
+  {
+    "academicyear_id": "2022-23",
+    "district_id": "101",
+    "avg": 0.6,
+    "count": 5,
+    "sum": 3,
+    "month": 1,
+    "year": 2023
+  },
+  {
+    "academicyear_id": "2022-23",
+    "district_id": "201",
+    "avg": 1,
+    "count": 5,
+    "sum": 5,
+    "month": 1,
+    "year": 2023
+  },
+  {
+    "academicyear_id": "2022-23",
+    "district_id": "102",
+    "avg": 0.8,
+    "count": 5,
+    "sum": 4,
+    "month": 1,
+    "year": 2023
+  },
+  {
+    "academicyear_id": "2022-23",
+    "district_id": "202",
+    "avg": 1,
+    "count": 5,
+    "sum": 5,
+    "month": 1,
+    "year": 2023
+  }
+]

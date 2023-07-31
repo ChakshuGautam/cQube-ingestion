@@ -45,13 +45,19 @@ export class QueryBuilderService {
   }
 
   generateCreateStatement(schema: JSONSchema4, autoPrimaryKey = false): string {
+    // console.log('schema: ', schema);
     const tableName = schema.title;
     const psqlSchema = schema.psql_schema;
     const primaryKeySegment = autoPrimaryKey ? '\n id SERIAL PRIMARY KEY,' : '';
     let createStatement = `CREATE TABLE ${psqlSchema}.${tableName} (${primaryKeySegment}\n`;
 
     const properties = schema.properties;
+
+    const propsForUniqueConstraint = [];
     for (const property in properties) {
+      if (['date', 'week', 'year', 'month'].includes(property.trim())) {
+        propsForUniqueConstraint.push(property);
+      }
       const column: JSONSchema4 = properties[property];
       createStatement += `  ${property} `;
       if (column.type === 'string' && column.format === 'date-time') {
@@ -84,11 +90,31 @@ export class QueryBuilderService {
     createStatement += '\n);';
 
     if (schema.fk !== undefined) {
+      // console.log('fk constraints called');
       createStatement = this.addFKConstraintDuringCreation(
         schema,
         createStatement,
       );
+
+      // adding unique constraint
+      let uniqueStatements = `,\nconstraint unique_${tableName} UNIQUE (`;
+      schema.fk.forEach((fk: fk) => {
+        uniqueStatements += `${fk.column}, `;
+      });
+      propsForUniqueConstraint.forEach((prop) => {
+        uniqueStatements += `${prop}, `;
+      });
+
+      uniqueStatements = uniqueStatements.slice(0, -2) + ')';
+      createStatement = createStatement
+        .slice(0, -2)
+        .concat(uniqueStatements)
+        .concat(');');
+      console.log('sql:', createStatement);
+      // console.log('schema: ', schema);
     }
+
+    // console.log('create statement: ', createStatement);
     return this.cleanStatement(createStatement);
   }
 
@@ -135,6 +161,7 @@ export class QueryBuilderService {
     const query = `INSERT INTO ${psqlSchema}.${tableName} (${fields.join(
       ', ',
     )}) VALUES (${values.join(', ')});`;
+    // ON CONFLICT ON CONSTRAINT unique_${tableName} DO UPDATE SET sum=sum+EXCLUDED.sum, count=count+EXCLUDED.count, avg=(sum+EXCLUDED.sum)/(count+EXCLUDED.count);`;
     return this.cleanStatement(query);
   }
 
@@ -171,7 +198,16 @@ export class QueryBuilderService {
     const query = `INSERT INTO ${psqlSchema}.${tableName} (${fields.join(
       ', ',
     )}) VALUES ${values.join(', ')};`;
+    // console.log('insert statement: ', query);
     return this.cleanStatement(query);
+  }
+
+  addOnConflictStatement(tableName: string, query: string): string {
+    return query
+      .slice(0, -1)
+      .concat(
+        ` ON CONFLICT ON CONSTRAINT unique_${tableName} DO UPDATE SET sum = datasets.${tableName}.sum + EXCLUDED.sum, count = datasets.${tableName}.count + EXCLUDED.count, avg = (datasets.${tableName}.sum + EXCLUDED.sum) / (datasets.${tableName}.count + EXCLUDED.count); `,
+      );
   }
 
   generateBulkInsertStatement(schema: JSONSchema4, data: any[]): string {
@@ -190,10 +226,10 @@ export class QueryBuilderService {
       fields.push(property);
     }
 
-    const tempTableName = `temp_${tableName}`;
-    const createTempTable = `CREATE TABLE IF NOT EXISTS ${tempTableName} (LIKE ${psqlSchema}.${tableName});`;
+    const tempTableName = `temp_${tableName} `;
+    const createTempTable = `CREATE TABLE IF NOT EXISTS ${tempTableName} (LIKE ${psqlSchema}.${tableName}); `;
     queries.push(createTempTable);
-    const autoGen = `ALTER TABLE ${tempTableName} ADD COLUMN id SERIAL PRIMARY KEY;`;
+    const autoGen = `ALTER TABLE ${tempTableName} ADD COLUMN id SERIAL PRIMARY KEY; `;
     queries.push(autoGen);
     const rows = [];
     let id = 1;
@@ -218,7 +254,7 @@ export class QueryBuilderService {
     const insertTempTable = `INSERT INTO ${tempTableName} (${tempTableFields.join(
       ', ',
     )}) VALUES `;
-    const insertTempTableRows = `${insertTempTable}${rows.join(', ')};`;
+    const insertTempTableRows = `${insertTempTable}${rows.join(', ')}; `;
     queries.push(this.cleanStatement(insertTempTable));
     let joinStatements = '';
     let whereStatements = '';
@@ -228,7 +264,7 @@ export class QueryBuilderService {
         const referenceTable = fk.reference.table;
         const referenceColumn = fk.reference.column;
         const childColumn = fk.column;
-        joinStatements += ` LEFT JOIN dimensions.${referenceTable} ON ${tempTableName}.${childColumn} = dimensions.${referenceTable}.${childColumn}`;
+        joinStatements += ` LEFT JOIN dimensions.${referenceTable} ON ${tempTableName}.${childColumn} = dimensions.${referenceTable}.${childColumn} `;
         whereStatements += ` AND dimensions.${referenceTable}.${childColumn} IS NOT NULL`;
       });
     }
@@ -240,14 +276,15 @@ export class QueryBuilderService {
         .map((field) => `${tempTableName}.${field}`)
         .join(', ')} FROM ${tempTableName}
         ${joinStatements === '' ? ' ' : joinStatements}
-        WHERE TRUE${whereStatements === '' ? ' ' : whereStatements};`;
+        WHERE TRUE${whereStatements === '' ? ' ' : whereStatements} 
+        ON CONFLICT ON CONSTRAINT unique_${tableName} DO UPDATE SET sum = ${psqlSchema}.${tableName}.sum + EXCLUDED.sum, count = ${psqlSchema}.${tableName}.count + EXCLUDED.count, avg = (${psqlSchema}.${tableName}.sum + EXCLUDED.sum) / (${psqlSchema}.${tableName}.count + EXCLUDED.count);`;
 
     queries.push(filteredInsert);
 
-    const dropTempTable = `DROP TABLE ${tempTableName};`;
+    const dropTempTable = `DROP TABLE ${tempTableName}; `;
     queries.push(dropTempTable);
-    const query = `${createTempTable}\n${insertTempTableRows}\n${filteredInsert}\n${dropTempTable}`;
-    // const query = `${createTempTable}\n${insertTempTableRows}\n${filteredInsert}`;
+    const query = `${createTempTable} \n${insertTempTableRows} \n${filteredInsert} \n${dropTempTable} `;
+    // const query = `${ createTempTable } \n${ insertTempTableRows } \n${ filteredInsert } `;
     // if (query.toLowerCase().includes('null')) {
     //   console.log('NULL Query: ', query);
     // }
@@ -256,7 +293,16 @@ export class QueryBuilderService {
     return this.cleanStatement(query);
   }
 
-  generateUpdateStatement(schema: JSONSchema4, data: any): string[] {
-    throw new Error('Method not implemented.');
+  generateUpdateStatement(
+    schema: JSONSchema4,
+    data: any,
+    where: string,
+  ): string {
+    // throw new Error('Method not implemented.');
+    return `UPDATE ${schema.schema.psql_schema}.${schema.tableName} 
+SET sum = sum + ${data.sum},
+    count = count + ${data.count - 2 * data.negcount},
+    avg = (sum + ${data.sum}) /(count+${data.count - 2 * data.negcount})
+WHERE ${where} `;
   }
 }

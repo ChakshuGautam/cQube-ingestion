@@ -23,13 +23,12 @@ describe('remove empty lines', () => {
     fs.unlinkSync(dupFilePath);
   });
   test('test get files in directory', async () => {
-    const files = await getFilesInDirectory('./test/fixtures/test-csvs');
+    const files = await getFilesInDirectory(
+      './test/fixtures/test-csvs/csvcleaner',
+    );
     expect(files).toEqual([
       'test/fixtures/test-csvs/csvcleaner/withEmpty.csv',
       'test/fixtures/test-csvs/csvcleaner/withoutEmpty.csv',
-      'test/fixtures/test-csvs/csvreader/invalid.reader.csv',
-      'test/fixtures/test-csvs/csvreader/valid.reader.csv',
-      'test/fixtures/test-csvs/event-grammars/test-dimension.grammar.csv',
     ]);
   });
 });

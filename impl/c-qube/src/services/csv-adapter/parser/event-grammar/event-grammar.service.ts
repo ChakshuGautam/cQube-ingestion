@@ -43,6 +43,7 @@ export const createEventGrammarFromCSVDefinition = async (
   csvFilePath: string,
   dimensionFileBasePath: string,
   programNamespace: string,
+  blacklist?: string[],
 ): Promise<EventGrammar[]> => {
   const eventGrammars: EventGrammar[] = [];
 
@@ -58,6 +59,8 @@ export const createEventGrammarFromCSVDefinition = async (
   const dimensionGrammarDefs = getDGDefsFromEGDefs(eventGrammarDef);
 
   for (const dimensionGrammarDef of dimensionGrammarDefs) {
+    if (blacklist && blacklist.includes(dimensionGrammarDef.dimensionName))
+      continue;
     const dimensionGrammar = await createDimensionGrammarFromCSVDefinition(
       `${dimensionFileBasePath}/${dimensionGrammarDef.dimensionName}-dimension.grammar.csv`,
     );

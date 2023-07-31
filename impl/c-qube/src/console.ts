@@ -18,14 +18,28 @@ async function bootstrap() {
       default: false,
       describe: 'Enable debug mode',
     })
-    .command('ingest', 'Starting Ingestion Process', {}, async (argv) => {
-      process.env['DEBUG'] = argv.debug.toString();
-      intro(`Starting Ingestion Process`);
-      await csvAdapterService.ingest();
-      outro(`You're all set!`);
-      await application.close();
-      process.exit(0);
-    })
+    .command(
+      'ingest',
+      'Starting Ingestion Process',
+      (yargs) => {
+        yargs.option('config', {
+          alias: 'c',
+          type: 'string',
+          default: 'config.json',
+          describe: 'Name of the config file',
+        });
+      },
+      async (argv) => {
+        process.env['DEBUG'] = argv.debug.toString();
+        intro(`Starting Ingestion Process`);
+        console.log('argv.configName: ', argv.config);
+        const configName: string = argv.config as unknown as string;
+        await csvAdapterService.ingest('./ingest', configName);
+        outro(`You're all set!`);
+        await application.close();
+        process.exit(0);
+      },
+    )
     .command(
       'ingest-data',
       'Starting Data Ingestion Process',

@@ -36,6 +36,11 @@ jobs:
         run: |
           touch .env
           echo "DATABASE_URL="postgres://timescaledb:postgrespassword@localhost:5432/postgres?sslmode=disable"" > .env
+          echo "DB_USERNAME="timescaledb"" >> .env
+          echo "DB_HOST="localhost"" >> .env
+          echo "DB_NAME="postgres"" >> .env
+          echo "DB_PASSWORD="postgrespassword"" >> .env
+          echo "DB_PORT=5432" >> .env
 
       - name: Install dependencies
         working-directory: impl/c-qube
@@ -45,25 +50,28 @@ jobs:
         working-directory: impl/c-qube
         run: |
           npx prisma migrate dev
+          npx prisma generate
 
-      - name: build
-        working-directory: impl/c-qube
-        run: |
-          yarn install
-          yarn build
+      # - name: build
+      #   working-directory: impl/c-qube
+      #   run: |
+      #     yarn build
 
       - name: Tests
         working-directory: impl/c-qube
         run: |
-          yarn test
-          yarn test:cov
+          yarn test:all
 
       - name: Stop DBs
         working-directory: .
         run: |
           docker-compose down
 
-      - name: Coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+#       - name: Coveralls
+#         uses: coverallsapp/github-action@master
+#         with:
+#           github-token: ${{ secrets.GITHUB_TOKEN }}
