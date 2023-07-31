@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { ConfigService } from '@nestjs/config';
 import { AppModule  } from './app.module';
 import { measureExecutionTime } from './utils/runtime';
+import { NestFactory } from '@nestjs/core';
+import { bootstrap } from './main';
 
 const mockConfigService = {
   get: jest.fn((key: string) => {
@@ -99,4 +101,23 @@ describe('AppService', () => {
     expect(result).toBe(expectedResult);
   });
 
+});
+
+describe('AppModule', () => {
+  it('should create and listen to the Nest.js application', async () => {
+    // Mock the NestFactory.create function
+    const mockApp = {
+      listen: jest.fn().mockResolvedValueOnce(undefined),
+    };
+    jest.spyOn(NestFactory, 'create').mockResolvedValueOnce(mockApp as any);
+
+    // Call the bootstrap function
+    await bootstrap();
+
+    // Expect NestFactory.create to be called with AppModule
+    expect(NestFactory.create).toHaveBeenCalledWith(AppModule);
+
+    // Expect app.listen to be called with port 3000
+    expect(mockApp.listen).toHaveBeenCalledWith(3000);
+  });
 });

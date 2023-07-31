@@ -62,4 +62,51 @@ describe('CsvAdapterService', () => {
     expect(timeDifference).toBeLessThanOrEqual(millSecondsToWait + deviation);
   });
 
+  it('should reject promise after nthTry === 1', async () => {
+    const error = new Error('Sample error');
+    const promise = Promise.reject(error);
+
+    try {
+      await retryPromiseWithDelay(promise, 1, 1000);
+    } catch (e) {
+      expect(e).toBe(error);
+    }
+  });
+
+  it('should retry promise and resolve on nthTry > 1', async () => {
+    const value = 'Sample result';
+    const promise = Promise.resolve(value);
+    const retryAttempts = 3;
+    const delayTime = 1000;
+
+    const retryPromise = retryPromiseWithDelay(promise, retryAttempts, delayTime);
+
+    // Fast-forward time to trigger the retries
+    jest.advanceTimersByTime(delayTime * (retryAttempts - 1));
+
+    const result = await retryPromise;
+
+    expect(result).toBe(value);
+  });
+
+  it('should retry promise and reject on nthTry > 1 if the promise rejects', async () => {
+    const error = new Error('Sample error');
+    const promise = Promise.reject(error);
+    const retryAttempts = 3;
+    const delayTime = 1000;
+
+    const retryPromise = retryPromiseWithDelay(promise, retryAttempts, delayTime);
+
+    // Fast-forward time to trigger the retries
+    jest.advanceTimersByTime(delayTime * (retryAttempts - 1));
+
+    try {
+      await retryPromise;
+    } catch (e) {
+      expect(e).toBe(error);
+    }
+  });
+
+
+
 });
