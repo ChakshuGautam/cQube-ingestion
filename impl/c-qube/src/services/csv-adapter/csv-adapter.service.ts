@@ -37,6 +37,7 @@ import {
 } from './parser/dataset/dataset-grammar.service';
 import { EventGrammarCSVFormat } from './types/parser';
 import { DimensionGrammarService } from './parser/dimension-grammar/dimension-grammar.service';
+import path from 'path';
 const chalk = require('chalk');
 const fs = require('fs').promises;
 const pl = require('nodejs-polars');
@@ -645,5 +646,26 @@ export class CsvAdapterService {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  public async processMinioCDCUpdates(minioFolderPath: string) {
+    let directories = [];
+
+    fs.readdir(minioFolderPath, (err, files) => {
+      if (err) {
+        console.error('Error reading directory:', err);
+        return;
+      }
+      // make this recursive
+      // Filter the list to include only directories
+      directories = files.filter((file) => {
+        const filePath = path.join(minioFolderPath, file);
+        return fs.statSync(filePath).isDirectory();
+      });
+    });
+
+
+    const dateRegex = /a/;
+
   }
 }
