@@ -17,17 +17,18 @@ The following changes were made to implement the `quoteChar` feature:
     "quoteChar": "/"
   }
 }
+```
 
 
 2. **Modified `readCSV` function to use `quoteChar`:** The `readCSV` function was modified to read the `quoteChar` value from the `config.json` file and use it in the CSV parsing process. The `getquoteChar` function was created to extract the `quoteChar` value from the `config.json` file. The `readCSV` function now uses the obtained `quoteChar` value during CSV parsing. The modified `readCSV` function looks like this:
 
-```json
+```typescript
 function getquoteChar(configPath: string): string {
   const configContent = fs.readFileSync(configPath, 'utf-8');
   const config = JSON.parse(configContent);
   return config.globals && config.globals.quoteChar ? config.globals.quoteChar : "'";
 }
-
+```
 
 3. **Test Case Video:**
 A test case video demonstrating the functionality of the `quoteChar` parameter in cQube has been created. The video showcases the following steps:
