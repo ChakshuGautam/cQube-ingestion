@@ -20,7 +20,7 @@ The following changes were made to implement the `quoteChar` feature:
 ```
 
 
-2. **Modified `readCSV` function to use `quoteChar`:** The `readCSV` function was modified to read the `quoteChar` value from the `config.json` file and use it in the CSV parsing process. The `getquoteChar` function was created to extract the `quoteChar` value from the `config.json` file. The `readCSV` function now uses the obtained `quoteChar` value during CSV parsing. The modified `readCSV` function looks like this:
+2. **Modified `readCSV` function to use `quoteChar`:** The `readCSV` function was modified to read the `quoteChar` value from the `config.json` file and use it in the CSV parsing process. The `getquoteChar` function was created to extract the `quoteChar` value from the `config.json` file. The `readCSV` function now uses the obtained `quoteChar` value during CSV parsing. The `getquoteChar` function looks like this:
 
 ```typescript
 function getquoteChar(configPath: string): string {
