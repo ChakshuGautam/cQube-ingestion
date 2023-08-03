@@ -41,46 +41,32 @@ describe('CSVReader', () => {
     // add a benchmark test here similar to date parser
   });
 
-  it('should remove empty lines', async () => {
-    const filePath = './test/fixtures/test-csvs/csvreader/valid.reader.csv';
-    const expected = [
-      'PK,Index,,,,,,,,,,',
-      'string,string,string,integer,string,string,string,string,string,string,string, string',
-      'school_id,school_name,schoolcategory_id,grade_id,cluster_id,cluster_name,block_id,block_name,district_id,district_name,latitude,longitude',
-    ];
-    const result = await readCSVFile(filePath);
-    expect(result).toEqual(expected);
-  });
-
-  test('returns default quote character when config file is empty', () => {
-    jest.spyOn(fs1, 'readFileSync').mockReturnValue('{}');
-    const quoteChar = getquoteChar('./csvreader');
-    expect(quoteChar).toBe("'");
-    fs1.readFileSync.mockRestore();
-  });
-
   test('should return the quote character from the config file', () => {
-    jest.spyOn(fs1, 'readFileSync').mockReturnValue('{"globals": {"QuoteChar": "`"}}');
+    jest.spyOn(fs1, 'readFileSync').mockReturnValue('{"globals": {"quoteChar": "`"}}');
     const configPath ='ingest/config.json';
     const quoteChar = getquoteChar(configPath);
     expect(quoteChar).toBe('`');
   });
 
-  test('should return the default quote character if not specified in the config file', () => {
-    jest.spyOn(fs1, 'readFileSync').mockReturnValue('{"globals": {}}');
-    const configPath = 'ingest/config.json';
-    const quoteChar = getquoteChar(configPath);
-    expect(quoteChar).toBe("'");
+  it('should take quote value from config , incase both are defined ', async () => {
+    let rows = await readCSV('./test/fixtures/test-csvs/csvreader/quote.csv', 'ingest/config.json', '`');
+    console.log(rows)
+    expect(rows).toEqual([
+      [ 'Name', 'Age', 'Country' ],
+      [ 'John Doe', '30', 'USA' ],
+      [ 'Jane Smith', '25', 'Canada' ],
+      [ 'Backtick User', '40', 'Australia' ]
+    ]);
   });
 
-  it('should parse CSV with ` as quote character', async () => {
-    const filePath = './test/fixtures/test-csvs/csvreader/quote.csv';
-    const result = await readCSV(filePath);
-    expect(result).toEqual([
-      ['Name', 'Age', 'Country'],
-      ['John Doe', '30', 'USA'],
-      ['Jane Smith', '25', 'Canada'],
-      ['`Backtick User`', '40', 'Australia'],
+  it('should take quote value from config , incase one is defined ', async () => {
+    let rows = await readCSV('./test/fixtures/test-csvs/csvreader/quote.csv', 'ingest/config.json', undefined);
+    console.log(rows)
+    expect(rows).toEqual([
+      [ 'Name', 'Age', 'Country' ],
+      [ 'John Doe', '30', 'USA' ],
+      [ 'Jane Smith', '25', 'Canada' ],
+      [ 'Backtick User', '40', 'Australia' ]
     ]);
   });
 

@@ -1,7 +1,7 @@
 {
   "globals": {
     "onlyCreateWhitelisted": true,
-    "QuoteChar": "`"
+    "quoteChar": "`"
   },
   "dimensions": {
     "namespace": "dimensions",
