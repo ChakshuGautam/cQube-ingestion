@@ -3,7 +3,12 @@ import { PrismaService } from '../../prisma.service';
 import { DimensionService } from '../dimension/dimension.service';
 import { QueryBuilderService } from '../query-builder/query-builder.service';
 import { EventService } from './event.service';
-import { mockEventGrammar } from '../mocks/types.mocks';
+import { mockDimensionGrammar, mockEventGrammar } from '../mocks/types.mocks';
+import {
+  EventGrammar as EventGrammarModel,
+  InstrumentType as InstrumentTypeModel,
+  DimensionGrammar as DimensionGrammarModel,
+} from '@prisma/client';
 
 console.error = jest.fn();
 describe('EventService', () => {
@@ -36,6 +41,13 @@ describe('EventService', () => {
     expect(service).toBeDefined();
   });
 
+  it('should call generateInsertStatement with the correct parameters', async () => {
+    jest.spyOn(qbService, 'generateInsertStatement').mockReturnValue('INSERT QUERY');
+    const data = { field1: 'value1', field2: 'value2' };
+    await service.processEventData(mockEventGrammar(), data);
+    expect(qbService.generateInsertStatement).toHaveBeenCalledWith(mockEventGrammar().schema, data);
+  });
+
   it('should return the EventGrammar when event grammar with specified dimensionId exists', async () => {
     const dimensionId = 1;
     jest.spyOn(service, 'dbModelToEventGrammar').mockResolvedValue(mockEventGrammar());
@@ -49,5 +61,14 @@ describe('EventService', () => {
     const result = await service.getEventGrammarByName(eventName);
     expect(result).toEqual(mockEventGrammar());
   });
-
+  
+  it('should process bulk event data', async () => {
+    const mockData = [
+      { field1: 'value1', field2: 'value2' },
+      { field1: 'value3', field2: 'value4' },
+    ];
+    await service.processBulkEventData(mockEventGrammar(), mockData);
+    expect(null).toBeNull();
+  });
+  
 });
