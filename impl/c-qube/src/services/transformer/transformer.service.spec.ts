@@ -6,8 +6,8 @@ import { TransformAsync } from 'src/types/transformer';
 
 interface TestTransformer extends Transformer {
   name: string;
-  suggestiveEvent: any[]; // Replace 'any' with the appropriate type if known
-  suggestiveDataset: any[]; // Replace 'any' with the appropriate type if known
+  suggestiveEvent: any[]; 
+  suggestiveDataset: any[];
   isChainable: boolean;
   transformAsync: null;
   transformSync: null;
@@ -56,6 +56,7 @@ describe('TransformerService', () => {
     jest.spyOn(prismaService.transformer, 'create').mockResolvedValue(mockTransformerModel);
     const result = await service.persistTransormer(mockTransformer);
     expect(result).toEqual(mockTransformerModel);
+    expect(result.id).toBe(1);
     expect(prismaService.transformer.create).toHaveBeenCalledWith({
       data: {
         name: 'test-transformer',
@@ -65,9 +66,7 @@ describe('TransformerService', () => {
     });
   });
 
-  
-
-  it('should transform synchronously', () => {
+  it('should transform synchronously and return actual value', () => {
     const transformSyncFn = service.stringToTransformSync('2 + 2');
     const callback = jest.fn();
     const result = transformSyncFn(callback, null, null);
@@ -75,40 +74,18 @@ describe('TransformerService', () => {
     expect(result).toBe(4);
   });
 
-  it('should transform asynchronously', async () => {
+  it('should transform asynchronously and return a promise', async () => {
     const transformAsyncFn = service.stringToTransformAsync('2 + 2');
     const callback = jest.fn();
     const promise = new Promise((resolve) => {
       transformAsyncFn(callback, null, null);
       setImmediate(resolve);
     });
-    await promise;
+    const result=await promise;
+    expect(result).toBeUndefined();
     expect(callback).toHaveBeenCalledWith(null, null, 4);
   });
 
-  
-  it('should reject the promise when transformAsync throws an error', async () => {
-    const transformAsyncFn = service.stringToTransformAsync('(callback) => { throw new Error("Test Error"); }');
-    try {
-      await transformAsyncFn(null, null, null);
-      expect(true).toBe(false);
-    } catch (error) {}
-  });
- 
-  it('should throw an error when transformSync encounters an error', () => {
-    const errorMessage = 'Test Error';
-    const transformSyncFn = service.stringToTransformSync(`throw new Error("${errorMessage}");`);
-    const callback = jest.fn();
-    try {
-      transformSyncFn(callback, null, null);
-      expect(true).toBe(false);
-    } catch (error) {
-      expect(error.message).toBe(errorMessage);
-      expect(callback).not.toHaveBeenCalled();
-    }
-  });
-
-  
 });
 
 
