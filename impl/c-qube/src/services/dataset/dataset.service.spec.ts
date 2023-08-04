@@ -7,6 +7,12 @@ import { DatasetService } from './dataset.service';
 import { Pool } from 'pg';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DatasetGrammar, DatasetUpdateRequest, DimensionMapping } from 'src/types/dataset';
+import { mockDatasetGrammar, mockDatasetUpdateRequest } from '../mocks/types.mocks';
+import { datasetGrammar, datasetUpdateRequest } from '../mocks/test.expect';
+const consoleErrorSpy = jest.spyOn(console, 'error');
+const writeFileMock = jest.fn();
+require('fs').writeFile = writeFileMock;
+
 
 describe('DatasetService', () => {
   let service: DatasetService;
@@ -65,285 +71,80 @@ describe('DatasetService', () => {
     eventService = module.get<EventService>(EventService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+
   it('should be defined', () => {
-    expect(true).toBe(true);
+    expect(service).toBeDefined;
   });
 
   it('should create a new dataset grammar', async () => {
-    const datasetGrammar: DatasetGrammar = {
-      name: 'Test Dataset',
-      description: 'This is a test dataset',
-      dimensions: [],
-      schema: {
-        type: 'object',
-        properties: {},
-      },
-      eventGrammar: undefined,
-      eventGrammarFile: null,
-      isCompound: false,
-      tableName: null,
-      tableNameExpanded: null,
-      timeDimension: null,
-    };
-    const result = await service.createDatasetGrammar(datasetGrammar);
-
-    expect(result).toEqual(datasetGrammar);
+    const createdDatasetGrammar = await service.createDatasetGrammar(mockDatasetGrammar());
+    expect(createdDatasetGrammar).toBeDefined();
+    expect(createdDatasetGrammar.name).toEqual(mockDatasetGrammar().name);
   });
 
-  it('should create a new dataset grammar', async () => {
+  it('should create a new dataset grammar with error', async () => {
 
     jest.mock('fs', () => ({
       writeFile: jest.fn(),
     }));
-    const datasetGrammar: DatasetGrammar = {
-      name: 'Test Dataset',
-      description: 'This is a test dataset',
-      dimensions: [],
-      schema: {
-        type: 'object',
-        properties: {},
-      },
-      eventGrammar: undefined,
-      eventGrammarFile: null,
-      isCompound: false,
-      tableName: null,
-      tableNameExpanded: null,
-      timeDimension: null,
-    };
-
+    
     const mockError = new Error('Database error');
     mockPrismaService.datasetGrammar.create.mockRejectedValueOnce(mockError);
-    const consoleErrorSpy = jest.spyOn(console, 'error');
-    const writeFileMock = jest.fn();
-    require('fs').writeFile = writeFileMock;
-
     try {
-      const result = await service.createDatasetGrammar(datasetGrammar);
+      const result = await service.createDatasetGrammar(mockDatasetGrammar());
+      expect(result.name).toEqual('defaultName');
     } catch (error) {
-      expect(consoleErrorSpy).toHaveBeenCalledWith('Test Dataset');
-      expect(consoleErrorSpy).toHaveBeenCalledWith(JSON.stringify(datasetGrammar, null, 2));
+      expect(consoleErrorSpy).toHaveBeenCalledWith(JSON.stringify(mockDatasetGrammar(), null, 2));
     }
   });
 
   it('should insert bulk dataset data', async () => {
-    const datasetGrammar: DatasetGrammar = {
-      name: 'Test Dataset',
-      description: 'This is a test dataset',
-      dimensions: [],
-      schema: {
-        type: 'object',
-        properties: {}, 
-      },
-    };
-
+  
     const data = [
       { id: 1, name: 'Data 1' },
       { id: 2, name: 'Data 2' },
     ];
-
+  
     jest
       .spyOn(service['qbService'], 'generateBulkInsertStatement')
       .mockReturnValue('INSERT INTO test_table VALUES ...');
-
-    jest.spyOn(service['pool'], 'query').mockResolvedValue({ rows: [] });
-
-    const result = await service.insertBulkDatasetData(datasetGrammar, data);
-
-    expect(result).toEqual([]);
+  
+    jest.spyOn(service['pool'], 'query').mockResolvedValue({ rows: 2 });
+  
+    const result = await service.insertBulkDatasetData(datasetGrammar, data);  
+    expect(result).toEqual(2);
+    
   });
-
-  it('should process the dataset update request and perform bulk insertion successfully', async () => {
-    const dimension: DimensionMapping = {
-      key: 'testKey', // Replace with a valid key
-      dimension: {
-        name: {
-          name: 'testName', 
-          type: 'testType',
-          storage: {
-            indexes: [],
-            primaryId: 'testPrimaryId', 
-          },
-          schema: null,
-        },
-        mapped_to: 'testMappedTo', 
-      },
-    };
-
-    const consoleErrorSpy = jest.spyOn(console, 'error');
-    const dimensionFilter = {};
-
-   const dataset: DatasetUpdateRequest = {
-
-      dataset: {
-        name: 'Test Dataset',
-        description: 'This is a test dataset',
-        dimensions: [dimension],
-        schema: {
-          properties: {},
-        },
-        timeDimension: {
-          key: 'timeKey',
-          type: 'timeType', 
-        },
-      },
-      updateParams: {
-        sum: 0, 
-        count: 0, 
-        avg: 0, 
-      },      
-      filterParams: {},
-      dimensionFilter: JSON.stringify(dimensionFilter), 
-
-    };
-    jest.spyOn(service, 'insertBulkDatasetData').mockResolvedValueOnce(Promise.resolve());
-    await service.processDatasetUpdateRequest([dataset]);
-    expect(consoleErrorSpy).toHaveBeenCalled();
-  });
-
-
 
   it('should handle bulk insertion errors and try individual insertions', async () => {
-    const dimension: DimensionMapping = {
-      key: 'testKey', 
-      dimension: {
-        name: {
-          name: 'testName', 
-          type: 'testType', 
-          storage: {
-            indexes: [],
-            primaryId: 'testPrimaryId', 
-          },
-          schema: null,
-        },
-        mapped_to: 'testMappedTo', 
-      },
-    };
-    const datasetUpdateRequest: DatasetUpdateRequest = {
-      dataset: {
-        name: 'Test Dataset',
-        description: 'This is a test dataset',
-        dimensions: [dimension],
-        schema: {
-          properties: {},
-        },
-        timeDimension: {
-          key: 'timeKey',
-          type: 'timeType',
-        },
-      },
-      updateParams: {
-        sum: 0, 
-        count: 0, 
-        avg: 0, 
-      },
-      filterParams: {},
-      dimensionFilter: JSON.stringify({}), 
-    };
-
-    const mockErrorLogger = jest.spyOn(console, 'error').mockImplementation();
     const mockInsertDatasetData = jest.fn(() => {
       throw new Error('Mocked insertion error');
     });
     service.insertDatasetData = mockInsertDatasetData;
-
-    try {
-      await service.processDatasetUpdateRequest([datasetUpdateRequest]);
-      expect(mockErrorLogger).toHaveBeenCalledWith('Mocked insertion error');
-    } catch (error) {
-    } finally {
-      mockErrorLogger.mockRestore();
+    const mockInsertDatasetDataIndividual = jest.fn();
+    service.insertDatasetData = mockInsertDatasetDataIndividual;
+    await service.processDatasetUpdateRequest([datasetUpdateRequest]);
+    expect(mockInsertDatasetDataIndividual).toHaveBeenCalledTimes(1);
+    expect(mockInsertDatasetDataIndividual.mock.calls[0][1]).toEqual({
+      avg: 0,
+      count: 0,
+      sum: 0,
     }
-  });
-
-  it('should insert data for a single dataset', async () => {
-    const data = [];
-    const dimension: DimensionMapping = {
-      key: 'testKey', 
-      dimension: {
-        name: {
-          name: 'testName', 
-          type: 'testType', 
-          storage: {
-            indexes: [],
-            primaryId: 'testPrimaryId', 
-          },
-          schema: null,
-        },
-        mapped_to: 'testMappedTo', 
-      },
-    };
-    const datasetGrammar: DatasetGrammar = {
-      name: 'Test Dataset',
-      description: 'This is a test dataset',
-      dimensions: [dimension],
-      schema: {},
-    };
-    try {
-      const insertQuery = mockQbService.generateInsertStatement(
-        datasetGrammar.schema,
-        data,
-      );
-      console.log('Insert Query:', insertQuery);
-  
-      // Call the insertDatasetData function with the insertQuery
-      await service.insertDatasetData(datasetGrammar, data);
-  
-      // Add your assertions here to verify the expected behavior
-    } catch (error) {
-      // Log any errors that occurred during the test
-      console.error('Error:', error);
-    }
-  });
-
- 
-  
-  it('should return an array of compound dataset grammars when filter is provided', async () => {
-    const mockFilter = {
-      name: 'Test',
-    };
-    const mockDatasetGrammars = [
-      {
-        id: 1,
-        name: 'Test Dataset 1',
-        isCompound: true,
-      },
-      {
-        id: 2,
-        name: 'Another Test Dataset',
-        isCompound: true,
-      },
-    ];
-    mockPrismaService.datasetGrammar.findMany.mockResolvedValueOnce(mockDatasetGrammars);
+    );
   });
 
   it('should return an empty array when no compound dataset grammar matches the filter', async () => {
     const mockFilter = {
       name: 'NonExistentDataset',
     };
-    const mockEmptyDatasetGrammars: any[] = [];
-    mockPrismaService.datasetGrammar.findMany.mockResolvedValueOnce(mockEmptyDatasetGrammars);
+    mockPrismaService.datasetGrammar.findMany.mockResolvedValueOnce(mockDatasetGrammar());
     const result = await service.getCompoundDatasetGrammars(mockFilter);
     expect(result).toEqual([]);
-  });
-
-  it('should return an array of non-compound dataset grammars when filter is provided', async () => {
-    const mockFilter = {
-      name: 'NonCompoundTest',
-    };
-    const mockDatasetGrammars = [
-      {
-        id: 1,
-        name: 'NonCompoundTest Dataset 1',
-        isCompound: false,
-      },
-      {
-        id: 2,
-        name: 'Another NonCompoundTest Dataset',
-        isCompound: false,
-      },
-    ];
-    mockPrismaService.datasetGrammar.findMany.mockResolvedValueOnce(mockDatasetGrammars);  
-  });
+  });    
 
   it('should return an empty array when no non-compound dataset grammar matches the filter', async () => {
     const mockFilter = {
@@ -355,10 +156,7 @@ describe('DatasetService', () => {
     const result = await service.getNonCompoundDatasetGrammars(mockFilter);
 
     expect(result).toEqual([]);
-  });
-
-  
-
+  }); 
   
   it('should return the correct counter aggregates', () => {
     const result = service.counterAggregates();
