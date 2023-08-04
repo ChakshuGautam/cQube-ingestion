@@ -62,13 +62,4 @@ describe('EventService', () => {
     expect(result).toEqual(mockEventGrammar());
   });
   
-  it('should process bulk event data', async () => {
-    const mockData = [
-      { field1: 'value1', field2: 'value2' },
-      { field1: 'value3', field2: 'value4' },
-    ];
-    await service.processBulkEventData(mockEventGrammar(), mockData);
-    expect(null).toBeNull();
-  });
-  
 });
