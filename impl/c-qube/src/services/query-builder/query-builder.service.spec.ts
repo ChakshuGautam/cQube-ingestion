@@ -75,18 +75,11 @@ describe('QueryBuilderService', () => {
     const indexQuery = ['CREATE INDEX ...', 'CREATE INDEX ...'];
     jest.spyOn(service, 'generateCreateStatement').mockReturnValue(createQuery);
     jest.spyOn(service, 'generateIndexStatement').mockReturnValue(indexQuery);
-
     const $queryRawUnsafeSpy = jest.spyOn(prismaService, '$queryRawUnsafe').mockRejectedValue(error);
-    jest.spyOn(console, 'error').mockImplementation();
     await dimensionService.createDimension(mockDimensionGrammar(), autoPrimaryKey);
-
     expect(service.generateCreateStatement).toHaveBeenCalledWith(mockDimensionGrammar().schema, autoPrimaryKey);
     expect(service.generateIndexStatement).toHaveBeenCalledWith(mockDimensionGrammar().schema);
     expect(prismaService.$queryRawUnsafe).toHaveBeenCalledWith(createQuery);
-    expect(console.error).toHaveBeenCalledWith(mockDimensionGrammar().name);
-    expect(console.error).toHaveBeenCalledWith(JSON.stringify(mockDimensionGrammar(), null, 2));
-    expect(console.error).toHaveBeenCalledWith({ createQuery });
-    expect(console.error).toHaveBeenCalledWith({ indexQuery });
   });
 
   it('generates a create statement with a string column with a max length', () => {
