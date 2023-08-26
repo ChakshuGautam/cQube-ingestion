@@ -24,12 +24,18 @@ describe('remove empty lines', () => {
   });
   test('test get files in directory', async () => {
     const files = await getFilesInDirectory('./test/fixtures/test-csvs');
-    expect(files).toEqual([
+    const expectedFiles = [
       'test/fixtures/test-csvs/csvcleaner/withEmpty.csv',
       'test/fixtures/test-csvs/csvcleaner/withoutEmpty.csv',
       'test/fixtures/test-csvs/csvreader/invalid.reader.csv',
       'test/fixtures/test-csvs/csvreader/valid.reader.csv',
       'test/fixtures/test-csvs/event-grammars/test-dimension.grammar.csv',
-    ]);
+      'test/fixtures/test-csvs/event-grammars/incorrect_length-dimension.grammar.csv',
+      'test/fixtures/test-csvs/event-grammars/invalid-dimension.grammar.csv',
+      'test/fixtures/test-csvs/event-grammars/school-dimension.grammar.csv',
+    ];
+    files.sort();
+    expectedFiles.sort();
+    expect(files).toEqual(expectedFiles);
   });
 });
