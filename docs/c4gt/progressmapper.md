@@ -51,14 +51,6 @@ format\: \`CLI Progress \|</span>{colors.cyan('{bar}')}| {percentage}% || {value
 
 This code defines two new functions, `createProgressBar_withFileName` and `createProgressBar`. These functions create new progress bars that can be used to track the progress of data ingestion. The `createProgressBar_withFileName` function also includes the file name of the dataset that is being ingested.
 
-## Test Case Video
-
-A test case video demonstrating the functionality of the `progressionMapper` in cQube has been created. 
-
-**Link to Test Case Video:**
-[Link to Test Case Video]
-
-
 ## Conclusion
 
 The new code that has been added to the CLI will provide users with a more detailed view of the ingestion process. This will help to identify any potential problems early on and will make it easier for users to track the progress of data ingestion.

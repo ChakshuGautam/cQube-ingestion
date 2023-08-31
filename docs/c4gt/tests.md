@@ -2,7 +2,7 @@
 
 ## Description
 
-This document describes the master ticket to track the test case coverage and availability for different services. The goal of this ticket is to ensure that all services are fully tested and that the test cases are available to all developers.
+Describing the master ticket to track the test case coverage and availability for different services. The goal of this ticket is to ensure that all services are fully tested and that the test cases are available to all developers.
 
 ## Services
 
@@ -32,6 +32,17 @@ Every single column should be tested. The following unit tests should be written
 ## Test Case Coverage
 
 The test case coverage for each service should be at least 80%. The test cases should be written in a way that they can be easily executed and reviewed.
+
+## Comparative figures 
+
+* Old test case coverage scenario -
+![image](https://github.com/ChakshuGautam/cQube-ingestion/assets/100033918/2cf60aae-76e6-4255-998e-7fcc38498cc8)
+
+* Test case scenario after this ticket - 
+![image](https://github.com/ChakshuGautam/cQube-ingestion/assets/100033918/8bcd91f4-9dae-460b-b0b5-5290ff129cb0)
+
+
+
 
 ## Conclusion
 
