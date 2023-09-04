@@ -100,6 +100,8 @@ export class QueryBuilderService {
 
       for (const index of indexes) {
         for (const column of index.columns) {
+          // if no indexes are specified in grammar, skip
+          if (column.length === 0) continue;
           const indexName = `${schema.title}_${column.join('_')}_idx`;
           const columns = column.join(', ');
           const statement = `CREATE INDEX ${indexName} ON ${psqlSchema}.${schema.title} (${columns});`;
@@ -237,8 +239,8 @@ export class QueryBuilderService {
       ', ',
     )})
         SELECT ${fields
-        .map((field) => `${tempTableName}.${field}`)
-        .join(', ')} FROM ${tempTableName}
+          .map((field) => `${tempTableName}.${field}`)
+          .join(', ')} FROM ${tempTableName}
         ${joinStatements === '' ? ' ' : joinStatements}
         WHERE TRUE${whereStatements === '' ? ' ' : whereStatements};`;
 
