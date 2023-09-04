@@ -41,9 +41,6 @@ The test case coverage for each service should be at least 80%. The test cases s
 * Test case scenario after this ticket - 
 ![image](https://github.com/ChakshuGautam/cQube-ingestion/assets/100033918/8bcd91f4-9dae-460b-b0b5-5290ff129cb0)
 
-
-
-
 ## Conclusion
 
 This ticket will help to ensure that all services are fully tested and that the test cases are available to all developers. This will help to improve the quality of the code and to prevent bugs from being introduced into the system.

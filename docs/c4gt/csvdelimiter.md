@@ -4,7 +4,7 @@
 
 cQube allows users to specify data to be ingested using a `config.json` file. A new configuration parameter called `csvDelimeter` is implemented. `csvDelimeter` allows users to define the CSV delimiter during data ingestion for datasets or dimensions. The default delimiter used in cQube is a comma.
 
-## Changes Made
+## Implementation
 
 The following changes were made to implement the `csvDelimeter` feature:
 

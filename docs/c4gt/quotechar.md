@@ -4,7 +4,7 @@
 
 cQube allows users to specify data to be ingested using a `config.json` file. A new configuration parameter called `quoteChar` is implemented. `quoteChar` allows users to define the CSV quote character during data ingestion for datasets or dimensions. The default quote character used in cQube is a single quote.
 
-## Changes Made
+## Implementation
 
 The following changes were made to implement the `quoteChar` feature:
 
