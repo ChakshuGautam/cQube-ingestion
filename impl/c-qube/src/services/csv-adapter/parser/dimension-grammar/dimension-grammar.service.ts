@@ -28,7 +28,14 @@ export class DimensionGrammarService {
     const dimensionName = getDimensionNameFromFilePath(csvFilePath);
     const { pk, indexes } = getPrimaryKeyAndIndexes(row1, row3);
     const dimensionColumns = getDimensionColumns(row2, row3);
-
+    dimensionColumns.forEach((column) => {
+      if (column.name.toLowerCase() === 'id') {
+        this.logger.error(
+          `Cannot use reserved word 'id'. Invalid column name for dimension grammar file: ${csvFilePath}`,
+        );
+        return null;
+      }
+    });
     const dimensionGrammar = this.createCompositeDimensionGrammar(
       dimensionColumns,
       dimensionName,
