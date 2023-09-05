@@ -29,7 +29,7 @@ export class DimensionGrammarService {
     const { pk, indexes } = getPrimaryKeyAndIndexes(row1, row3);
     const dimensionColumns = getDimensionColumns(row2, row3);
     dimensionColumns.forEach((column) => {
-      if (column.name === 'id') {
+      if (column.name.toLowerCase() === 'id') {
         this.logger.error(
           `Cannot use reserved word 'id'. Invalid column name for dimension grammar file: ${csvFilePath}`,
         );
