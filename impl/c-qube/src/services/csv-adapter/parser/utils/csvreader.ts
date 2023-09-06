@@ -3,13 +3,20 @@ const fs = require('fs').promises;
 
 import * as csv from 'csv-parser';
 
-export async function readCSV(filePath: string): Promise<string[][]> {
+export async function readCSV(filePath: string, configPath?: string, quoteChar?: string): Promise<string[][]> {
   return new Promise((resolve, reject) => {
-    const rows: string[][] = [];
+    const rows: string[][] = configPath ? [] : [[]]; 
+    if (configPath) {
+      const configquote = getquoteChar(configPath);
+      quoteChar = configquote || quoteChar || "'";
+    } else {
+      quoteChar = quoteChar || "'";
+    }
+    
     // TODO: Add checking here
     fs1
       .createReadStream(filePath)
-      .pipe(csv({ separator: ',', headers: false, quote: "'" }))
+      .pipe(csv({ separator: ',', headers: false, quote: quoteChar }))
       .on('data', (data) => {
         rows.push(Object.values(data));
       })
@@ -29,4 +36,14 @@ export async function readCSVFile(filePath: string): Promise<string[]> {
     .split('\n')
     .map((row: string) => row.trim())
     .filter((row: string) => row !== '');
+}
+
+export function getquoteChar (configPath: string): string | undefined {
+  try {
+    const configContent = fs1.readFileSync(configPath, 'utf-8');
+    const config = JSON.parse(configContent);
+    return config.globals.quoteChar;
+  } catch (error) {
+    return undefined;
+  }
 }
