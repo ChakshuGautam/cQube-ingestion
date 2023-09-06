@@ -43,6 +43,7 @@ const pl = require('nodejs-polars');
 const _ = require('lodash');
 const pLimit = require('p-limit');
 const limit = pLimit(10);
+const fs1 = require('fs');
 
 @Injectable()
 export class CsvAdapterService {
@@ -72,6 +73,16 @@ export class CsvAdapterService {
     const config = JSON.parse(
       await readFile(ingestionFolder + '/' + ingestionConfigFileName, 'utf8'),
     );
+    for (const program of config.programs) {
+      const programConfigPath = `${ingestionFolder}/programs/${program.namespace}/${ingestionConfigFileName}`;
+      
+      if (fs1.existsSync(programConfigPath)) {
+        const config = JSON.parse(await readFile(programConfigPath, 'utf8'));
+        //This is parsing the program specific config
+      } else {
+        // This is using the global config for this program which has already been parsed above
+      }
+    }
     const regexEventGrammar = /\-event\.grammar.csv$/i;
     const defaultTimeDimensions = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
     s.stop('✅ 2. Config parsing completed');
