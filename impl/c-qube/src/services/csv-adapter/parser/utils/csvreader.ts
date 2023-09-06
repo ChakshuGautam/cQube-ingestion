@@ -5,16 +5,25 @@ import * as csv from 'csv-parser';
 
 export async function readCSV(filePath: string): Promise<string[][]> {
   return new Promise((resolve, reject) => {
-    const rows: string[][] = [];
-    // TODO: Add checking here
-    fs1
-      .createReadStream(filePath)
+    let rows: string[][] = [];
+    const chunkSize = 100000; 
+
+    fs1.createReadStream(filePath)
       .pipe(csv({ separator: ',', headers: false, quote: "'" }))
       .on('data', (data) => {
         rows.push(Object.values(data));
+
+        if (rows.length >= chunkSize) {
+          resolve(rows);
+          rows = [];
+        }
       })
       .on('end', () => {
-        resolve(rows);
+        if (rows.length > 0) {
+          resolve(rows);
+        } else {
+          reject(new Error('File is empty'));
+        }
       })
       .on('error', (error) => {
         reject(error);
