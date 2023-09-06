@@ -14,6 +14,8 @@ import { VizService } from './services/viz/viz.service';
 import { DimensionGrammarService } from './services/csv-adapter/parser/dimension-grammar/dimension-grammar.service';
 import { Pool } from 'pg';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
 const databasePoolFactory = async (configService: ConfigService) => {
   return new Pool({
     user: configService.get('DB_USERNAME'),
@@ -28,6 +30,13 @@ const databasePoolFactory = async (configService: ConfigService) => {
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    WinstonModule.forRoot({
+      level: 'silly', 
+      format: winston.format.simple(), // Use the desired log format
+      transports: [
+          new winston.transports.File({ filename: 'logfile.log' }) // Specify the file to which logs should be written
+      ]
+  })
   ],
   controllers: [AppController],
   providers: [

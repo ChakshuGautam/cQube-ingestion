@@ -17,6 +17,8 @@ import { EventService } from '../event/event.service';
 import { EventGrammar } from 'src/types/event';
 import { readCSV } from '../csv-adapter/parser/utils/csvreader';
 import { table } from 'console';
+import { Controller, LoggerService } from '@nestjs/common';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 const pLimit = require('p-limit');
 const limit = pLimit(10);
 
@@ -35,12 +37,13 @@ export type DatasetGrammarFilter = {
 
 @Injectable()
 export class DatasetService {
-  private readonly logger: Logger = new Logger(DatasetService.name);
+  
   constructor(
     public prisma: PrismaService,
     private qbService: QueryBuilderService,
     private eventGrammarService: EventService,
     @Inject('DATABASE_POOL') private pool: Pool,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService
   ) {}
 
   counterAggregates(): any {
@@ -229,10 +232,41 @@ export class DatasetService {
       );
   }
 
+  getonlyCreateWhitelisted(configPath: string): Promise<boolean> {
+    const configContent = fs.readFileSync(configPath, 'utf-8');
+    const config = JSON.parse(configContent);
+    return config.globals.onlyCreateWhitelisted ;
+  } 
+
+  async whitelistedMatching(datasetGrammar: DatasetGrammar): Promise<boolean> {
+    const configContent = fs.readFileSync('ingest/config.json', 'utf-8');
+    const config = JSON.parse(configContent);
+    const onlyCreateWhitelisted = await this.getonlyCreateWhitelisted('ingest/config.json');
+
+    if (onlyCreateWhitelisted) {
+      const whitelistedCombinations = config.programs
+        .flatMap((program) => program.dimensions.whitelisted);
+
+      const isWhitelisted = whitelistedCombinations.some((combination) => {
+        const dimensionNames = combination.split(',');
+        return dimensionNames.every((dimension) => datasetGrammar.name.includes(dimension));
+      });
+
+      return isWhitelisted;
+    }
+
+    return false;
+  }
+
   async createDataset(
     datasetGrammar: DatasetGrammar,
     autoPrimaryKey = true,
   ): Promise<void> {
+    const isWhitelisted = await this.whitelistedMatching(datasetGrammar); 
+    if (!isWhitelisted) {
+      // Skipping the not whitelisted datasets
+      return;
+    }
     // add FK params to schema
     let timeDimensionKey = 'date';
     if (datasetGrammar.dimensions.length > 0) {
@@ -304,6 +338,11 @@ export class DatasetService {
   }
 
   async insertDatasetData(datasetGrammar: DatasetGrammar, data): Promise<void> {
+    const isWhitelisted = await this.whitelistedMatching(datasetGrammar); 
+    if (!isWhitelisted) {
+      // Skipping the not whitelisted datasets
+      return;
+    }
     const insertQuery = this.qbService.generateInsertStatement(
       datasetGrammar.schema,
       data,
@@ -327,6 +366,11 @@ export class DatasetService {
     datasetGrammar: DatasetGrammar,
     data: any[],
   ): Promise<void> {
+    const isWhitelisted = await this.whitelistedMatching(datasetGrammar); 
+    if (!isWhitelisted) {
+      // Skipping the not whitelisted datasets
+      return;
+    }
     const insertQueries = this.qbService.generateBulkInsertStatement(
       datasetGrammar.schema,
       data,
