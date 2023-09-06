@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DimensionGrammarService } from './dimension-grammar.service';
 import { promises as fsMock } from 'fs';
 import {
+  createDimensionGrammarFromCSVDefinition,
   getDimensionColumns,
   getDimensionNameFromFilePath,
   getPrimaryKeyAndIndexes,
@@ -165,5 +166,36 @@ describe('DimensionGrammarService', () => {
       );
       expect(dimensionGrammar.schema.properties['school_id'].unique).toBe(true);
     });
+  });
+});
+
+describe('createDimensionGrammarFromCSVDefinition', () => {
+
+  it('should return null for invalid CSV format', async () => {
+    const mockReadFile = jest.fn().mockResolvedValue(`
+      invalid_row_1,invalid_row_2,invalid_row_3
+      invalid_row_1,invalid_row_2,invalid_row_3
+      invalid_row_1,invalid_row_2,invalid_row_3
+    `);
+    const csvFilePath = '/path/to/invalid_file.csv';
+    console.error = jest.fn();
+    const result = await createDimensionGrammarFromCSVDefinition(csvFilePath, mockReadFile);
+    expect(result).toBeNull();
+    expect(mockReadFile).toHaveBeenCalledWith(csvFilePath, 'utf-8');
+    expect(console.error).toHaveBeenCalledWith(`Invalid CSV format for file: ${csvFilePath}`);
+  });
+
+
+  test('Test createDimensionGrammarFromCSVDefinition with a valid file path', async () => {
+    const mockReadFile = (path, encoding) => {
+      return Promise.resolve(`id, name, price\n1, Product A, 10.99\n2, Product B, 15.49\n3, Product C, 5.99`);
+    };
+    const csvFilePath = 'mockvalid/products.csv';
+    const dimensionGrammar = await createDimensionGrammarFromCSVDefinition(csvFilePath, mockReadFile);
+    expect(dimensionGrammar).not.toBeNull();
+    expect(dimensionGrammar.name).toBe('products');
+    expect(dimensionGrammar.schema.properties['2']).toBeDefined(); 
+    expect(dimensionGrammar.schema.title).toBe('products');
+    expect(dimensionGrammar.schema.psql_schema).toBe('dimensions');
   });
 });
