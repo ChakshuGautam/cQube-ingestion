@@ -10,6 +10,7 @@ import * as csv from 'csv-parser';
 import { DimensionGrammarService } from './parser/dimension-grammar/dimension-grammar.service';
 import { Pool } from 'pg';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { WinstonModule } from 'nest-winston';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs').promises;
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -37,7 +38,7 @@ describe('CsvAdapterService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [ConfigModule],
+      imports: [ConfigModule, WinstonModule.forRoot({}) ],
       providers: [
         CsvAdapterService,
         EventService,
