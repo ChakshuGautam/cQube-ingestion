@@ -16,7 +16,10 @@ import {
 } from '../../types/parser';
 import { readCSVFile } from '../utils/csvreader';
 
-export async function getEGDefFromFile(csvFilePath: string) {
+export async function getEGDefFromFile(
+  csvFilePath: string,
+  singleDimensionWhitelist?: string[],
+) {
   const [
     dimensionName,
     dimensionGrammarKey,
@@ -24,6 +27,8 @@ export async function getEGDefFromFile(csvFilePath: string) {
     fieldName,
     fieldType,
   ] = await readCSVFile(csvFilePath);
+  console.log('csvFilePath: ', csvFilePath);
+  // console.log('dimensionName in getEGDefFromFile', dimensionName);
 
   const eventGrammarDef: EventGrammarCSVFormat[] =
     processCSVtoEventGrammarDefJSON(
@@ -32,10 +37,11 @@ export async function getEGDefFromFile(csvFilePath: string) {
       fieldDataType,
       fieldName,
       fieldType,
+      singleDimensionWhitelist,
     );
   // Find text "metric" in row 5 get it's index and get the value from row 4
   const instrumentField = getInstrumentField(fieldName, fieldType);
-
+  console.log('eventGrammarDef', eventGrammarDef);
   return { eventGrammarDef, instrumentField };
 }
 
@@ -43,19 +49,28 @@ export const createEventGrammarFromCSVDefinition = async (
   csvFilePath: string,
   dimensionFileBasePath: string,
   programNamespace: string,
+  whitelistedDimensions?: string[],
 ): Promise<EventGrammar[]> => {
-  const eventGrammars: EventGrammar[] = [];
+  if (whitelistedDimensions.length === 0) return []; // this is the case when onlyCreateWhitelist is true and the user has not specified any single dimensions as whitelisted
 
-  const {
-    eventGrammarDef,
-    instrumentField,
-  }: {
+  const eventGrammars: EventGrammar[] = [];
+  let egDefFromFile: {
     eventGrammarDef: EventGrammarCSVFormat[];
     instrumentField: string;
-  } = await getEGDefFromFile(csvFilePath);
+  };
+
+  if (whitelistedDimensions.length === 1 && whitelistedDimensions[0] === '*') {
+    // case when onlyCreateWhiteListed is false or is true and the user has defined '*' to signify all dimensions
+    egDefFromFile = await getEGDefFromFile(csvFilePath, null);
+  } else {
+    // case when onlyCreateWhiteListed is True and we pass in the array of whitelisted dimensions
+    egDefFromFile = await getEGDefFromFile(csvFilePath, whitelistedDimensions);
+  }
 
   // Find eventGrammarsDefs where field type is dimension
-  const dimensionGrammarDefs = getDGDefsFromEGDefs(eventGrammarDef);
+  const dimensionGrammarDefs = getDGDefsFromEGDefs(
+    egDefFromFile.eventGrammarDef,
+  );
 
   for (const dimensionGrammarDef of dimensionGrammarDefs) {
     const dimensionGrammar = await createDimensionGrammarFromCSVDefinition(
@@ -68,7 +83,7 @@ export const createEventGrammarFromCSVDefinition = async (
     };
 
     // Ignore every other dimension and pick the other ones.
-    const eventColumns: Column[] = eventGrammarDef
+    const eventColumns: Column[] = egDefFromFile.eventGrammarDef
       .filter((value) => value.fieldType !== FieldType.dimension)
       .map((value) => {
         return {
@@ -96,7 +111,7 @@ export const createEventGrammarFromCSVDefinition = async (
       eventName,
       mapping,
       eventColumns,
-      instrumentField,
+      egDefFromFile.instrumentField,
       csvFilePath,
     );
 

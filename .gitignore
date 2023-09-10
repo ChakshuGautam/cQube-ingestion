@@ -6,3 +6,7 @@ venv
 scratchpad.md
 .env
 random_data.csv
+
+ingest
+ingest-bak
+ingest-new
