@@ -98,6 +98,7 @@ export const processCSVtoEventGrammarDefJSON = (
   fieldDataType: string,
   fieldName: string,
   fieldType: string,
+  singleDimensionWhitelist?: string[],
 ): EventGrammarCSVFormat[] => {
   // Vertical columns for CSV File
   // | dimensionName |
@@ -105,21 +106,27 @@ export const processCSVtoEventGrammarDefJSON = (
   // | fieldDataType |
   // | fieldName |
   // | fieldType |
-  return fieldType.split(',').map((value, index) => {
-    return {
-      dimensionName:
-        dimensionName.split(',')[index].trim() === ''
-          ? null
-          : dimensionName.split(',')[index].trim(),
-      dimensionGrammarKey:
-        dimensionGrammarKey.split(',')[index].trim() === ''
-          ? null
-          : dimensionGrammarKey.split(',')[index].trim(),
-      fieldDataType: fieldDataType.split(',')[index].trim() as ColumnType,
-      fieldName: fieldName.split(',')[index].trim(),
-      fieldType: fieldType.split(',')[index].trim() as FieldType,
-    };
-  });
+  return fieldType
+    .split(',')
+    .map((value, index) => {
+      return {
+        dimensionName:
+          dimensionName.split(',')[index].trim() === ''
+            ? null
+            : dimensionName.split(',')[index].trim(),
+        dimensionGrammarKey:
+          dimensionGrammarKey.split(',')[index].trim() === ''
+            ? null
+            : dimensionGrammarKey.split(',')[index].trim(),
+        fieldDataType: fieldDataType.split(',')[index].trim() as ColumnType,
+        fieldName: fieldName.split(',')[index].trim(),
+        fieldType: fieldType.split(',')[index].trim() as FieldType,
+      };
+    })
+    .filter((item) => {
+      if (!singleDimensionWhitelist) return true;
+      return singleDimensionWhitelist.includes(item.dimensionName);
+    });
 };
 
 export const getInstrumentField = (
