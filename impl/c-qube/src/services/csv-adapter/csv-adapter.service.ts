@@ -202,7 +202,11 @@ export class CsvAdapterService {
             dimensionGrammarFolder,
             config?.programs[j].namespace,
             config?.programs[j].onlyCreateWhitelisted
-              ? config?.programs[j].dimensions.whitelisted.single
+              ? config?.programs[j].dimensions.whitelisted.filter(
+                (whitelistedDimensions: string) => {
+                  return whitelistedDimensions.trim().split(',').length === 1;
+                },
+              )
               : ['*'],
           );
           eventGrammarsGlobal.push(...eventGrammar);
@@ -245,8 +249,11 @@ export class CsvAdapterService {
     for (let j = 0; j < config?.programs.length; j++) {
       const inputFiles = readdirSync(config?.programs[j].input?.files);
       for (let i = 0; i < inputFiles?.length; i++) {
-        const compoundDimensions: string[] =
-          config.programs[j].dimensions.whitelisted.compound;
+        const compoundDimensions: string[] = config.programs[
+          j
+        ].dimensions.whitelisted.filter((whitelistedDimensions: string) => {
+          return whitelistedDimensions.trim().split(',').length > 1;
+        });
         for (let k = 0; k < compoundDimensions.length; k++) {
           const eventGrammarFiles = [];
           const compoundDimensionsToBeInEG = compoundDimensions[k]
