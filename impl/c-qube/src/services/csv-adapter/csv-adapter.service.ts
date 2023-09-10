@@ -185,14 +185,15 @@ export class CsvAdapterService {
     s.start('🚧 4. Processing Event Grammars');
     const eventGrammarsGlobal: EventGrammar[] = [];
     for (let j = 0; j < config?.programs.length; j++) {
-      const inputFiles = readdirSync(config?.programs[j].input?.files);
+      const inputFiles = readdirSync(config?.programs[j].input?.files); // read the data files
       // For 1TimeDimension + 1EventCounter + 1Dimension
+      // Looping through the data files for the program
       for (let i = 0; i < inputFiles?.length; i++) {
         if (regexEventGrammar.test(inputFiles[i])) {
-          // console.log(config?.programs[j].input?.files + `/${inputFiles[i]}`);
+          // check if the filename is as per the standard
           const eventGrammarFileName =
             config?.programs[j].input?.files + `/${inputFiles[i]}`;
-          // console.log(eventGrammarFileName);
+          // check if there is a time-dimension in the current data file
           const ifTimeDimensionPresent = await isTimeDimensionPresent(
             eventGrammarFileName,
           );
@@ -200,6 +201,9 @@ export class CsvAdapterService {
             eventGrammarFileName,
             dimensionGrammarFolder,
             config?.programs[j].namespace,
+            config?.programs[j].onlyCreateWhitelisted
+              ? config?.programs[j].dimensions.whitelisted.single
+              : ['*'],
           );
           eventGrammarsGlobal.push(...eventGrammar);
           for (let i = 0; i < eventGrammar.length; i++) {
@@ -224,6 +228,8 @@ export class CsvAdapterService {
             );
             datasetGrammarsGlobal.push(...dgs2);
           }
+        } else {
+          // TODO: add this file name to a error log file and show at the end
         }
       }
     }
@@ -240,7 +246,7 @@ export class CsvAdapterService {
       const inputFiles = readdirSync(config?.programs[j].input?.files);
       for (let i = 0; i < inputFiles?.length; i++) {
         const compoundDimensions: string[] =
-          config.programs[j].dimensions.whitelisted;
+          config.programs[j].dimensions.whitelisted.compound;
         for (let k = 0; k < compoundDimensions.length; k++) {
           const eventGrammarFiles = [];
           const compoundDimensionsToBeInEG = compoundDimensions[k]
@@ -384,6 +390,7 @@ export class CsvAdapterService {
 
     // Create Empty Dataset Tables
     for (let i = 0; i < datasetGrammarsGlobal.length; i++) {
+      // console.log('datasetGrammarsGlobal[i]: ', datasetGrammarsGlobal[i]);
       await this.datasetService.createDataset(datasetGrammarsGlobal[i]);
     }
 
