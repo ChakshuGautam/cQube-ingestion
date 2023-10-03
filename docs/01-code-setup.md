@@ -36,7 +36,7 @@ Create the environment (`.env`) file for connecting to the `timescaledb` docker 
 
 ```bash
 touch .env
-echo "DATABASE_URL="postgres://timescaledb:postgrespassword@localhost:8001/postgres?sslmode=disable"" > .env
+echo "DATABASE_URL"="postgres://timescaledb:postgrespassword@localhost:8001/postgres?sslmode=disable" > .env
 ```
 
 Install all the necessary `yarn` dependencies (while staying within the `impl/c-qube` folder)
