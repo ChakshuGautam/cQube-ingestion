@@ -3818,6 +3818,11 @@ nodejs-polars-linux-x64-gnu@0.7.2:
   resolved "https://registry.npmjs.org/nodejs-polars-linux-x64-gnu/-/nodejs-polars-linux-x64-gnu-0.7.2.tgz"
   integrity sha512-liAu2Yhtj97Ca1YducGEbT9+NKrV/z7+EBaPlo6BC8qIdwDsVzu/3A2g56HxmNclvEkguKnyibjEnOAtQbhMqQ==
 
+nodejs-polars-linux-x64-gnu@^0.7.2:
+  version "0.7.4"
+  resolved "https://registry.yarnpkg.com/nodejs-polars-linux-x64-gnu/-/nodejs-polars-linux-x64-gnu-0.7.4.tgz#53eb393bb6ee160e0112694440efb424c3cf6640"
+  integrity sha512-HkoBJ1BljBWxxr/7yGEHz/dynV6quwvgvXZ28wzhivM0ULNHSgdvZKZZ5rOCvnBIBm3QjogrlWR6u6c+lAcQUA==
+
 nodejs-polars-win32-ia32-msvc@0.7.2:
   version "0.7.2"
   resolved "https://registry.yarnpkg.com/nodejs-polars-win32-ia32-msvc/-/nodejs-polars-win32-ia32-msvc-0.7.2.tgz#ec25c954f0b047b336db6d4fd1d8b82fa246cbec"
@@ -4028,6 +4033,16 @@ path-type@^4.0.0:
   resolved "https://registry.npmjs.org/path-type/-/path-type-4.0.0.tgz"
   integrity sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==
 
+pg-cloudflare@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/pg-cloudflare/-/pg-cloudflare-1.1.0.tgz#833d70870d610d14bf9df7afb40e1cba310c17a0"
+  integrity sha512-tGM8/s6frwuAIyRcJ6nWcIvd3+3NmUKIs6OjviIm1HPPFEt5MzQDOTBQyhPWg/m0kCl95M6gA1JaIXtS8KovOA==
+
+pg-connection-string@^2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/pg-connection-string/-/pg-connection-string-2.6.0.tgz#12a36cc4627df19c25cc1b9b736cc39ee1f73ae8"
+  integrity sha512-x14ibktcwlHKoHxx9X3uTVW9zIGR41ZB6QNhHb21OPNdCCO3NaRnpJuwKIQSR4u+Yqjx4HCvy7Hh7VSy1U4dGg==
+=======
 pg-cloudflare@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/pg-cloudflare/-/pg-cloudflare-1.1.1.tgz#e6d5833015b170e23ae819e8c5d7eaedb472ca98"
@@ -4043,6 +4058,11 @@ pg-int8@1.0.1:
   resolved "https://registry.yarnpkg.com/pg-int8/-/pg-int8-1.0.1.tgz#943bd463bf5b71b4170115f80f8efc9a0c0eb78c"
   integrity sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==
 
+pg-pool@^3.6.0:
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/pg-pool/-/pg-pool-3.6.0.tgz#3190df3e4747a0d23e5e9e8045bcd99bda0a712e"
+  integrity sha512-clFRf2ksqd+F497kWFyM21tMjeikn60oGDmqMT8UBrynEwVEX/5R5xd2sdvdo1cZCFlguORNpVuqxIj+aK4cfQ==
+=======
 pg-pool@^3.6.1:
   version "3.6.1"
   resolved "https://registry.yarnpkg.com/pg-pool/-/pg-pool-3.6.1.tgz#5a902eda79a8d7e3c928b77abf776b3cb7d351f7"
@@ -4065,6 +4085,15 @@ pg-types@^2.1.0:
     postgres-interval "^1.1.0"
 
 pg@^8.10.0:
+
+  version "8.11.0"
+  resolved "https://registry.yarnpkg.com/pg/-/pg-8.11.0.tgz#a37e534e94b57a7ed811e926f23a7c56385f55d9"
+  integrity sha512-meLUVPn2TWgJyLmy7el3fQQVwft4gU5NGyvV0XbD41iU9Jbg8lCH4zexhIkihDzVHJStlt6r088G6/fWeNjhXA==
+  dependencies:
+    buffer-writer "2.0.0"
+    packet-reader "1.0.0"
+    pg-connection-string "^2.6.0"
+    pg-pool "^3.6.0"
   version "8.11.3"
   resolved "https://registry.yarnpkg.com/pg/-/pg-8.11.3.tgz#d7db6e3fe268fcedd65b8e4599cda0b8b4bf76cb"
   integrity sha512-+9iuvG8QfaaUrrph+kpF24cXkH1YOOUeArRNYIxq1viYHZagBxrTno7cecY1Fa44tJeZvaoG+Djpkc3JwehN5g==
@@ -4073,11 +4102,15 @@ pg@^8.10.0:
     packet-reader "1.0.0"
     pg-connection-string "^2.6.2"
     pg-pool "^3.6.1"
+
     pg-protocol "^1.6.0"
     pg-types "^2.1.0"
     pgpass "1.x"
   optionalDependencies:
+
+    pg-cloudflare "^1.1.0"
     pg-cloudflare "^1.1.1"
+
 
 pgpass@1.x:
   version "1.0.5"
