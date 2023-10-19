@@ -1,0 +1,102 @@
+{
+  "args": {
+    "schema": {
+      "fk": [
+        {
+          "column": "gender",
+          "reference": { "table": "gender", "column": "gender_id" }
+        },
+        {
+          "column": "district_id",
+          "reference": { "table": "district", "column": "district_id" }
+        }
+      ],
+      "title": "sch_att_studentsmarked_Z2tnSW9jIGRNYmR9YHRf",
+      "properties": {
+        "gender": { "type": "string" },
+        "district_id": { "type": "string" },
+        "count": { "type": "number", "format": "float" },
+        "sum": { "type": "number", "format": "float" },
+        "avg": { "type": "number", "format": "float" },
+        "week": { "type": "integer" },
+        "year": { "type": "integer" }
+      },
+      "psql_schema": "datasets"
+    },
+    "data": [
+      {
+        "count": 120,
+        "sum": 4200,
+        "avg": 35,
+        "week": 9,
+        "year": 2023,
+        "gender": "male",
+        "district_id": "101"
+      },
+      {
+        "count": 120,
+        "sum": 4176,
+        "avg": 34.8,
+        "week": 8,
+        "year": 2023,
+        "gender": "male",
+        "district_id": "101"
+      },
+      {
+        "count": 120,
+        "sum": 4083,
+        "avg": 34.025,
+        "week": 6,
+        "year": 2023,
+        "gender": "male",
+        "district_id": "101"
+      },
+      {
+        "count": 239,
+        "sum": 8269,
+        "avg": 34.59832635983263,
+        "week": 7,
+        "year": 2023,
+        "gender": "male",
+        "district_id": "101"
+      },
+      {
+        "count": 120,
+        "sum": 4184,
+        "avg": 34.86666666666667,
+        "week": 9,
+        "year": 2023,
+        "gender": "female",
+        "district_id": "101"
+      },
+      {
+        "count": 120,
+        "sum": 4111,
+        "avg": 34.25833333333333,
+        "week": 8,
+        "year": 2023,
+        "gender": "female",
+        "district_id": "101"
+      },
+      {
+        "count": 120,
+        "sum": 4141,
+        "avg": 34.50833333333333,
+        "week": 6,
+        "year": 2023,
+        "gender": "female",
+        "district_id": "101"
+      },
+      {
+        "count": 240,
+        "sum": 8278,
+        "avg": 34.49166666666667,
+        "week": 7,
+        "year": 2023,
+        "gender": "female",
+        "district_id": "101"
+      }
+    ]
+  },
+  "output": "CREATE TABLE IF NOT EXISTS temp_sch_att_studentsmarked_Z2tnSW9jIGRNYmR9YHRf  (LIKE datasets.sch_att_studentsmarked_Z2tnSW9jIGRNYmR9YHRf);  INSERT INTO temp_sch_att_studentsmarked_Z2tnSW9jIGRNYmR9YHRf  (gender, district_id, count, sum, avg, week, year, id) VALUES ('male', '101', '120', '4200', '35', '9', '2023', 1), ('male', '101', '120', '4176', '34.8', '8', '2023', 2), ('male', '101', '120', '4083', '34.025', '6', '2023', 3), ('male', '101', '239', '8269', '34.59832635983263', '7', '2023', 4), ('female', '101', '120', '4184', '34.86666666666667', '9', '2023', 5), ('female', '101', '120', '4111', '34.25833333333333', '8', '2023', 6), ('female', '101', '120', '4141', '34.50833333333333', '6', '2023', 7), ('female', '101', '240', '8278', '34.49166666666667', '7', '2023', 8);  INSERT INTO datasets.sch_att_studentsmarked_Z2tnSW9jIGRNYmR9YHRf (gender, district_id, count, sum, avg, week, year)        SELECT temp_sch_att_studentsmarked_Z2tnSW9jIGRNYmR9YHRf .gender, temp_sch_att_studentsmarked_Z2tnSW9jIGRNYmR9YHRf .district_id, temp_sch_att_studentsmarked_Z2tnSW9jIGRNYmR9YHRf .count, temp_sch_att_studentsmarked_Z2tnSW9jIGRNYmR9YHRf .sum, temp_sch_att_studentsmarked_Z2tnSW9jIGRNYmR9YHRf .avg, temp_sch_att_studentsmarked_Z2tnSW9jIGRNYmR9YHRf .week, temp_sch_att_studentsmarked_Z2tnSW9jIGRNYmR9YHRf .year FROM temp_sch_att_studentsmarked_Z2tnSW9jIGRNYmR9YHRf          LEFT JOIN dimensions.gender ON temp_sch_att_studentsmarked_Z2tnSW9jIGRNYmR9YHRf .gender = dimensions.gender.gender  LEFT JOIN dimensions.district ON temp_sch_att_studentsmarked_Z2tnSW9jIGRNYmR9YHRf .district_id = dimensions.district.district_id         WHERE TRUE AND dimensions.gender.gender IS NOT NULL AND dimensions.district.district_id IS NOT NULL         ON CONFLICT ON CONSTRAINT unique_sch_att_studentsmarked_Z2tnSW9jIGRNYmR9YHRf DO UPDATE SET sum = datasets.sch_att_studentsmarked_Z2tnSW9jIGRNYmR9YHRf.sum + EXCLUDED.sum, count = datasets.sch_att_studentsmarked_Z2tnSW9jIGRNYmR9YHRf.count + EXCLUDED.count, avg = (datasets.sch_att_studentsmarked_Z2tnSW9jIGRNYmR9YHRf.sum + EXCLUDED.sum) / (datasets.sch_att_studentsmarked_Z2tnSW9jIGRNYmR9YHRf.count + EXCLUDED.count); DROP TABLE temp_sch_att_studentsmarked_Z2tnSW9jIGRNYmR9YHRf ;"
+}

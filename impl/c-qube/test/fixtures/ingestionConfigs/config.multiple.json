@@ -1,0 +1,34 @@
+{
+  "globals": {
+    "onlyCreateWhitelisted": true
+  },
+  "dimensions": {
+    "namespace": "dimensions",
+    "fileNameFormat": "${dimensionName}.${index}.dimensions.data.csv",
+    "input": {
+      "files": "./ingest/dimensions"
+    }
+  },
+  "programs": [
+    {
+      "name": "DIKSHA",
+      "namespace": "diksha",
+      "description": "DIKSHA",
+      "shouldIngestToDB": true,
+      "input": {
+        "files": "./ingest/programs/diksha"
+      },
+      "./output": {
+        "location": "./output/programs/diksha"
+      },
+      "dimensions": {
+        "whitelisted": [
+          "state,grade,subject,medium,board",
+          "textbookdiksha,grade,subject,medium",
+          "textbookdiksha,grade,subject,medium"
+        ],
+        "blacklisted": []
+      }
+    }
+  ]
+}

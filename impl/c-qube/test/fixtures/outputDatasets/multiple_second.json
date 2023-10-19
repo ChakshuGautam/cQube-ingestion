@@ -1,0 +1,51 @@
+[
+  {
+    "grade_diksha": "Class 2",
+    "avg": 2,
+    "count": 2,
+    "sum": 4,
+    "id": 1
+  },
+  {
+    "grade_diksha": "Class 1",
+    "avg": 2,
+    "count": 4,
+    "sum": 8,
+    "id": 2
+  },
+  {
+    "grade_diksha": "Class 4",
+    "avg": 1,
+    "count": 2,
+    "sum": 2,
+    "id": 7
+  },
+  {
+    "grade_diksha": "Class 8",
+    "avg": 3,
+    "count": 2,
+    "sum": 6,
+    "id": 5
+  },
+  {
+    "grade_diksha": "Class 7",
+    "avg": 1.5,
+    "count": 4,
+    "sum": 6,
+    "id": 4
+  },
+  {
+    "grade_diksha": "Class 3",
+    "avg": 3.3333333333333335,
+    "count": 6,
+    "sum": 20,
+    "id": 6
+  },
+  {
+    "grade_diksha": "Class 6",
+    "avg": 2.25,
+    "count": 8,
+    "sum": 18,
+    "id": 3
+  }
+]
