@@ -110,7 +110,7 @@ export class QueryBuilderService {
         .slice(0, -2)
         .concat(uniqueStatements)
         .concat(');');
-      console.log('sql:', createStatement);
+      // console.log('sql:', createStatement);
       // console.log('schema: ', schema);
     }
 

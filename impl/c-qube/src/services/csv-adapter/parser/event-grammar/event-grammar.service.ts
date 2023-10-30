@@ -15,6 +15,7 @@ import {
   FieldType,
 } from '../../types/parser';
 import { readCSVFile } from '../utils/csvreader';
+import { PrismaService } from 'src/prisma.service';
 
 export async function getEGDefFromFile(csvFilePath: string) {
   const [
@@ -37,6 +38,28 @@ export async function getEGDefFromFile(csvFilePath: string) {
   const instrumentField = getInstrumentField(fieldName, fieldType);
 
   return { eventGrammarDef, instrumentField };
+}
+
+export async function getEGDefFromDB(
+  csvFilePath: string,
+  prisma: PrismaService,
+) {
+  console.log('csvFilePath: ', csvFilePath);
+  const metrics = await prisma.eventGrammar.findMany({
+    where: {
+      file: csvFilePath,
+    },
+    select: {
+      egSchema: true,
+      metric: true,
+    },
+  });
+  console.log('metrics: ', metrics);
+
+  return {
+    eventGrammarDef: metrics[0]?.egSchema,
+    instrumentField: metrics[0]?.metric,
+  };
 }
 
 export const createEventGrammarFromCSVDefinition = async (

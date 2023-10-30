@@ -27,6 +27,7 @@ import {
 } from './parser/dataset/dataset-grammar.helper';
 import {
   createEventGrammarFromCSVDefinition,
+  getEGDefFromDB,
   getEGDefFromFile,
 } from './parser/event-grammar/event-grammar.service';
 import {
@@ -494,77 +495,77 @@ export class CsvAdapterService {
     for (let m = 0; m < compoundDatasetGrammars.length; m++) {
       promises.push(
         limit(() =>
-          getEGDefFromFile(compoundDatasetGrammars[m].eventGrammarFile).then(
-            async (s) => {
-              const {
-                instrumentField,
-              }: {
-                eventGrammarDef: EventGrammarCSVFormat[];
-                instrumentField: string;
-              } = s;
-              const compoundEventGrammar: EventGrammar = {
-                name: '',
-                description: '',
-                dimension: [],
-                instrument_field: instrumentField,
-                is_active: true,
-                schema: {},
-                instrument: {
-                  type: InstrumentType.COUNTER,
-                  name: 'counter',
-                },
-              };
-              const events: Event[] =
-                await createCompoundDatasetDataToBeInserted(
-                  compoundDatasetGrammars[m].eventGrammarFile.replace(
-                    'grammar',
-                    'data',
-                  ),
-                  compoundEventGrammar,
-                  compoundDatasetGrammars[m],
-                );
-              // Create Pipes
-              const pipe: Pipe = {
-                event: compoundEventGrammar,
-                transformer: defaultTransformers[0],
-                dataset: compoundDatasetGrammars[m],
-              };
-              const transformContext: TransformerContext = {
-                dataset: compoundDatasetGrammars[m],
-                events: events,
-                isChainable: false,
-                pipeContext: {},
-              };
-              if (events && events.length > 0) {
-                const datasetUpdateRequest: DatasetUpdateRequest[] =
-                  pipe.transformer.transformSync(
-                    callback,
-                    transformContext,
-                    events,
-                  ) as DatasetUpdateRequest[];
+          getEGDefFromDB(
+            compoundDatasetGrammars[m].eventGrammarFile,
+            this.prisma,
+          ).then(async (s) => {
+            const {
+              instrumentField,
+            }: {
+              eventGrammarDef: EventGrammarCSVFormat[];
+              instrumentField: string;
+            } = s as any;
+            const compoundEventGrammar: EventGrammar = {
+              name: '',
+              description: '',
+              dimension: [],
+              instrument_field: instrumentField,
+              is_active: true,
+              schema: {},
+              instrument: {
+                type: InstrumentType.COUNTER,
+                name: 'counter',
+              },
+            };
+            const events: Event[] = await createCompoundDatasetDataToBeInserted(
+              compoundDatasetGrammars[m].eventGrammarFile.replace(
+                'grammar',
+                'data',
+              ),
+              compoundEventGrammar,
+              compoundDatasetGrammars[m],
+            );
+            // Create Pipes
+            const pipe: Pipe = {
+              event: compoundEventGrammar,
+              transformer: defaultTransformers[0],
+              dataset: compoundDatasetGrammars[m],
+            };
+            const transformContext: TransformerContext = {
+              dataset: compoundDatasetGrammars[m],
+              events: events,
+              isChainable: false,
+              pipeContext: {},
+            };
+            if (events && events.length > 0) {
+              const datasetUpdateRequest: DatasetUpdateRequest[] =
+                pipe.transformer.transformSync(
+                  callback,
+                  transformContext,
+                  events,
+                ) as DatasetUpdateRequest[];
 
-                // console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
+              // console.log(datasetUpdateRequest.length, datasetUpdateRequest[0]);
 
-                await this.datasetService
-                  .processDatasetUpdateRequest(datasetUpdateRequest)
-                  .then(() => {
-                    this.logger.verbose(
-                      `Ingested Compound Dataset without any error ${events.length} events for ${compoundDatasetGrammars[m].name}`,
-                    );
-                  })
-                  .catch((e) => {
-                    this.logger.verbose(
-                      `Ingested Compound Dataset with error ${events.length} events for ${compoundDatasetGrammars[m].name}`,
-                    );
-                  });
-              } else {
-                console.error(
-                  'No relevant events for this dataset',
-                  compoundDatasetGrammars[m].name,
-                );
-              }
-            },
-          ),
+              await this.datasetService
+                .processDatasetUpdateRequest(datasetUpdateRequest)
+                .then(() => {
+                  this.logger.verbose(
+                    `Ingested Compound Dataset without any error ${events.length} events for ${compoundDatasetGrammars[m].name}`,
+                  );
+                })
+                .catch((e) => {
+                  this.logger.verbose(
+                    `Ingested Compound Dataset with error ${events.length} events for ${compoundDatasetGrammars[m].name}`,
+                  );
+                });
+            } else {
+              console.error(
+                'No relevant events for this dataset',
+                compoundDatasetGrammars[m].name,
+              );
+            }
+          }),
         ),
       );
     }

@@ -72,6 +72,8 @@ model EventGrammar {
   file             String?
   eventType        EventType        @default(INTERNAL)
   DatasetGrammar   DatasetGrammar[]
+  metric           String
+  egSchema         String
 
   @@schema("spec")
 }
