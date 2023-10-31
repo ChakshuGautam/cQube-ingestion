@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { JSONSchema4 } from 'json-schema';
+import { hash } from '../../utils/hash';
 
 const fs = require('fs');
+const crypto = require('crypto');
 
 type fk = {
   column: string;
@@ -49,7 +51,7 @@ export class QueryBuilderService {
     const tableName = schema.title;
     const psqlSchema = schema.psql_schema;
     const primaryKeySegment = autoPrimaryKey ? '\n id SERIAL PRIMARY KEY,' : '';
-    let createStatement = `CREATE TABLE ${psqlSchema}.${tableName} (${primaryKeySegment}\n`;
+    let createStatement = `CREATE TABLE IF NOT EXISTS ${psqlSchema}.${tableName} (${primaryKeySegment}\n`;
 
     const properties = schema.properties;
 
@@ -97,7 +99,8 @@ export class QueryBuilderService {
       );
 
       // adding unique constraint
-      let uniqueStatements = `,\nconstraint unique_${tableName} UNIQUE (`;
+      const hashedTableName = hash(tableName, 'secret', {});
+      let uniqueStatements = `,\nconstraint unique_${hashedTableName} UNIQUE (`;
       schema.fk.forEach((fk: fk) => {
         uniqueStatements += `${fk.column}, `;
       });
@@ -126,6 +129,7 @@ export class QueryBuilderService {
 
       for (const index of indexes) {
         for (const column of index.columns) {
+          if (column.length === 0) continue;
           const indexName = `${schema.title}_${column.join('_')}_idx`;
           const columns = column.join(', ');
           const statement = `CREATE INDEX ${indexName} ON ${psqlSchema}.${schema.title} (${columns});`;
@@ -206,7 +210,11 @@ export class QueryBuilderService {
     return query
       .slice(0, -1)
       .concat(
-        ` ON CONFLICT ON CONSTRAINT unique_${tableName} DO UPDATE SET sum = datasets.${tableName}.sum + EXCLUDED.sum, count = datasets.${tableName}.count + EXCLUDED.count, avg = (datasets.${tableName}.sum + EXCLUDED.sum) / (datasets.${tableName}.count + EXCLUDED.count); `,
+        ` ON CONFLICT ON CONSTRAINT unique_${hash(
+          tableName,
+          'secret',
+          {},
+        )} DO UPDATE SET sum = datasets.${tableName}.sum + EXCLUDED.sum, count = datasets.${tableName}.count + EXCLUDED.count, avg = (datasets.${tableName}.sum + EXCLUDED.sum) / (datasets.${tableName}.count + EXCLUDED.count); `,
       );
   }
 
@@ -277,7 +285,11 @@ export class QueryBuilderService {
         .join(', ')} FROM ${tempTableName}
         ${joinStatements === '' ? ' ' : joinStatements}
         WHERE TRUE${whereStatements === '' ? ' ' : whereStatements} 
-        ON CONFLICT ON CONSTRAINT unique_${tableName} DO UPDATE SET sum = ${psqlSchema}.${tableName}.sum + EXCLUDED.sum, count = ${psqlSchema}.${tableName}.count + EXCLUDED.count, avg = (${psqlSchema}.${tableName}.sum + EXCLUDED.sum) / (${psqlSchema}.${tableName}.count + EXCLUDED.count);`;
+        ON CONFLICT ON CONSTRAINT unique_${hash(
+          tableName,
+          'secret',
+          {},
+        )} DO UPDATE SET sum = ${psqlSchema}.${tableName}.sum + EXCLUDED.sum, count = ${psqlSchema}.${tableName}.count + EXCLUDED.count, avg = (${psqlSchema}.${tableName}.sum + EXCLUDED.sum) / (${psqlSchema}.${tableName}.count + EXCLUDED.count);`;
 
     queries.push(filteredInsert);
 

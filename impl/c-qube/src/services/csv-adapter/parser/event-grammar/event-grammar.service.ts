@@ -44,7 +44,6 @@ export async function getEGDefFromDB(
   csvFilePath: string,
   prisma: PrismaService,
 ) {
-  console.log('csvFilePath: ', csvFilePath);
   const metrics = await prisma.eventGrammar.findMany({
     where: {
       file: csvFilePath,
@@ -54,7 +53,6 @@ export async function getEGDefFromDB(
       metric: true,
     },
   });
-  console.log('metrics: ', metrics);
 
   return {
     eventGrammarDef: metrics[0]?.egSchema,

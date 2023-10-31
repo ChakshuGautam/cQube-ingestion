@@ -15,6 +15,13 @@ export class DimensionGrammarService {
   async createDimensionGrammarFromCSVDefinition(
     csvFilePath: string,
   ): Promise<DimensionGrammar | null> {
+    try {
+      await fs.access(csvFilePath, fs.constants.F_OK);
+    } catch (err) {
+      console.error(`File at: ${csvFilePath} does not exist`);
+      return null;
+    }
+
     const fileContent = await fs.readFile(csvFilePath, 'utf-8');
     const [row1, row2, row3] = fileContent.split('\n').map((row) => row.trim());
 

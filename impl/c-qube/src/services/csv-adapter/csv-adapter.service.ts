@@ -28,7 +28,6 @@ import {
 import {
   createEventGrammarFromCSVDefinition,
   getEGDefFromDB,
-  getEGDefFromFile,
 } from './parser/event-grammar/event-grammar.service';
 import {
   createCompoundDatasetGrammars,
@@ -487,7 +486,7 @@ export class CsvAdapterService {
         ),
       );
     }
-
+    this.logger.verbose('Ingested single DatasetGrammars');
     const compoundDatasetGrammars: DatasetGrammar[] =
       await this.datasetService.getCompoundDatasetGrammars(filter);
 
