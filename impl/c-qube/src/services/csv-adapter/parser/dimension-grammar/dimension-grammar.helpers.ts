@@ -6,7 +6,14 @@ export const createDimensionGrammarFromCSVDefinition = async (
   csvFilePath: string,
   readFile: (path: string, encoding: string) => Promise<string> = fs.readFile,
 ): Promise<DimensionGrammar | null> => {
+  fs.access(csvFilePath, fs.constants.F_OK, (err) => {
+    if (err) {
+      console.error('File does not exist');
+      return null;
+    }
+  });
   const fileContent = await readFile(csvFilePath, 'utf-8');
+
   const [row1, row2, row3] = fileContent.split('\n').map((row) => row.trim());
 
   if (!isValidCSVFormat(row1, row2, row3)) {

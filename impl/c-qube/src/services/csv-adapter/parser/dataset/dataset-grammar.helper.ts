@@ -18,6 +18,13 @@ export const createDatasetDataToBeInserted = async (
 
   const filePath = eventGrammar.file.replace('grammar', 'data');
 
+  fs.access(filePath, fs.constants.F_OK, (err) => {
+    if (err) {
+      console.error(`File at $${filePath} does not exist`);
+      return;
+    }
+  });
+
   const df = await readCSV(filePath);
   if (!df || !df[0]) return;
 
@@ -94,6 +101,12 @@ export const createCompoundDatasetDataToBeInserted = async (
   delete properties.year;
 
   // checking if the file is empty or not
+  fs.access(eventFilePath, fs.constants.F_OK, (err) => {
+    if (err) {
+      console.error('File does not exist');
+      return;
+    }
+  });
   const stats = fs.statSync(eventFilePath);
   if (stats.size === 0) {
     console.log(`File at ${eventFilePath} is empty`);

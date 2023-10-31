@@ -2,6 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { JSONSchema4 } from 'json-schema';
 import { QueryBuilderService } from './query-builder.service';
 
+// JSON imports
+import * as createStatementInput from './test-fixtures/createStatement.json';
+import * as insertStatementInput from './test-fixtures/insertStatement.json';
+
 describe('QueryBuilderService', () => {
   let service: QueryBuilderService;
 
@@ -240,5 +244,23 @@ describe('QueryBuilderService', () => {
         date_created TIMESTAMP
       );`),
     );
+  });
+
+  it('checks for bulk upserting statement', () => {
+    const res = service.generateBulkInsertStatement(
+      insertStatementInput.args.schema as any,
+      insertStatementInput.args.data as any,
+    );
+
+    expect(res).toBe(insertStatementInput.output);
+  });
+
+  it('checks for create statement with proper unique constraint', async () => {
+    const res = service.generateCreateStatement(
+      createStatementInput.args.schema as any,
+      createStatementInput.args.autoPrimaryKey,
+    );
+
+    expect(res).toBe(createStatementInput.output);
   });
 });

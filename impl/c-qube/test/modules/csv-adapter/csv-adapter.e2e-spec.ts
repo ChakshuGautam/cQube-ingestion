@@ -12,6 +12,10 @@ import { DimensionGrammarService } from './../../../src/services/csv-adapter/par
 import { Pool } from 'pg';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
+// importing JSONs
+import * as multiple_first from '../../fixtures/outputDatasets/multiple_first.json';
+import * as multiple_second from '../../fixtures/outputDatasets/multiple_second.json';
+
 describe('AppController (e2e)', () => {
   let app: INestApplication;
   let csvAdapterService: CsvAdapterService;
@@ -119,5 +123,43 @@ describe('AppController (e2e)', () => {
 
     expect(data).toBeDefined();
     expect(data).toEqual([]);
+  });
+
+  it('should test for multiple ingestion', async () => {
+    await csvAdapterService.nuke();
+    await csvAdapterService.ingest(
+      './test/fixtures/ingestionConfigs',
+      'config.multiple.json',
+    );
+    await csvAdapterService.ingestData({});
+
+    // check that the values are correct
+
+    let data = await csvAdapterService.prisma.$queryRawUnsafe(
+      'SELECT grade_diksha, sum, count, avg FROM datasets.diksha_avg_play_time_in_mins_on_app_and_portal_grade',
+    );
+    // remove id col
+
+    expect(data).toEqual(
+      expect.arrayContaining(
+        multiple_first.map((item) => {
+          delete item.id;
+          return item;
+        }),
+      ),
+    );
+
+    await csvAdapterService.ingestData({});
+    data = await csvAdapterService.prisma.$queryRawUnsafe(
+      'SELECT grade_diksha, sum, count, avg FROM datasets.diksha_avg_play_time_in_mins_on_app_and_portal_grade',
+    );
+    expect(data).toEqual(
+      expect.arrayContaining(
+        multiple_second.map((item) => {
+          delete item.id;
+          return item;
+        }),
+      ),
+    );
   });
 });

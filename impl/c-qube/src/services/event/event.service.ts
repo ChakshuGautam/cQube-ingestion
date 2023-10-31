@@ -15,6 +15,10 @@ import { QueryBuilderService } from '../query-builder/query-builder.service';
 import { DimensionService } from '../dimension/dimension.service';
 import { DimensionMapping } from 'src/types/dataset';
 import { DimensionGrammar } from 'src/types/dimension';
+import {
+  getEGDefFromDB,
+  getEGDefFromFile,
+} from '../csv-adapter/parser/event-grammar/event-grammar.service';
 
 @Injectable()
 export class EventService {
@@ -65,6 +69,10 @@ export class EventService {
       await this.dimensionService.getDimensionGrammaModelByName(
         eventGrammar.dimension[0].dimension.name.name,
       );
+    const { eventGrammarDef, instrumentField } = await getEGDefFromFile(
+      eventGrammar.file,
+    );
+
     return this.prisma.eventGrammar
       .create({
         data: {
@@ -82,6 +90,8 @@ export class EventService {
               },
             },
           ]),
+          metric: eventGrammar.instrument_field,
+          egSchema: JSON.stringify(eventGrammarDef),
           instrument: {
             connect: {
               name: 'COUNTER', //TODO: Change this to eventGrammar.instrument.name
