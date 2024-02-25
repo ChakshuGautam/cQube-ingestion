@@ -44,15 +44,31 @@ describe('CSVReader', () => {
     expect(result).toEqual(false);
   });
 
-  it('should correctly process CSV data with case insensitivity', async () => {
-    const filePath = './test/fixtures/test-csvs/csvreader/fksearch.csv';
-    const expectedRows = [
-      ['1', 'john', '30'],
-      ['2', 'david', '25'],
-      ['3', 'michael', '22'],
-      ['4', 'mary', '28'],
-    ];
-    const rows = await readCSV(filePath);
-    expect(rows).toEqual(expectedRows);
+  /* checks if the caseSensitiveFKSearch is set to true or false.
+   * Based on that runs test case to cover
+   * any possible edge case that may arise.
+   */
+  it('should set caseSensitiveFKSearch to true', async () => {
+    if (FKvalue('ingest/config.json')) {
+      const filePath = './test/fixtures/test-csvs/csvreader/fksearch.csv';
+      const expectedRows = [
+        ['1', 'John', '30'],
+        ['2', 'DAVID', '25'],
+        ['3', 'Michael', '22'],
+        ['4', 'MARY', '28'],
+      ];
+      const rows = await readCSV(filePath);
+      expect(rows).toEqual(expectedRows);
+    } else {
+      const filePath = './test/fixtures/test-csvs/csvreader/fksearch.csv';
+      const expectedRows = [
+        ['1', 'john', '30'],
+        ['2', 'david', '25'],
+        ['3', 'michael', '22'],
+        ['4', 'mary', '28'],
+      ];
+      const rows = await readCSV(filePath);
+      expect(rows).toEqual(expectedRows);
+    }
   });
 });
