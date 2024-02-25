@@ -1,19 +1,30 @@
 const fs1 = require('fs');
 const fs = require('fs').promises;
+import * as fs2 from 'fs';
 
 import * as csv from 'csv-parser';
+import { fsync } from 'fs';
 
-export async function readCSV(filePath: string, configPath?: string, quoteChar?: string): Promise<string[][]> {
+export async function readCSV(
+  filePath: string,
+  configPath?: string,
+  quoteChar?: string,
+): Promise<string[][]> {
   return new Promise((resolve, reject) => {
-    const rows: string[][] = configPath ? [] : [[]]; 
+    const rows: string[][] = configPath ? [] : [[]];
     if (configPath) {
       const configquote = getquoteChar(configPath);
       quoteChar = configquote || quoteChar || "'";
     } else {
       quoteChar = quoteChar || "'";
     }
-    
+
     // TODO: Add checking here
+    if (!fs2.existsSync(filePath)) {
+      reject(new Error('Invalid file path'));
+      return;
+    }
+
     fs1
       .createReadStream(filePath)
       .pipe(csv({ separator: ',', headers: false, quote: quoteChar }))
@@ -38,7 +49,7 @@ export async function readCSVFile(filePath: string): Promise<string[]> {
     .filter((row: string) => row !== '');
 }
 
-export function getquoteChar (configPath: string): string | undefined {
+export function getquoteChar(configPath: string): string | undefined {
   try {
     const configContent = fs1.readFileSync(configPath, 'utf-8');
     const config = JSON.parse(configContent);
