@@ -1,6 +1,9 @@
 {
   "globals": {
-    "onlyCreateWhitelisted": true
+    "onlyCreateWhitelisted": true,
+    "csvDelimiter": ";",
+    "caseSensitiveFKSearch": false,
+    "quoteChar": "`"
   },
   "dimensions": {
     "namespace": "dimensions",
@@ -68,9 +71,7 @@
         "location": "./output/programs/pm-poshan"
       },
       "dimensions": {
-        "whitelisted": [
-          "district,categorypm"
-        ],
+        "whitelisted": ["district,categorypm"],
         "blacklisted": []
       }
     },
@@ -86,10 +87,7 @@
         "location": "./output/programs/nas"
       },
       "dimensions": {
-        "whitelisted": [
-          "district,lo,subject,grade",
-          "state,lo,subject,grade"
-        ],
+        "whitelisted": ["district,lo,subject,grade", "state,lo,subject,grade"],
         "blacklisted": []
       }
     },
@@ -105,10 +103,7 @@
         "location": "./output/programs/udise"
       },
       "dimensions": {
-        "whitelisted": [
-          "district,categoryudise",
-          "state,categoryudise"
-        ],
+        "whitelisted": ["district,categoryudise", "state,categoryudise"],
         "blacklisted": []
       }
     },
@@ -144,10 +139,7 @@
         "location": "./output/programs/pgi"
       },
       "dimensions": {
-        "whitelisted": [
-          "state,district,categorypgi",
-          "state,categorypgi"
-        ],
+        "whitelisted": ["state,district,categorypgi", "state,categorypgi"],
         "blacklisted": []
       }
     },
