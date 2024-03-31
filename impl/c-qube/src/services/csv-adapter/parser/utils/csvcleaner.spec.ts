@@ -30,8 +30,9 @@ describe('remove empty lines', () => {
     const expectedFiles = [
       'test/fixtures/test-csvs/csvcleaner/withEmpty.csv',
       'test/fixtures/test-csvs/csvcleaner/withoutEmpty.csv',
-      "test/fixtures/test-csvs/csvreader/fksearch.csv",
+      'test/fixtures/test-csvs/csvreader/fksearch.csv',
       'test/fixtures/test-csvs/csvreader/invalid.reader.csv',
+      'test/fixtures/test-csvs/csvreader/quote.csv',
       'test/fixtures/test-csvs/csvreader/valid.reader.csv',
       'test/fixtures/test-csvs/event-grammars/test-dimension.grammar.csv',
       'test/fixtures/test-csvs/event-grammars/incorrect_length-dimension.grammar.csv',
@@ -44,7 +45,7 @@ describe('remove empty lines', () => {
   });
   test('processSleep resolves after the specified time', async () => {
     const startTime = Date.now();
-    const sleepTime = 2000; 
+    const sleepTime = 2000;
     await processSleep(sleepTime);
     const elapsedTime = Date.now() - startTime;
     expect(elapsedTime).toBeGreaterThanOrEqual(sleepTime);
