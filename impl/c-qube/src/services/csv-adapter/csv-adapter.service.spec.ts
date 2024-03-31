@@ -11,7 +11,15 @@ import { DimensionGrammarService } from './parser/dimension-grammar/dimension-gr
 import { Pool } from 'pg';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { WinstonModule } from 'nest-winston';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+import {
+  mockDatasetGrammar,
+  mockDimensionGrammar,
+  mockEvent,
+  mockEventGrammar,
+} from '../mocks/types.mocks';
+import { DimensionGrammar } from 'src/types/dimension';
+import { getFilesInDirectory } from './parser/utils/csvcleaner';
+const path = require('path'); // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs').promises;
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs1 = require('fs');
@@ -24,8 +32,25 @@ const readline = require('readline');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const retry = require('retry');
 
+const getCompoundDatasetGrammarsMock = jest.fn().mockResolvedValue([
+  {
+    tableName: 'program_name_hash1',
+    tableNameExpanded: 'program_name_0X0Y0Z0T',
+  },
+  {
+    tableName: 'program_name_hash2',
+    tableNameExpanded: 'program_name_1A1B1C1D',
+  },
+]);
+DatasetService.prototype.getCompoundDatasetGrammars =
+  getCompoundDatasetGrammarsMock;
+
 describe('CsvAdapterService', () => {
   let service: CsvAdapterService;
+  let dimensionService: DimensionService;
+  let eventService: EventService;
+  let datasetService: DatasetService;
+
   const databasePoolFactory = async (configService: ConfigService) => {
     return new Pool({
       user: configService.get('DB_USERNAME'),
@@ -38,7 +63,7 @@ describe('CsvAdapterService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [ConfigModule, WinstonModule.forRoot({}) ],
+      imports: [ConfigModule, WinstonModule.forRoot({})],
       providers: [
         CsvAdapterService,
         EventService,
@@ -56,11 +81,13 @@ describe('CsvAdapterService', () => {
     }).compile();
 
     service = module.get<CsvAdapterService>(CsvAdapterService);
+    dimensionService = module.get<DimensionService>(DimensionService);
+    eventService = module.get<EventService>(EventService);
   });
 
-  // it('should be defined', () => {
-  //   expect(service).toBeDefined();
-  // });
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
 
   it('should create a temp csv file', async () => {
     const inputFile = 'fixtures/dimension-with-comma.csv';
@@ -139,7 +166,7 @@ describe('CsvAdapterService', () => {
 
     const filePath = 'fixtures/dimension-with-comma.csv';
     const df = await readCSV(filePath);
-    df.shift(); // Remove the header row
+    df.shift();
   });
 
   it('should retry an async await method', async () => {
@@ -158,8 +185,6 @@ describe('CsvAdapterService', () => {
         if (nthTry === 1) {
           return Promise.reject(e);
         }
-        // console.log('retrying', nthTry, 'time');
-        // wait for delayTime amount of time before calling this method again
         await waitFor(delayTime);
         return retryPromiseWithDelay(promise, nthTry - 1, delayTime);
       }
@@ -182,74 +207,120 @@ describe('CsvAdapterService', () => {
     expect(responseWithError).toBe('error from test');
   });
 
-  // it('should create dimensions out of CSV', async () => {
-  //   const dimensionGrammar: DimensionGrammar =
-  //     await createDimensionGrammarFromCSVDefinition(
-  //       'fixtures/cluster-dimension.grammar.csv',
-  //     );
+  it('should create a valid hashtable', async () => {
+    await service.ingest();
+    expect(getCompoundDatasetGrammarsMock).toHaveBeenCalled();
+  });
 
-  //   expect(dimensionGrammar).toBeDefined();
-  //   const expectedDimensionGrammar: DimensionGrammar = {
-  //     name: 'cluster',
-  //     description: '',
-  //     type: 'dynamic',
-  //     storage: {
-  //       indexes: ['name'],
-  //       primaryId: 'cluster_id',
-  //       retention: null,
-  //       bucket_size: null,
-  //     },
-  //     schema: {
-  //       title: 'cluster',
-  //       psql_schema: 'dimensions',
-  //       properties: {
-  //         cluster_id: {
-  //           type: 'string',
-  //           unique: true,
-  //         },
-  //         cluster_name: {
-  //           type: 'string',
-  //           unique: true,
-  //         },
-  //         block_id: {
-  //           type: 'string',
-  //           unique: false,
-  //         },
-  //         block_name: {
-  //           type: 'string',
-  //           unique: false,
-  //         },
-  //         district_id: {
-  //           type: 'string',
-  //           unique: false,
-  //         },
-  //         district_name: {
-  //           type: 'string',
-  //           unique: false,
-  //         },
-  //         latitude: {
-  //           type: 'string',
-  //           unique: false,
-  //         },
-  //         longitude: {
-  //           type: 'string',
-  //           unique: false,
-  //         },
-  //       },
-  //       indexes: [
-  //         {
-  //           columns: [['cluster_name']],
-  //         },
-  //       ],
-  //     },
-  //   };
-  //   expect(dimensionGrammar).toEqual(expectedDimensionGrammar);
+  it('should ingest data without any errors', async () => {
+    const mockDatasetService = {
+      getNonCompoundDatasetGrammars: () => Promise.resolve([]),
+      getCompoundDatasetGrammars: () => Promise.resolve([]),
+      processDatasetUpdateRequest: () => Promise.resolve(),
+    };
+    const testProgramDir = './ingest/programs';
+    await service.ingestData.call(
+      {
+        nukeDatasets: async () => {},
+        logger: {
+          verbose: jest.fn(),
+          warn: jest.fn(),
+        },
+        datasetService: mockDatasetService,
+      },
+      null,
+      testProgramDir,
+    );
+  });
 
-  //   //Pretty print dimensionGrammar object
-  //   // console.log(JSON.stringify(dimensionGrammar, null, 2));
-  // });
+  it('should create dimensions out of CSV', async () => {
+    const dimensionGrammar: DimensionGrammar =
+      await service.dimensionGrammarService.createDimensionGrammarFromCSVDefinition(
+        'fixtures/cluster-dimension.grammar.csv',
+      );
 
-  // Run first
+    expect(dimensionGrammar).toBeDefined();
+    const expectedDimensionGrammar: DimensionGrammar = {
+      name: 'cluster',
+      description: '',
+      type: 'dynamic',
+      storage: {
+        indexes: ['name'],
+        primaryId: 'cluster_id',
+        retention: null,
+        bucket_size: null,
+      },
+      schema: {
+        title: 'cluster',
+        psql_schema: 'dimensions',
+        properties: {
+          cluster_id: {
+            type: 'string',
+            unique: true,
+          },
+          cluster_name: {
+            type: 'string',
+            unique: true,
+          },
+          block_id: {
+            type: 'string',
+            unique: false,
+          },
+          block_name: {
+            type: 'string',
+            unique: false,
+          },
+          district_id: {
+            type: 'string',
+            unique: false,
+          },
+          district_name: {
+            type: 'string',
+            unique: false,
+          },
+          latitude: {
+            type: 'string',
+            unique: false,
+          },
+          longitude: {
+            type: 'string',
+            unique: false,
+          },
+        },
+        indexes: [
+          {
+            columns: [['cluster_name']],
+          },
+        ],
+      },
+    };
+    expect(dimensionGrammar).toEqual(expectedDimensionGrammar);
+  });
+
+  it('should ingest data without any errors', async () => {
+    const mockDatasetService = {
+      getNonCompoundDatasetGrammars: () => Promise.resolve([]),
+      getCompoundDatasetGrammars: () => Promise.resolve([]),
+      processDatasetUpdateRequest: () => Promise.resolve(),
+    };
+
+    const testProgramDir = './ingest/programs';
+
+    await service.ingestData.call(
+      {
+        nukeDatasets: async () => {},
+        logger: {
+          verbose: jest.fn(),
+          warn: jest.fn(),
+        },
+        datasetService: mockDatasetService,
+      },
+      null,
+      testProgramDir,
+    );
+  });
+
+  // // Run first
   // describe('CSV Ingest', () => {
   //   it('should process a CSV', async () => {
   //     const csvPath = 'fixtures/2023-01-11.csv';
@@ -327,23 +398,23 @@ describe('CsvAdapterService', () => {
   // });
 
   // Run second
-  // describe('Nuke DB', () => {
-  //   it('should test nuke database', async () => {
-  //     await service.nuke();
-  //     const pendingDimensions: any[] = await service.prisma
-  //       .$queryRaw`select * from pg_tables where schemaname = 'dimension'`;
-  //     const pendingDatasets: any[] = await service.prisma
-  //       .$queryRaw`select * from pg_tables where schemaname = 'datasets'`;
-  //     const currentDatasetGrammars =
-  //       await service.prisma.datasetGrammar.findMany();
-  //     const currentDimensionGrammars =
-  //       await service.prisma.dimensionGrammar.findMany();
-  //     const currenEventGrammars = await service.prisma.eventGrammar.findMany();
-  //     expect(currenEventGrammars.length).toEqual(0);
-  //     expect(currentDimensionGrammars.length).toEqual(0);
-  //     expect(currentDatasetGrammars.length).toEqual(0);
-  //     expect(pendingDimensions.length).toEqual(0);
-  //     expect(pendingDatasets.length).toEqual(0);
-  //   });
-  // });
+  describe('Nuke DB', () => {
+    it('should test nuke database', async () => {
+      await service.nuke();
+      const pendingDimensions: any[] = await service.prisma
+        .$queryRaw`select * from pg_tables where schemaname = 'dimension'`;
+      const pendingDatasets: any[] = await service.prisma
+        .$queryRaw`select * from pg_tables where schemaname = 'datasets'`;
+      const currentDatasetGrammars =
+        await service.prisma.datasetGrammar.findMany();
+      const currentDimensionGrammars =
+        await service.prisma.dimensionGrammar.findMany();
+      const currenEventGrammars = await service.prisma.eventGrammar.findMany();
+      expect(currenEventGrammars.length).toEqual(0);
+      expect(currentDimensionGrammars.length).toEqual(0);
+      expect(currentDatasetGrammars.length).toEqual(0);
+      expect(pendingDimensions.length).toEqual(0);
+      expect(pendingDatasets.length).toEqual(0);
+    });
+  });
 });

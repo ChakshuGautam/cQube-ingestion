@@ -1,16 +1,32 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JSONSchema4 } from 'json-schema';
 import { QueryBuilderService } from './query-builder.service';
+import { mockDimensionGrammar, mockEventGrammar } from '../mocks/types.mocks';
+import { PrismaService } from '../../prisma.service';
+import { DimensionService } from '../dimension/dimension.service';
+import { EventService } from '../event/event.service';
+
+
 
 describe('QueryBuilderService', () => {
   let service: QueryBuilderService;
+  let dimensionService: DimensionService;
+  let prismaService: PrismaService;
+  let eventService: EventService;
+
+
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [QueryBuilderService],
+      providers: [QueryBuilderService, PrismaService, DimensionService, EventService],
     }).compile();
 
     service = module.get<QueryBuilderService>(QueryBuilderService);
+    prismaService = module.get<PrismaService>(PrismaService);
+    dimensionService = module.get<DimensionService>(DimensionService);
+    eventService = module.get<EventService>(EventService);
+
+
   });
 
   it('generates a create statement with a single integer column', () => {
@@ -50,6 +66,20 @@ describe('QueryBuilderService', () => {
         'CREATE TABLE my_schema.my_table (\n  name VARCHAR\n);',
       ),
     );
+  });
+
+  it('should log errors when there is an error in the create query', async () => {
+    const error = new Error('Some error occurred');
+    const autoPrimaryKey = true;
+    const createQuery = 'CREATE TABLE school ...';
+    const indexQuery = ['CREATE INDEX ...', 'CREATE INDEX ...'];
+    jest.spyOn(service, 'generateCreateStatement').mockReturnValue(createQuery);
+    jest.spyOn(service, 'generateIndexStatement').mockReturnValue(indexQuery);
+    const $queryRawUnsafeSpy = jest.spyOn(prismaService, '$queryRawUnsafe').mockRejectedValue(error);
+    await dimensionService.createDimension(mockDimensionGrammar(), autoPrimaryKey);
+    expect(service.generateCreateStatement).toHaveBeenCalledWith(mockDimensionGrammar().schema, autoPrimaryKey);
+    expect(service.generateIndexStatement).toHaveBeenCalledWith(mockDimensionGrammar().schema);
+    expect(prismaService.$queryRawUnsafe).toHaveBeenCalledWith(createQuery);
   });
 
   it('generates a create statement with a string column with a max length', () => {
@@ -240,5 +270,26 @@ describe('QueryBuilderService', () => {
         date_created TIMESTAMP
       );`),
     );
+  });
+
+  it('should call generateInsertStatement with the correct parameters', async () => {
+    jest.spyOn(service, 'generateInsertStatement').mockReturnValue('INSERT QUERY');
+    const data = { field1: 'value1', field2: 'value2' };
+    await eventService.processEventData(mockEventGrammar(), data);
+    expect(service.generateInsertStatement(mockEventGrammar().schema, data)).toBe('INSERT QUERY');
+    expect(service.generateInsertStatement).toHaveBeenCalledWith(mockEventGrammar().schema, data);
+  });
+
+  it('should call generateInsertStatement with the correct parameters', async () => {
+  const mockInsertQuery = 'mock-insert-query';
+    const mockError = new Error('Some error occurred');
+    const data = [
+      { name: 'value1', date_created: '2020-01-01T00:00:00.000Z' },
+      { name: 'value2', date_created: '2020-01-02T00:00:00.000Z' },
+    ];     jest.spyOn(service, 'generateBulkInsertStatementOld').mockReturnValue(mockInsertQuery);
+    prismaService.$queryRawUnsafe = jest.fn().mockRejectedValue(mockError);
+    await dimensionService.insertBulkDimensionDataV2(mockDimensionGrammar(), data);
+    expect(service.generateBulkInsertStatementOld).toHaveBeenCalledWith(mockDimensionGrammar().schema, data);
+    expect(prismaService.$queryRawUnsafe).toHaveBeenCalledWith(mockInsertQuery);
   });
 });

@@ -42,7 +42,7 @@ export async function processCsv(input, output) {
   });
 }
 
-async function processSleep(time) {
+export async function processSleep(time) {
   return new Promise((resolve) => setTimeout(resolve, time));
 }
 
