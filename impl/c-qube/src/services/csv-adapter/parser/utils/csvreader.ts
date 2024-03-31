@@ -9,6 +9,7 @@ const configPath = 'ingest/config.json';
 export async function readCSV(
   filePath: string,
   configPath?: string,
+  delimiter?: string,
   quoteChar?: string,
 ): Promise<string[][]> {
   return new Promise((resolve, reject) => {
@@ -16,8 +17,12 @@ export async function readCSV(
     if (configPath) {
       const configquote = getquoteChar(configPath);
       quoteChar = configquote || quoteChar || "'";
+      const configDelimiter = getCsvDelimiter(configPath);
+      delimiter = configDelimiter || delimiter || ',';
+      console.log('delimiter', delimiter);
     } else {
       quoteChar = quoteChar || "'";
+      delimiter = delimiter || ',';
     }
 
     // TODO: Add checking here
@@ -28,7 +33,7 @@ export async function readCSV(
 
     fs1
       .createReadStream(filePath)
-      .pipe(csv({ separator: ',', headers: false, quote: quoteChar }))
+      .pipe(csv({ separator: delimiter, headers: false, quote: quoteChar }))
       .on('data', (data) => {
         const rowValues: string[] = Object.values(data);
         const processedRowValues = FKvalue(configPath)
@@ -68,4 +73,14 @@ export function FKvalue(configPath: string): boolean {
   const configContent = fs1.readFileSync(configPath, 'utf-8');
   const config = JSON.parse(configContent);
   return config.globals.caseSensitiveFKSearch || false;
+}
+
+export function getCsvDelimiter(configPath: string): string | undefined {
+  try {
+    const configContent = fs1.readFileSync(configPath, 'utf-8');
+    const config = JSON.parse(configContent);
+    return config.globals.csvDelimiter;
+  } catch (error) {
+    return undefined;
+  }
 }

@@ -1,6 +1,7 @@
 {
   "globals": {
     "onlyCreateWhitelisted": true,
+    "csvDelimiter": ";",
     "caseSensitiveFKSearch": false,
     "quoteChar": "`"
   },
